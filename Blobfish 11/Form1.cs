@@ -32,11 +32,138 @@ namespace Blobfish_11
     public class position
     {
         private readonly string FEN;
+        public bool whiteToMove;
+        private int halfMoveClock = 0;
+        private int moveCounter = 0;
+        private int[] enPassantSquare = new int[2];
+        private bool[] castlingRights = new bool[4];
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
         public position(string FEN)
         {
             this.FEN = FEN;
+            int column = 0, row = 0;
+            square[,] board = new square[8, 8]; //TODO: Make higher
+            string boardString = FEN.Substring(0, FEN.IndexOf(' '));
+            foreach (char tkn in boardString)
+            {
+                switch (tkn)
+                {
+                    case 'p':
+                        board[row, column].piece = tkn;
+                        column++;
+                        break;
+                    case 'P':
+                        board[row, column].piece = tkn;
+                        column++;
+                        break;
+
+                    case 'n':
+                        board[row, column].piece = tkn;
+                        column++; break;
+                    case 'N':
+                        board[row, column].piece = tkn;
+                        column++; break;
+
+                    case 'b':
+                        board[row, column].piece = tkn;
+                        column++; break;
+                    case 'B':
+                        board[row, column].piece = tkn;
+                        column++; break;
+
+                    case 'r':
+                        board[row, column].piece = tkn;
+                        column++; break;
+                    case 'R':
+                        board[row, column].piece = tkn;
+                        column++; break;
+
+                    case 'k':
+                        board[row, column].piece = tkn;
+                        column++; break;
+                    case 'K':
+                        board[row, column].piece = tkn;
+                        column++; break;
+
+                    case 'q':
+                        board[row, column].piece = tkn;
+                        column++; break;
+                    case 'Q':
+                        board[row, column].piece = tkn;
+                        column++; break;
+
+                    case '/': column = 0; row++; break;
+                    case '1': column += 1; break;
+                    case '2': column += 2; break;
+                    case '3': column += 3; break;
+                    case '4': column += 4; break;
+                    case '5': column += 5; break;
+                    case '6': column += 6; break;
+                    case '7': column += 7; break;
+                    case '8': break;
+                    default:
+                        column++;
+                        break;
+                }
+            }
+            if (FEN[FEN.IndexOf(' ') + 1] == 'w') this.whiteToMove = true;
+            else this.whiteToMove = false;
+            int temp = FEN.IndexOf(' ');
+            string infoString = FEN.Substring(FEN.IndexOf(' ') + 3, FEN.Length - FEN.IndexOf(' ') - 3);
+            int tep = infoString.IndexOf(' ');
+            string castlingString = infoString.Substring(0, infoString.IndexOf(' ')); //Till exempel: KQkq
+            #region castlingRights
+            if (castlingString == "-")
+            {
+                 castlingRights =  new bool[] { false, false, false, false };
+            }
+            else
+            {
+                if (castlingString.Contains('K'))
+                {
+                    castlingRights[0] = true;
+                }
+                if (castlingString.Contains('Q'))
+                {
+                    castlingRights[1] = true;
+                }
+                if (castlingString.Contains('k'))
+                {
+                    castlingRights[2] = true;
+                }
+                if (castlingString.Contains('q'))
+                {
+                    castlingRights[3] = true;
+                }
+            }
+            #endregion
+            string EPString = infoString.Substring(infoString.IndexOf(' ')+1, infoString.Length - infoString.IndexOf(' ')-1);
+            //Till exempel: c6 0 2
+            if (EPString[0] == '-')
+            {
+                enPassantSquare = new int[] { -1, -1 };
+            }
+            else
+            {
+                int EPcolumn = EPString[0] - 'a';
+                int EProw = EPString[1] - '1';
+                if (EPcolumn < 0 || EPcolumn > 7 || EProw < 0 || EProw > 7)
+                {
+                    throw new Exception("Felaktig FEN."); //TODO: Hantera
+                }
+                enPassantSquare[0] = EProw;
+                enPassantSquare[1] = EPcolumn; //Eftersom ordingen är omvänd i FEN.
+            }
+            string lastString = EPString.Substring(EPString.IndexOf(' ')+1, EPString.Length - EPString.IndexOf(' ')-1);
+            //Till exempel: "1 2".
+            string clockString = lastString.Substring(0, lastString.IndexOf(' '));
+            //Till exempel: "1".
+            this.halfMoveClock = int.Parse(clockString);
+            string moveString = lastString.Substring(lastString.IndexOf(' '), lastString.Length - lastString.IndexOf(' '));
+            this.moveCounter = int.Parse(moveString);
+            //Till exempel: "2".
+
         }
         public double eval()
         {
@@ -44,17 +171,16 @@ namespace Blobfish_11
         }
         public double extract()
         {
-            /* [row, column]
+            /* 
+             * [row, column]
              * row==0       -> rad 8.
              * row==7       -> rad 1.
              * column==0    -> a-linjen.
              * column==7    -> h-linjen.
              */
-
-
             int[] numberOfPawns = new int[2];
             int[,] kingPositions = new int[2, 2];
-            square[,] board = new square[8, 8];
+            square[,] board = new square[8, 8]; //TODO: Make higher
             double[] posFactor = { 1f, 1f };
             int[,] pawns = new int[2, 8]; //0=black, 1=white.
             bool done = false; //TODO: substring?
@@ -69,16 +195,14 @@ namespace Blobfish_11
                 {
                     case 'p':
                         board[row, column].piece = tkn;
-                        board[row, column].piece = 'p';
                         numberOfPawns[0]++;
                         pawns[0, column]++;
                         posFactor[0] += placement.pawn[0, row, column];
                         column++;
-                        whiteSquare = !whiteSquare;
+                       
                         break;
                     case 'P':
                         board[row, column].piece = tkn;
-                        board[row, column].piece = 'P';
                         numberOfPawns[1]++;
                         pawns[1, column]++;
                         posFactor[1] += placement.pawn[1, row, column];
@@ -187,16 +311,46 @@ namespace Blobfish_11
                             if (column < 7)
                             {
                                 board[row + 1, column + 1].bControl = true;
-                                if (board[row + 1, column + 1].piece > 'Z') //Svart pjäs
+                                if (board[row + 1, column + 1].piece < 'Z') //Vit pjäs
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
+
                                 }
                             }
-                            //moves.Add( new Move())
+                            if (board[row + 1, column].piece == '\0') //Tomt fält
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column }));
+                                if(row == 1 && board[row + 2, column].piece == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 2, column }));
+                                }
+                            }
                             break;
                         case 'P':
-                            if (column > 0) board[row - 1, column - 1].wControl = true;
-                            if (column < 7) board[row - 1, column + 1].wControl = true;
+                            if (column > 0)
+                            {
+                                board[row + 1, column - 1].wControl = true;
+                                if (board[row + 1, column - 1].piece > 'Z') //Svart pjäs
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
+                                }
+                            }
+                            if (column < 7)
+                            {
+                                board[row + 1, column + 1].wControl = true;
+                                if (board[row + 1, column + 1].piece > 'Z') //Svart pjäs
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
+                                }
+                            }
+                            if (board[row + 1, column].piece == '\0') //Tomt fält
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column }));
+                                if (row == 6 && board[row - 2, column].piece == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 2, column }));
+                                }
+                            }
                             break;
                         case 'k':
                             #region blackKingControl
@@ -810,18 +964,7 @@ namespace Blobfish_11
             { 0.95f, 1f,    1.05f, 1.1f,   1.1f,  1.05f, 1f,    0.95f, },
             { 0.9f,  0.95f, 1f,    1.05f,  1.05f, 1f,    0.95f, 0.9f,  },
             { 0.85f, 0.9f,  0.95f, 1f,     1f,    0.95f, 0.9f,  0.85f, }
-        };/*
-        public static readonly double[,] queen =
-        {
-            { 0.85f, 0.86f, 0.81f, 0.80f, 0.80f, 0.81f, 0.86f, 0.85f },
-            { 0.86f, 1.05f, 1.00f, 0.89f, 0.89f, 1.00f, 1.05f, 0.86f },
-            { 0.81f, 1.00f, 1.37f, 1.21f, 1.21f, 1.37f, 1.00f, 0.81f },
-            { 0.80f, 0.89f, 1.21f, 1.73f, 1.73f, 1.21f, 0.89f, 0.80f },
-            { 0.80f, 0.89f, 1.21f, 1.73f, 1.73f, 1.21f, 0.89f, 0.80f },
-            { 0.81f, 1.00f, 1.37f, 1.21f, 1.21f, 1.37f, 1.00f, 0.81f },
-            { 0.86f, 1.05f, 1.00f, 0.89f, 0.89f, 1.00f, 1.05f, 0.86f },
-            { 0.85f, 0.86f, 0.81f, 0.80f, 0.80f, 0.81f, 0.86f, 0.85f }
-        };*/
+        };
         public static readonly double[,] queen =
         {
             { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f},
