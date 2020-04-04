@@ -28,7 +28,7 @@ namespace Blobfish_11
             evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
             evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
             string temp = pos.getMoves();
-            evalBox.Text = temp;
+            textBox1.Text = temp;
         }
     }
     public class position
@@ -50,7 +50,7 @@ namespace Blobfish_11
             string text = "";
             foreach (Move item in allMoves)
             {
-                text += item.toString(board) + '\n';
+                text += item.toString(board) + Environment.NewLine;
             }
             return text;
         }
@@ -928,7 +928,8 @@ namespace Blobfish_11
                             #region blackPawnMoves
                             if (column > 0)
                             {
-                                if (board[row + 1, column - 1].piece < 'Z'
+                                char pjas = board[row + 1, column - 1].piece;
+                                if ((pjas != '\0' && pjas < 'Z')
                                     || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Vit pjäs  eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column - 1 }));
@@ -936,7 +937,8 @@ namespace Blobfish_11
                             }
                             if (column < 7)
                             {
-                                if (board[row + 1, column + 1].piece < 'Z'
+                                char pjas = board[row + 1, column + 1].piece;
+                                if ((pjas != '\0' && pjas < 'Z')
                                     || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Vit pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
@@ -956,7 +958,7 @@ namespace Blobfish_11
                             #region whitePawnMoves
                             if (column > 0)
                             {
-                                if (board[row + 1, column - 1].piece > 'Z'
+                                if (board[row - 1, column - 1].piece > 'Z'
                                     || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Svart pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
@@ -964,13 +966,13 @@ namespace Blobfish_11
                             }
                             if (column < 7)
                             {
-                                if (board[row + 1, column + 1].piece > 'Z'
+                                if (board[row - 1, column + 1].piece > 'Z'
                                     || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Svart pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
                                 }
                             }
-                            if (board[row + 1, column].piece == '\0') //Tomt fält
+                            if (board[row - 1, column].piece == '\0') //Tomt fält
                             {
                                 moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column }));
                                 if (row == 6 && board[row - 2, column].piece == '\0')
@@ -1152,7 +1154,7 @@ namespace Blobfish_11
                             #region blackBishopMoves
                             int i = 1;
                             bool done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (validSquare(row+i, column+i) && !done)
                             {
                                 char pjas = board[row + i, column + i].piece;
                                 if (pjas == '\0')
@@ -1169,7 +1171,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
+                            while (validSquare(row - i, column + i) && !done)
                             {
                                 char pjas = board[row - i, column + i].piece;
                                 if (pjas == '\0')
@@ -1186,7 +1188,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
+                            while (validSquare(row + i, column - i) && !done)
                             {
                                 char pjas = board[row + i, column - i].piece;
                                 if (pjas == '\0')
@@ -1203,7 +1205,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
+                            while (validSquare(row - i, column - i) && !done)
                             {
                                 char pjas = board[row - i, column - i].piece;
                                 if (pjas == '\0')
@@ -1223,8 +1225,7 @@ namespace Blobfish_11
                         case 'B':
                             #region whiteBishopMoves
                             i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (validSquare(row + i, column + i))
                             {
                                 char pjas = board[row + i, column + i].piece;
                                 if (pjas == '\0')
@@ -1240,8 +1241,7 @@ namespace Blobfish_11
                                 i++;
                             }
                             i = 1;
-                            done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
+                            while (validSquare(row - i, column + i))
                             {
                                 char pjas = board[row - i, column + i].piece;
                                 if (pjas == '\0')
@@ -1257,8 +1257,7 @@ namespace Blobfish_11
                                 i++;
                             }
                             i = 1;
-                            done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
+                            while (validSquare(row + i, column - i))
                             {
                                 char pjas = board[row + i, column - i].piece;
                                 if (pjas == '\0')
@@ -1274,8 +1273,7 @@ namespace Blobfish_11
                                 i++;
                             }
                             i = 1;
-                            done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
+                            while (validSquare(row + i, column - i))
                             {
                                 char pjas = board[row - i, column - i].piece;
                                 if (pjas == '\0')
@@ -1295,8 +1293,7 @@ namespace Blobfish_11
                         case 'r':
                             #region blackRookMoves
                             i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
+                            while (row + i < 8)
                             {
                                 char pjas = board[row + i, column].piece;
                                 if (pjas == '\0')
@@ -1312,10 +1309,9 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
+                            while (row - i >= 0)
                             {
-                                char pjas = board[row + i, column].piece;
+                                char pjas = board[row - i, column].piece;
                                 if (pjas == '\0')
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
@@ -1329,10 +1325,9 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
+                            while (column + i < 8)
                             {
-                                char pjas = board[row + i, column].piece;
+                                char pjas = board[row, column + i].piece;
                                 if (pjas == '\0')
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
@@ -1346,10 +1341,9 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
+                            while (column - i >= 0)
                             {
-                                char pjas = board[row + i, column].piece;
+                                char pjas = board[row, column - i].piece;
                                 if (pjas == '\0')
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
@@ -1367,8 +1361,7 @@ namespace Blobfish_11
                         case 'R':
                             #region whiteRookMoves
                             i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
+                            while (row + i < 8)
                             {
                                 char pjas = board[row + i, column].piece;
                                 if (pjas == '\0')
@@ -1384,8 +1377,7 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
+                            while (row - i >= 0)
                             {
                                 char pjas = board[row - i, column].piece;
                                 if (pjas == '\0')
@@ -1401,8 +1393,7 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
+                            while (column + i < 8)
                             {
                                 char pjas = board[row, column + i].piece;
                                 if (pjas == '\0')
@@ -1418,8 +1409,7 @@ namespace Blobfish_11
                                 else break;
                             }
                             i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
+                            while (column - i >= 0)
                             {
                                 char pjas = board[row, column - i].piece;
                                 if (pjas == '\0')
@@ -1806,6 +1796,10 @@ namespace Blobfish_11
                 else return false;
             }
         }
+        private bool validSquare(int row, int column)
+        {
+            return (row < 8) && (row >= 0) && (column < 8) && (column >= 0);
+        }
     }
     static class placement
     { //TODO: För hårda värden.
@@ -1887,13 +1881,15 @@ namespace Blobfish_11
     {
         public int[] from = new int[2];
         public int[] to = new int[2];
-        public Move(int[] to, int[] from){
+        public Move(int[] from, int[] to){
             this.from = from;
             this.to = to;
         }
         public string toString(square[,] board)
         {
-            string ret = "" + board[from[0], from[1]].piece;
+            string ret = "";
+            if(board[from[0], from[1]].piece != 'p' && board[from[0], from[1]].piece != 'P')
+                ret += board[from[0], from[1]].piece;
             ret = ret.ToUpper();
             ret += ((Char) (from[1] + 'a')).ToString();
             ret += 8 - from[0];
