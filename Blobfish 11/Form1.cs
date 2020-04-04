@@ -41,6 +41,9 @@ namespace Blobfish_11
         public double[] pawnValues = new double[2];
         square[,] board = new square[8, 8];
         int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
+        int[] checkingPieces = { 0, 0, 0, 0 };
+
+
         public position(string FEN)
         {
             this.FEN = FEN;
@@ -173,12 +176,12 @@ namespace Blobfish_11
         public double eval()
         {
             List<Move> moves = controlAndMoves();
+            int result = decisiveResult(moves); //1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
 
             return extract();
         }
         private int[] setControl(int row, int column, bool byWhite)
         {
-            int[] checkingPieces = { -1, -1, -1, -1 }; //Coordinaterna för första, respektive andra shackande pjäs.
             if (byWhite)
             {
                 board[row, column].wControl = true;
@@ -328,7 +331,6 @@ namespace Blobfish_11
                 }
             }
             List<Move> moves = controlAndMoves();
-            int result = decisiveResult(moves ); //1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
 
             posFactor[0] /= numberOfPawns[0];
             posFactor[1] /= numberOfPawns[1];
@@ -336,20 +338,46 @@ namespace Blobfish_11
             this.material = pieceValue;
             return pieceValue + pawnValue;
         }
-        private int decisiveResult(List<Move> moves, int[] checkingPieces)
+        private int decisiveResult(List<Move> moves)
         {
-            int i = 0;
-            if (whiteToMove) i = 1;
+            int c = 0;
+            if (whiteToMove) c = 1;
+            
+            if (whiteToMove)
+            {
+                for (int i = 0; i < moves.Count; i++)
+                {
+                    if (moves[i].from[0] == kingPositions[c, 0] && moves[i].from[1] == kingPositions[c, 1]
+                    && board[moves[i].to[0], moves[i].to[1]].bControl) //Tar bort olagliga kungsdrag för vit
+                    {
+                        moves.RemoveAt(i);
+                    }
+                }
+            }
+            else //Om det är svarts drag
+            {
+                for (int i = 0; i < moves.Count; i++)
+                {
+                    if (moves[i].from[0] == kingPositions[c, 0] && moves[i].from[1] == kingPositions[c, 1]
+                    && board[moves[i].to[0], moves[i].to[1]].wControl) //Tar bort olagliga kungsdrag för svart
+                    {
+                        moves.RemoveAt(i);
+                    }
+                }
+            }
+
             if (checkingPieces[0] != -1) //Schack
             {
-                if (checkingPieces[2] == -1) //Enkelschack
+                bool doubleCheck = (checkingPieces[2] != -1);
+                if (doubleCheck)
                 {
 
                 }
-                else //Dubbelschack
+                else //Enkelschack
                 {
 
                 }
+
             }
             else
             {
@@ -358,7 +386,7 @@ namespace Blobfish_11
 
             return -2;
         }
-        private List<Move> controlAndMoves()
+        private List<Move> controlAndMoves() //Fel! Flytta ut dragen.
         {
             List<Move> moves = new List<Move>();
             for (int row = 0; row < 8; row++)
@@ -368,10 +396,11 @@ namespace Blobfish_11
                     switch (board[row, column].piece)
                     {
                         case 'p':
-                            #region whitePawnControl
+                            #region blackPawnControl
                             if (column > 0) {
                                 setControl(row + 1, column - 1, false);
-                                if(board[row + 1, column - 1].piece < 'Z') //Vit pjäs
+                                if(board[row + 1, column - 1].piece < 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Vit pjäs  eller passant
                                 {
                                     moves.Add(new Move(new int[] {row, column}, new int[] { row+1, column-1 }));
                                 }
@@ -379,10 +408,10 @@ namespace Blobfish_11
                             if (column < 7)
                             {
                                 setControl(row + 1, column + 1, false);
-                                if (board[row + 1, column + 1].piece < 'Z') //Vit pjäs
+                                if (board[row + 1, column + 1].piece < 'Z' 
+                                    || (enPassantSquare[0] == row+1 && enPassantSquare[1] == column + 1)) //Vit pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
-
                                 }
                             }
                             if (board[row + 1, column].piece == '\0') //Tomt fält
@@ -396,11 +425,12 @@ namespace Blobfish_11
                             #endregion
                             break;
                         case 'P':
-                            #region blackPawnControl
+                            #region whitePawnControl
                             if (column > 0)
                             {
                                 setControl(row + 1, column - 1, true);
-                                if (board[row + 1, column - 1].piece > 'Z') //Svart pjäs
+                                if (board[row + 1, column - 1].piece > 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Svart pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
                                 }
@@ -408,7 +438,8 @@ namespace Blobfish_11
                             if (column < 7)
                             {
                                 setControl(row + 1, column + 1, true);
-                                if (board[row + 1, column + 1].piece > 'Z') //Svart pjäs
+                                if (board[row + 1, column + 1].piece > 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Svart pjäs eller passant
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
                                 }
@@ -1056,8 +1087,8 @@ namespace Blobfish_11
     }
     class Move
     {
-        int[] from = new int[2];
-        int[] to = new int[2];
+        public int[] from = new int[2];
+        public int[] to = new int[2];
         public Move(int[] to, int[] from){
             this.from = from;
             this.to = to;
