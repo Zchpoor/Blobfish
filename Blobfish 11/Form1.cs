@@ -39,11 +39,12 @@ namespace Blobfish_11
         private bool[] castlingRights = new bool[4];
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
+        square[,] board = new square[8, 8];
+        int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
         public position(string FEN)
         {
             this.FEN = FEN;
             int column = 0, row = 0;
-            square[,] board = new square[8, 8]; //TODO: Make higher
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
             {
@@ -81,9 +82,13 @@ namespace Blobfish_11
 
                     case 'k':
                         board[row, column].piece = tkn;
+                        kingPositions[0, 0] = row;
+                        kingPositions[0, 1] = column;
                         column++; break;
                     case 'K':
                         board[row, column].piece = tkn;
+                        kingPositions[1, 0] = row;
+                        kingPositions[1, 1] = column;
                         column++; break;
 
                     case 'q':
@@ -167,9 +172,58 @@ namespace Blobfish_11
         }
         public double eval()
         {
-            return this.extract();
+            List<Move> moves = controlAndMoves();
+
+            return extract();
         }
-        public double extract()
+        private int[] setControl(int row, int column, bool byWhite)
+        {
+            int[] checkingPieces = { -1, -1, -1, -1 }; //Coordinaterna för första, respektive andra shackande pjäs.
+            if (byWhite)
+            {
+                board[row, column].wControl = true;
+                if (row == kingPositions[1, 0] && row == kingPositions[1, 1])
+                {
+                    if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
+                    {
+                        checkingPieces[0] = row;
+                        checkingPieces[1] = column;
+                    }
+                    else if(checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
+                    {
+                        checkingPieces[2] = row;
+                        checkingPieces[3] = column;
+                    }
+                    else
+                    {
+                        throw new Exception("Fler än 2 schackande pjäser!");
+                    }
+                }
+            }
+            else
+            {
+                board[row, column].bControl = true;
+                if (row == kingPositions[0, 0] && row == kingPositions[0, 1])
+                {
+                    if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
+                    {
+                        checkingPieces[0] = row;
+                        checkingPieces[1] = column;
+                    }
+                    else if (checkingPieces[3] == -1) //Om detta är den andra pjäsen som schackar
+                    {
+                        checkingPieces[3] = row;
+                        checkingPieces[4] = column;
+                    }
+                    else
+                    {
+                        throw new Exception("Fler än 2 schackande pjäser!");
+                    }
+                }
+            }
+            return checkingPieces;
+        }
+        public double extract() //Förlegad
         {
             /* 
              * [row, column]
@@ -179,7 +233,6 @@ namespace Blobfish_11
              * column==7    -> h-linjen.
              */
             int[] numberOfPawns = new int[2];
-            int[,] kingPositions = new int[2, 2];
             square[,] board = new square[8, 8]; //TODO: Make higher
             double[] posFactor = { 1f, 1f };
             int[,] pawns = new int[2, 8]; //0=black, 1=white.
@@ -274,8 +327,8 @@ namespace Blobfish_11
                         break;
                 }
             }
-            board = controlAndMoves(board);
-            int result = decisiveResult(board, kingPositions); //1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
+            List<Move> moves = controlAndMoves();
+            int result = decisiveResult(moves ); //1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
 
             posFactor[0] /= numberOfPawns[0];
             posFactor[1] /= numberOfPawns[1];
@@ -283,15 +336,29 @@ namespace Blobfish_11
             this.material = pieceValue;
             return pieceValue + pawnValue;
         }
-        private int decisiveResult(square[,] board, int[,] kingPositions)
+        private int decisiveResult(List<Move> moves, int[] checkingPieces)
         {
-            for (int i = 0; i < 2; i++)
+            int i = 0;
+            if (whiteToMove) i = 1;
+            if (checkingPieces[0] != -1) //Schack
+            {
+                if (checkingPieces[2] == -1) //Enkelschack
+                {
+
+                }
+                else //Dubbelschack
+                {
+
+                }
+            }
+            else
             {
 
             }
+
             return -2;
         }
-        private square[,] controlAndMoves(square[,] board)
+        private List<Move> controlAndMoves()
         {
             List<Move> moves = new List<Move>();
             for (int row = 0; row < 8; row++)
@@ -301,8 +368,9 @@ namespace Blobfish_11
                     switch (board[row, column].piece)
                     {
                         case 'p':
+                            #region whitePawnControl
                             if (column > 0) {
-                                board[row + 1, column - 1].bControl = true;
+                                setControl(row + 1, column - 1, false);
                                 if(board[row + 1, column - 1].piece < 'Z') //Vit pjäs
                                 {
                                     moves.Add(new Move(new int[] {row, column}, new int[] { row+1, column-1 }));
@@ -310,7 +378,7 @@ namespace Blobfish_11
                             }
                             if (column < 7)
                             {
-                                board[row + 1, column + 1].bControl = true;
+                                setControl(row + 1, column + 1, false);
                                 if (board[row + 1, column + 1].piece < 'Z') //Vit pjäs
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
@@ -325,11 +393,13 @@ namespace Blobfish_11
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row + 2, column }));
                                 }
                             }
+                            #endregion
                             break;
                         case 'P':
+                            #region blackPawnControl
                             if (column > 0)
                             {
-                                board[row + 1, column - 1].wControl = true;
+                                setControl(row + 1, column - 1, true);
                                 if (board[row + 1, column - 1].piece > 'Z') //Svart pjäs
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
@@ -337,7 +407,7 @@ namespace Blobfish_11
                             }
                             if (column < 7)
                             {
-                                board[row + 1, column + 1].wControl = true;
+                                setControl(row + 1, column + 1, true);
                                 if (board[row + 1, column + 1].piece > 'Z') //Svart pjäs
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
@@ -351,36 +421,37 @@ namespace Blobfish_11
                                     moves.Add(new Move(new int[] { row, column }, new int[] { row - 2, column }));
                                 }
                             }
+                            #endregion
                             break;
                         case 'k':
                             #region blackKingControl
 
                             if (column > 0)
                             {
-                                board[row, column - 1].bControl = true;
+                                setControl(row, column - 1, false);
                                 if (row > 0)
                                 {
-                                    board[row - 1, column - 1].bControl = true;
-                                    board[row - 1, column].bControl = true;
+                                    setControl(row - 1, column - 1, false);
+                                    setControl(row - 1, column, false);
                                 }
                                 if (row < 7)
                                 {
-                                    board[row + 1, column - 1].bControl = true;
-                                    board[row + 1, column].bControl = true;
+                                    setControl(row + 1, column - 1, false);
+                                    setControl(row + 1, column, false);
                                 }
                             }
                             if (column < 7)
                             {
-                                board[row, column + 1].bControl = true;
+                                setControl(row, column + 1, false);
                                 if (row > 0)
                                 {
-                                    board[row - 1, column + 1].bControl = true;
-                                    board[row - 1, column].bControl = true;
+                                    setControl(row - 1, column + 1, false);
+                                    setControl(row - 1, column, false);
                                 }
                                 if (row < 7)
                                 {
-                                    board[row + 1, column + 1].bControl = true;
-                                    board[row + 1, column].bControl = true;
+                                    setControl(row + 1, column + 1, false);
+                                    setControl(row + 1, column, false);
                                 }
                             }
                             #endregion
@@ -389,30 +460,30 @@ namespace Blobfish_11
                             #region whiteKingControl
                             if (column > 0)
                             {
-                                board[row, column - 1].wControl = true;
+                                setControl(row, column - 1, true);
                                 if (row > 0)
                                 {
-                                    board[row - 1, column - 1].wControl = true;
-                                    board[row - 1, column].wControl = true;
+                                    setControl(row - 1, column - 1, true);
+                                    setControl(row - 1, column, true);
                                 }
                                 if (row < 7)
                                 {
-                                    board[row + 1, column - 1].wControl = true;
-                                    board[row + 1, column].wControl = true;
+                                    setControl(row + 1, column - 1, true);
+                                    setControl(row + 1, column, true);
                                 }
                             }
                             if (column < 7)
                             {
-                                board[row, column + 1].wControl = true;
+                                setControl(row, column + 1, true);
                                 if (row > 0)
                                 {
-                                    board[row - 1, column + 1].wControl = true;
-                                    board[row - 1, column].wControl = true;
+                                    setControl(row - 1, column + 1, true);
+                                    setControl(row - 1, column, true);
                                 }
                                 if (row < 7)
                                 {
-                                    board[row + 1, column + 1].wControl = true;
-                                    board[row + 1, column].wControl = true;
+                                    setControl(row + 1, column + 1, true);
+                                    setControl(row + 1, column, true);
                                 }
                             }
                             #endregion
@@ -420,41 +491,41 @@ namespace Blobfish_11
                         case 'n': //TODO: Förbättra!
                             #region blackKnightControl
                             if (row + 2 < 8 && column + 1 < 8)
-                                board[row + 2, column + 1].bControl = true;
+                                setControl(row + 2, column + 1, false);
                             if (row + 2 < 8 && column - 1 > 0)
-                                board[row + 2, column - 1].bControl = true;
+                                setControl(row + 2, column - 1, false);
                             if (row + 1 < 8 && column + 2 < 8)
-                                board[row + 1, column + 2].bControl = true;
+                                setControl(row + 1, column + 2, false);
                             if (row + 1 < 8 && column - 2 > 0)
-                                board[row + 1, column - 2].bControl = true;
+                                setControl(row + 1, column - 2, false);
                             if (row - 1 > 0 && column + 2 < 8)
-                                board[row - 1, column + 2].bControl = true;
+                                setControl(row - 1, column + 2, false);
                             if (row - 1 > 0 && column - 2 > 0)
-                                board[row - 1, column - 2].bControl = true;
+                                setControl(row - 1, column - 2, false);
                             if (row - 2 > 0 && column + 1 < 8)
-                                board[row - 2, column + 1].bControl = true;
+                                setControl(row - 2, column + 1, false);
                             if (row - 2 > 0 && column - 1 > 0)
-                                board[row - 2, column - 1].bControl = true;
+                                setControl(row - 2, column - 1, false);
                             #endregion
                             break;
                         case 'N': //TODO: Förbättra!
                             #region whiteKnightControl
                             if (row + 2 < 8 && column + 1 < 8)
-                                board[row + 2, column + 1].wControl = true;
+                                setControl(row + 2, column + 1, true);
                             if (row + 2 < 8 && column - 1 > 0)
-                                board[row + 2, column - 1].wControl = true;
+                                setControl(row + 2, column - 1, true);
                             if (row + 1 < 8 && column + 2 < 8)
-                                board[row + 1, column + 2].wControl = true;
+                                setControl(row + 1, column + 2, true);
                             if (row + 1 < 8 && column - 2 > 0)
-                                board[row + 1, column - 2].wControl = true;
+                                setControl(row + 1, column - 2, true);
                             if (row - 1 > 0 && column + 2 < 8)
-                                board[row - 1, column + 2].wControl = true;
+                                setControl(row - 1, column + 2, true);
                             if (row - 1 > 0 && column - 2 > 0)
-                                board[row - 1, column - 2].wControl = true;
+                                setControl(row - 1, column - 2, true);
                             if (row - 2 > 0 && column + 1 < 8)
-                                board[row - 2, column + 1].wControl = true;
+                                setControl(row - 2, column + 1, true);
                             if (row - 2 > 0 && column - 1 > 0)
-                                board[row - 2, column - 1].wControl = true;
+                                setControl(row - 2, column - 1, true);
                             #endregion
                             break;
                         case 'b':
@@ -463,7 +534,7 @@ namespace Blobfish_11
                             bool done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].bControl = true;
+                                setControl(row + i, column + i, false);
                                 if (board[row + i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -474,7 +545,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column + i < 8 && !done)
                             {
-                                board[row - i, column + i].bControl = true;
+                                setControl(row - i, column + i, false);
                                 if (board[row - i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -485,8 +556,8 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].bControl = true;
-                                if (board[row + i, column + i].piece != '\0')
+                                setControl(row + i, column - i, false);
+                                if (board[row + i, column - i].piece != '\0')
                                 {
                                     done = true;
                                 }
@@ -496,7 +567,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column - i > 0 && !done)
                             {
-                                board[row - i, column - i].bControl = true;
+                                setControl(row - i, column - i, false);
                                 if (board[row - i, column - i].piece != '\0')
                                 {
                                     done = true;
@@ -511,7 +582,7 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].wControl = true;
+                                setControl(row + i, column + i, true);
                                 if (board[row + i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -522,7 +593,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column + i < 8 && !done)
                             {
-                                board[row - i, column + i].wControl = true;
+                                setControl(row - i, column + i, true);
                                 if (board[row - i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -533,8 +604,8 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].wControl = true;
-                                if (board[row + i, column + i].piece != '\0')
+                                setControl(row + i, column - i, true);
+                                if (board[row + i, column - i].piece != '\0')
                                 {
                                     done = true;
                                 }
@@ -544,7 +615,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column - i > 0 && !done)
                             {
-                                board[row - i, column - i].wControl = true;
+                                setControl(row - i, column - i, true);
                                 if (board[row - i, column - i].piece != '\0')
                                 {
                                     done = true;
@@ -559,7 +630,7 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && !done)
                             {
-                                board[row + i, column].bControl = true;
+                                setControl(row + i, column, false);
                                 if (board[row + i, column].piece != '\0')
                                 {
                                     done = true;
@@ -570,7 +641,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && !done)
                             {
-                                board[row - i, column].bControl = true;
+                                setControl(row - i, column, false);
                                 if (board[row - i, column].piece != '\0')
                                 {
                                     done = true;
@@ -581,7 +652,7 @@ namespace Blobfish_11
                             done = false;
                             while (column + i < 8 && !done)
                             {
-                                board[row, column + i].bControl = true;
+                                setControl(row, column + i, false);
                                 if (board[row, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -592,7 +663,7 @@ namespace Blobfish_11
                             done = false;
                             while (column - i > 0 && !done)
                             {
-                                board[row, column - i].bControl = true;
+                                setControl(row, column - i, false);
                                 if (board[row, column - i].piece != '\0')
                                 {
                                     done = true;
@@ -607,7 +678,7 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && !done)
                             {
-                                board[row + i, column].wControl = true;
+                                setControl(row + i, column, true);
                                 if (board[row + i, column].piece != '\0')
                                 {
                                     done = true;
@@ -618,7 +689,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && !done)
                             {
-                                board[row - i, column].wControl = true;
+                                setControl(row - i, column, true);
                                 if (board[row - i, column].piece != '\0')
                                 {
                                     done = true;
@@ -629,7 +700,7 @@ namespace Blobfish_11
                             done = false;
                             while (column + i < 8 && !done)
                             {
-                                board[row, column + i].wControl = true;
+                                setControl(row, column + i, true);
                                 if (board[row, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -640,100 +711,8 @@ namespace Blobfish_11
                             done = false;
                             while (column - i > 0 && !done)
                             {
-                                board[row, column - i].wControl = true;
+                                setControl(row, column - i, true);
                                 if (board[row, column - i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'Q': //TODO: Förbättra
-                            #region whiteQueenControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
-                            {
-                                board[row + i, column].wControl = true;
-                                if (board[row + i, column].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
-                            {
-                                board[row - i, column].wControl = true;
-                                if (board[row - i, column].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
-                            {
-                                board[row, column + i].wControl = true;
-                                if (board[row, column + i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
-                            {
-                                board[row, column - i].wControl = true;
-                                if (board[row, column - i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                board[row + i, column + i].wControl = true;
-                                if (board[row + i, column + i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
-                            {
-                                board[row - i, column + i].wControl = true;
-                                if (board[row - i, column + i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                board[row + i, column + i].wControl = true;
-                                if (board[row + i, column + i].piece != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
-                            {
-                                board[row - i, column - i].wControl = true;
-                                if (board[row - i, column - i].piece != '\0')
                                 {
                                     done = true;
                                 }
@@ -747,7 +726,7 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && !done)
                             {
-                                board[row + i, column].wControl = true;
+                                setControl(row + i, column, false);
                                 if (board[row + i, column].piece != '\0')
                                 {
                                     done = true;
@@ -758,7 +737,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && !done)
                             {
-                                board[row - i, column].wControl = true;
+                                setControl(row - i, column, false);
                                 if (board[row - i, column].piece != '\0')
                                 {
                                     done = true;
@@ -769,7 +748,7 @@ namespace Blobfish_11
                             done = false;
                             while (column + i < 8 && !done)
                             {
-                                board[row, column + i].wControl = true;
+                                setControl(row, column + i, false);
                                 if (board[row, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -780,7 +759,7 @@ namespace Blobfish_11
                             done = false;
                             while (column - i > 0 && !done)
                             {
-                                board[row, column - i].wControl = true;
+                                setControl(row, column - i, false);
                                 if (board[row, column - i].piece != '\0')
                                 {
                                     done = true;
@@ -791,7 +770,7 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].wControl = true;
+                                setControl(row + i, column + i, false);
                                 if (board[row + i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -802,7 +781,7 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column + i < 8 && !done)
                             {
-                                board[row - i, column + i].wControl = true;
+                                setControl(row - i, column + i, false);
                                 if (board[row - i, column + i].piece != '\0')
                                 {
                                     done = true;
@@ -813,8 +792,8 @@ namespace Blobfish_11
                             done = false;
                             while (row + i < 8 && column + i < 8 && !done)
                             {
-                                board[row + i, column + i].wControl = true;
-                                if (board[row + i, column + i].piece != '\0')
+                                setControl(row + i, column - i, false);
+                                if (board[row + i, column - i].piece != '\0')
                                 {
                                     done = true;
                                 }
@@ -824,7 +803,99 @@ namespace Blobfish_11
                             done = false;
                             while (row - i > 0 && column - i > 0 && !done)
                             {
-                                board[row - i, column - i].wControl = true;
+                                setControl(row - i, column - i, false);
+                                if (board[row - i, column - i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            #endregion
+                            break;
+                        case 'Q': //TODO: Förbättra
+                            #region whiteQueenControl
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && !done)
+                            {
+                                setControl(row + i, column, true);
+                                if (board[row + i, column].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && !done)
+                            {
+                                setControl(row - i, column, true);
+                                if (board[row - i, column].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column + i < 8 && !done)
+                            {
+                                setControl(row, column + i, true);
+                                if (board[row, column + i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column - i > 0 && !done)
+                            {
+                                setControl(row, column - i, true);
+                                if (board[row, column - i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                setControl(row + i, column + i, true);
+                                if (board[row + i, column + i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column + i < 8 && !done)
+                            {
+                                setControl(row - i, column + i, true);
+                                if (board[row - i, column + i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                setControl(row + i, column - i, true);
+                                if (board[row + i, column - i].piece != '\0')
+                                {
+                                    done = true;
+                                }
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column - i > 0 && !done)
+                            {
+                                setControl(row - i, column - i, true);
                                 if (board[row - i, column - i].piece != '\0')
                                 {
                                     done = true;
@@ -837,7 +908,7 @@ namespace Blobfish_11
                     }
                 }
             }
-            return board;
+            return moves;
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
         {
