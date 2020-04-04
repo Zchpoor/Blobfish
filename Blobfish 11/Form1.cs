@@ -27,6 +27,8 @@ namespace Blobfish_11
             evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
             evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
             evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
+            string temp = pos.getMoves();
+            evalBox.Text = temp;
         }
     }
     public class position
@@ -42,8 +44,16 @@ namespace Blobfish_11
         square[,] board = new square[8, 8];
         int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
         int[] checkingPieces = { 0, 0, 0, 0 };
-
-
+        List<Move> allMoves;
+        public string getMoves()
+        {
+            string text = "";
+            foreach (Move item in allMoves)
+            {
+                text += item.toString(board) + '\n';
+            }
+            return text;
+        }
         public position(string FEN)
         {
             this.FEN = FEN;
@@ -175,7 +185,9 @@ namespace Blobfish_11
         }
         public double eval()
         {
-            List<Move> moves = controlAndMoves();
+            calculateControl();
+            List<Move> moves = calculateMoves();
+            allMoves = moves;
             int result = decisiveResult(moves); //1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
 
             return extract();
@@ -330,7 +342,7 @@ namespace Blobfish_11
                         break;
                 }
             }
-            List<Move> moves = controlAndMoves();
+            //calculateControl();
 
             posFactor[0] /= numberOfPawns[0];
             posFactor[1] /= numberOfPawns[1];
@@ -386,9 +398,8 @@ namespace Blobfish_11
 
             return -2;
         }
-        private List<Move> controlAndMoves() //Fel! Flytta ut dragen.
+        private void calculateControl()
         {
-            List<Move> moves = new List<Move>();
             for (int row = 0; row < 8; row++)
             {
                 for (int column = 0; column < 8; column++)
@@ -399,28 +410,10 @@ namespace Blobfish_11
                             #region blackPawnControl
                             if (column > 0) {
                                 setControl(row + 1, column - 1, false);
-                                if(board[row + 1, column - 1].piece < 'Z'
-                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Vit pjäs  eller passant
-                                {
-                                    moves.Add(new Move(new int[] {row, column}, new int[] { row+1, column-1 }));
-                                }
                             }
                             if (column < 7)
                             {
                                 setControl(row + 1, column + 1, false);
-                                if (board[row + 1, column + 1].piece < 'Z' 
-                                    || (enPassantSquare[0] == row+1 && enPassantSquare[1] == column + 1)) //Vit pjäs eller passant
-                                {
-                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
-                                }
-                            }
-                            if (board[row + 1, column].piece == '\0') //Tomt fält
-                            {
-                                moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column }));
-                                if(row == 1 && board[row + 2, column].piece == '\0')
-                                {
-                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 2, column }));
-                                }
                             }
                             #endregion
                             break;
@@ -429,28 +422,10 @@ namespace Blobfish_11
                             if (column > 0)
                             {
                                 setControl(row + 1, column - 1, true);
-                                if (board[row + 1, column - 1].piece > 'Z'
-                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Svart pjäs eller passant
-                                {
-                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
-                                }
                             }
                             if (column < 7)
                             {
                                 setControl(row + 1, column + 1, true);
-                                if (board[row + 1, column + 1].piece > 'Z'
-                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Svart pjäs eller passant
-                                {
-                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
-                                }
-                            }
-                            if (board[row + 1, column].piece == '\0') //Tomt fält
-                            {
-                                moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column }));
-                                if (row == 6 && board[row - 2, column].piece == '\0')
-                                {
-                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 2, column }));
-                                }
                             }
                             #endregion
                             break;
@@ -523,19 +498,19 @@ namespace Blobfish_11
                             #region blackKnightControl
                             if (row + 2 < 8 && column + 1 < 8)
                                 setControl(row + 2, column + 1, false);
-                            if (row + 2 < 8 && column - 1 > 0)
+                            if (row + 2 < 8 && column - 1 >= 0)
                                 setControl(row + 2, column - 1, false);
                             if (row + 1 < 8 && column + 2 < 8)
                                 setControl(row + 1, column + 2, false);
-                            if (row + 1 < 8 && column - 2 > 0)
+                            if (row + 1 < 8 && column - 2 >= 0)
                                 setControl(row + 1, column - 2, false);
-                            if (row - 1 > 0 && column + 2 < 8)
+                            if (row - 1 >= 0 && column + 2 < 8)
                                 setControl(row - 1, column + 2, false);
-                            if (row - 1 > 0 && column - 2 > 0)
+                            if (row - 1 >= 0 && column - 2 >= 0)
                                 setControl(row - 1, column - 2, false);
-                            if (row - 2 > 0 && column + 1 < 8)
+                            if (row - 2 >= 0 && column + 1 < 8)
                                 setControl(row - 2, column + 1, false);
-                            if (row - 2 > 0 && column - 1 > 0)
+                            if (row - 2 >= 0 && column - 1 >= 0)
                                 setControl(row - 2, column - 1, false);
                             #endregion
                             break;
@@ -543,19 +518,19 @@ namespace Blobfish_11
                             #region whiteKnightControl
                             if (row + 2 < 8 && column + 1 < 8)
                                 setControl(row + 2, column + 1, true);
-                            if (row + 2 < 8 && column - 1 > 0)
+                            if (row + 2 < 8 && column - 1 >= 0)
                                 setControl(row + 2, column - 1, true);
                             if (row + 1 < 8 && column + 2 < 8)
                                 setControl(row + 1, column + 2, true);
-                            if (row + 1 < 8 && column - 2 > 0)
+                            if (row + 1 < 8 && column - 2 >= 0)
                                 setControl(row + 1, column - 2, true);
-                            if (row - 1 > 0 && column + 2 < 8)
+                            if (row - 1 >= 0 && column + 2 < 8)
                                 setControl(row - 1, column + 2, true);
-                            if (row - 1 > 0 && column - 2 > 0)
+                            if (row - 1 >= 0 && column - 2 >= 0)
                                 setControl(row - 1, column - 2, true);
-                            if (row - 2 > 0 && column + 1 < 8)
+                            if (row - 2 >= 0 && column + 1 < 8)
                                 setControl(row - 2, column + 1, true);
-                            if (row - 2 > 0 && column - 1 > 0)
+                            if (row - 2 >= 0 && column - 1 >= 0)
                                 setControl(row - 2, column - 1, true);
                             #endregion
                             break;
@@ -585,7 +560,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (row + i < 8 && column - i > 0 && !done)
                             {
                                 setControl(row + i, column - i, false);
                                 if (board[row + i, column - i].piece != '\0')
@@ -633,7 +608,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (row + i < 8 && column - i > 0 && !done)
                             {
                                 setControl(row + i, column - i, true);
                                 if (board[row + i, column - i].piece != '\0')
@@ -821,7 +796,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (row + i < 8 && column - i > 0 && !done)
                             {
                                 setControl(row + i, column - i, false);
                                 if (board[row + i, column - i].piece != '\0')
@@ -913,7 +888,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
+                            while (row + i < 8 && column - i > 0 && !done)
                             {
                                 setControl(row + i, column - i, true);
                                 if (board[row + i, column - i].piece != '\0')
@@ -932,6 +907,816 @@ namespace Blobfish_11
                                     done = true;
                                 }
                                 i++;
+                            }
+                            #endregion
+                            break;
+                        default: break;
+                    }
+                }
+            }
+        }
+        private List<Move> calculateMoves() //TODO: Dela upp i vita och svarta drag.
+        {
+            List<Move> moves = new List<Move>();
+            for (int row = 0; row < 8; row++)
+            {
+                for (int column = 0; column < 8; column++)
+                {
+                    switch (board[row, column].piece)
+                    {
+                        case 'p':
+                            #region blackPawnMoves
+                            if (column > 0)
+                            {
+                                if (board[row + 1, column - 1].piece < 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Vit pjäs  eller passant
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column - 1 }));
+                                }
+                            }
+                            if (column < 7)
+                            {
+                                if (board[row + 1, column + 1].piece < 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Vit pjäs eller passant
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column + 1 }));
+                                }
+                            }
+                            if (board[row + 1, column].piece == '\0') //Tomt fält
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { row + 1, column }));
+                                if (row == 1 && board[row + 2, column].piece == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + 2, column }));
+                                }
+                            }
+                            #endregion
+                            break;
+                        case 'P':
+                            #region whitePawnMoves
+                            if (column > 0)
+                            {
+                                if (board[row + 1, column - 1].piece > 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column - 1)) //Svart pjäs eller passant
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column - 1 }));
+                                }
+                            }
+                            if (column < 7)
+                            {
+                                if (board[row + 1, column + 1].piece > 'Z'
+                                    || (enPassantSquare[0] == row + 1 && enPassantSquare[1] == column + 1)) //Svart pjäs eller passant
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column + 1 }));
+                                }
+                            }
+                            if (board[row + 1, column].piece == '\0') //Tomt fält
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { row - 1, column }));
+                                if (row == 6 && board[row - 2, column].piece == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - 2, column }));
+                                }
+                            }
+                            #endregion
+                            break;
+                        case 'k':
+                            #region blackKingMoves
+                            int r = row, c = column -1;
+                            if(c >= 0 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column + 1;
+                            if (c < 8 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            r = row + 1; c = column - 1;
+                            if (r < 8 && c >= 0 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r , c }));
+                            }
+                            c = column + 1;
+                            if (r < 8 && c < 8 &&  !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column;
+                            if (r < 8 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            r = row - 1; c = column - 1;
+                            if (r >= 0 && c >= 0 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column + 1;
+                            if (r >= 0 && c < 8 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column;
+                            if (r >= 0 && !board[r, c].wControl && accessableFor(false, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            //TODO: Fixa rockad
+
+                            #endregion
+                            break;
+                        case 'K':
+                            #region whiteKingMoves
+                            r = row; c = column - 1;
+                            if (c >= 0 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column + 1;
+                            if (c < 8 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            r = row + 1; c = column - 1;
+                            if (r < 8 && c >= 0 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column + 1;
+                            if (r < 8 && c < 8 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column;
+                            if (r < 8 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            r = row - 1; c = column - 1;
+                            if (r >= 0 && c >= 0 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column + 1;
+                            if (r >= 0 && c < 8 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+                            c = column;
+                            if (r >= 0 && !board[r, c].bControl && accessableFor(true, board[r, c].piece))
+                            {
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            }
+
+                            //TODO: Fixa rockad
+
+                            #endregion
+                            break;
+                        case 'n':
+                            #region blackKnightMoves
+                            r = row + 2; c = column + 1;
+                            if (r < 8 && c < 8 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 1;
+                            if (r < 8 && c >= 0 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row + 1; c = column + 2;
+                            if (r < 8 && c < 8 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 2;
+                            if (r < 8 && c >= 0 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row - 1; c = column + 2;
+                            if (r >= 0 && c < 8 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 2;
+                            if (r >= 0 && c >= 0 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row - 2; c = column + 1;
+                            if (r >= 0 && c < 8 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 1;
+                            if (r >= 0 && c >= 0 && board[r, c].piece < 'Z')
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            #endregion
+                            break;
+                        case 'N':
+                            #region whiteKnightMoves
+                            r = row + 2; c = column + 1;
+                            if (r < 8 && c < 8 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 1;
+                            if (r < 8 && c >= 0 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row + 1; c = column + 2;
+                            if (r < 8 && c < 8 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 2;
+                            if (r < 8 && c >= 0 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row - 1; c = column + 2;
+                            if (r >= 0 && c < 8 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 2;
+                            if (r >= 0 && c >= 0 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            r = row - 2; c = column + 1;
+                            if (r >= 0 && c < 8 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+
+                            c = column - 1;
+                            if (r >= 0 && c >= 0 && (board[r, c].piece > 'Z' || board[r, c].piece == '\0'))
+                                moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
+                            #endregion
+                            break;
+                        case 'b':
+                            #region blackBishopMoves
+                            int i = 1;
+                            bool done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row - i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            #endregion
+                            break;
+                        case 'B':
+                            #region whiteBishopMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row - i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            #endregion
+                            break;
+                        case 'r':
+                            #region blackRookMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            #endregion
+                            break;
+                        case 'R':
+                            #region whiteRookMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column + i < 8 && !done)
+                            {
+                                char pjas = board[row, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column - i > 0 && !done)
+                            {
+                                char pjas = board[row, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            #endregion
+                            break;
+                        case 'q':
+                            #region blackBishopMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row - i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            #endregion
+                            #region blackRookMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    i++;
+                                }
+                                else if (pjas < 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            #endregion
+                            break;
+                        case 'Q':
+                            #region whiteBishopMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column + i < 8 && !done)
+                            {
+                                char pjas = board[row - i, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column + i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row + i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && column - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column - i }));
+                                    break;
+                                }
+                                else break;
+                                i++;
+                            }
+                            #endregion
+                            #region whiteRookMoves
+                            i = 1;
+                            done = false;
+                            while (row + i < 8 && !done)
+                            {
+                                char pjas = board[row + i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row + i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (row - i > 0 && !done)
+                            {
+                                char pjas = board[row - i, column].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row - i, column }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column + i < 8 && !done)
+                            {
+                                char pjas = board[row, column + i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column + i }));
+                                    break;
+                                }
+                                else break;
+                            }
+                            i = 1;
+                            done = false;
+                            while (column - i > 0 && !done)
+                            {
+                                char pjas = board[row, column - i].piece;
+                                if (pjas == '\0')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    i++;
+                                }
+                                else if (pjas > 'Z')
+                                {
+                                    moves.Add(new Move(new int[] { row, column }, new int[] { row, column - i }));
+                                    break;
+                                }
+                                else break;
                             }
                             #endregion
                             break;
@@ -1007,6 +1792,19 @@ namespace Blobfish_11
             }
 
             return null;
+        } //TODO: Ta bort?
+        private bool accessableFor(bool white, char piece)
+        {
+            if (white)
+            {
+                if (piece == '\0' || piece > 'Z') return true;
+                else return false;
+            }
+            else
+            {
+                if (piece < 'Z') return true;
+                else return false;
+            }
         }
     }
     static class placement
@@ -1092,6 +1890,24 @@ namespace Blobfish_11
         public Move(int[] to, int[] from){
             this.from = from;
             this.to = to;
+        }
+        public string toString(square[,] board)
+        {
+            string ret = "" + board[from[0], from[1]].piece;
+            ret = ret.ToUpper();
+            ret += ((Char) (from[1] + 'a')).ToString();
+            ret += 8 - from[0];
+            if(board[to[0], to[1]].piece != '\0')
+            {
+                ret += "x";
+            }
+            else
+            {
+                ret += "-";
+            }
+            ret += ((Char)(to[1] + 'a')).ToString();
+            ret += 8 - to[0];
+            return ret;
         }
     }   
 }
