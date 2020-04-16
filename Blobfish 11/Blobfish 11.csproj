@@ -79,5 +79,20 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Bb.png" />
+    <Content Include="Bk.png" />
+    <Content Include="Bn.png" />
+    <Content Include="Bp.png" />
+    <Content Include="Bq.png" />
+    <Content Include="Br.png" />
+    <Content Include="null.png" />
+    <Content Include="WB.png" />
+    <Content Include="WK.png" />
+    <Content Include="WN.png" />
+    <Content Include="Wp.png" />
+    <Content Include="WQ.png" />
+    <Content Include="WR.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
