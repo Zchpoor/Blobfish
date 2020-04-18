@@ -13,6 +13,7 @@ namespace Blobfish_11
     public partial class Form1 : Form
     {
         PictureBox[,] Falt = new PictureBox[8,8];
+        int[] firstSquare = { -1, -1 };
         public Form1()
         {
             InitializeComponent();
@@ -34,6 +35,7 @@ namespace Blobfish_11
                     picBox.Margin = new Padding(0);
                     picBox.Padding = new Padding(0);
                     picBox.Image = Image.FromFile("null.png");
+                    picBox.MouseClick += new MouseEventHandler(squareClick);
                     if ((i + j) % 2 == 0)
                         picBox.BackColor = Color.WhiteSmoke;
                     else
@@ -80,7 +82,25 @@ namespace Blobfish_11
             textBox1.Text = temp;
             display(pos);
         }
-        
+        private void squareClick(object sender, MouseEventArgs e)
+        {
+            int xVal = ((PictureBox)sender).Location.X;
+            int yVal = ((PictureBox)sender).Location.Y;
+            xVal = xVal / (boardPanel.Size.Width / 8);
+            yVal = (boardPanel.Size.Height - yVal) / (boardPanel.Size.Height / 8);
+            if (firstSquare[0] == -1) {
+                firstSquare[0] = yVal;
+                firstSquare[1] = xVal;
+                moveLabel.Text = (char)(xVal + 'a') + yVal.ToString();
+            }
+            else
+            {
+                moveLabel.Text = (char)(firstSquare[1] + 'a') + firstSquare[0].ToString() + "-" +
+                    (char)(xVal + 'a') + yVal.ToString();
+                firstSquare[0] = -1;
+                firstSquare[1] = -1;
+            }
+        }
     }
     public class position
     {
@@ -89,7 +109,7 @@ namespace Blobfish_11
         private int halfMoveClock = 0;
         private int moveCounter = 0;
         private int[] enPassantSquare = new int[2];
-        private bool[] castlingRights = new bool[4];
+        private bool[] castlingRights = new bool[4]; //KQkq
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
         public Square[,] board = new Square[8, 8];
@@ -958,7 +978,7 @@ namespace Blobfish_11
                 }
             }
         }
-        private List<Move> calculateMoves() //TODO: Dela upp i vita och svarta drag.
+        private List<Move> calculateMoves()
         {
             //TODO: Spikar
             List<Move> moves = new List<Move>();
@@ -1042,8 +1062,25 @@ namespace Blobfish_11
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
                                 }
+                                
+                                if(column == 4 && row == 7)
+                                {
+                                    //Kort rockad
+                                    if(castlingRights[0] && board[7, 5].piece== '\0' && board[7, 6].piece == '\0'
+                                        && !board[7, 5].bControl && !board[7, 6].bControl)
+                                    {
+                                        moves.Add(new Castle(new int[] { column, row }, new int[] { 7, 6 },
+                                            new int[] { 7, 7 }, new int[] { 7, 5 }));
+                                    }
 
-                                //TODO: Fixa rockad
+                                    //Lång rockad
+                                    if (castlingRights[1] && board[7, 3].piece == '\0' && board[7, 2].piece == '\0'
+                                        && board[7, 1].piece == '\0' && !board[7, 3].bControl && !board[7, 2].bControl)
+                                    {
+                                        moves.Add(new Castle(new int[] { column, row }, new int[] { 7, 2 },
+                                            new int[] { 7, 0 }, new int[] { 7, 3 }));
+                                    }
+                                }
 
                                 #endregion
                                 break;
@@ -1443,8 +1480,25 @@ namespace Blobfish_11
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
                                 }
+                                
+                                if (column == 4 && row == 0)
+                                {
+                                    //Kort rockad
+                                    if (castlingRights[2] && board[0, 5].piece == '\0' && board[0, 6].piece == '\0'
+                                        && !board[0, 5].wControl && !board[0, 6].wControl)
+                                    {
+                                        moves.Add(new Castle(new int[] { column, row }, new int[] { 0, 6 },
+                                            new int[] { 0, 7 }, new int[] { 0, 5 }));
+                                    }
 
-                                //TODO: Fixa rockad
+                                    //Lång rockad
+                                    if (castlingRights[3] && board[0, 3].piece == '\0' && board[0, 2].piece == '\0'
+                                        && board[0, 1].piece == '\0' && !board[0, 3].wControl && !board[0, 2].wControl)
+                                    {
+                                        moves.Add(new Castle(new int[] { column, row }, new int[] { 0, 2 },
+                                            new int[] { 0, 0 }, new int[] { 0, 3 }));
+                                    }
+                                }
 
                                 #endregion
                                 break;
@@ -1794,7 +1848,7 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        private Square[,] getInfo()
+        /*private Square[,] getInfo()
         {
             foreach (char tkn in FEN)
             {
@@ -1838,7 +1892,7 @@ namespace Blobfish_11
             }
 
             return null;
-        } //TODO: Ta bort?
+        } //TODO: Ta bort?*/
         private bool accessableFor(bool white, char piece)
         {
             if (white)
@@ -1988,7 +2042,7 @@ namespace Blobfish_11
             board[rookFrom[0], rookFrom[1]].piece = '\0';
             return board;
         }
-        public override string ToString()
+        public override string toString(Square[,] board)
         {
             if (rookFrom[1] == 7) return "0-0";
             else return "0-0-0";
@@ -2025,7 +2079,7 @@ namespace Blobfish_11
             board[from[0], from[1]].piece = '\0';
             return board;
         }
-        public override string ToString()
+        public override string toString(Square[,] board)
         {
             return base.ToString() + "=" + promoteTo.ToString().ToUpper();
         }

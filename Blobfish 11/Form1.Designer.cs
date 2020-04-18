@@ -34,6 +34,7 @@
             this.evalBox = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.moveLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // fenBox
@@ -77,12 +78,12 @@
             // 
             this.textBox1.AcceptsReturn = true;
             this.textBox1.AcceptsTab = true;
-            this.textBox1.Location = new System.Drawing.Point(12, 34);
+            this.textBox1.Location = new System.Drawing.Point(794, 0);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(258, 519);
+            this.textBox1.Size = new System.Drawing.Size(258, 560);
             this.textBox1.TabIndex = 4;
             // 
             // boardPanel
@@ -97,7 +98,7 @@
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.boardPanel.Location = new System.Drawing.Point(311, 35);
+            this.boardPanel.Location = new System.Drawing.Point(15, 31);
             this.boardPanel.Margin = new System.Windows.Forms.Padding(0);
             this.boardPanel.Name = "boardPanel";
             this.boardPanel.RowCount = 8;
@@ -112,11 +113,20 @@
             this.boardPanel.Size = new System.Drawing.Size(480, 480);
             this.boardPanel.TabIndex = 5;
             // 
+            // moveLabel
+            // 
+            this.moveLabel.AutoSize = true;
+            this.moveLabel.Location = new System.Drawing.Point(704, 31);
+            this.moveLabel.Name = "moveLabel";
+            this.moveLabel.Size = new System.Drawing.Size(0, 17);
+            this.moveLabel.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1314, 560);
+            this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.evalBox);
@@ -124,7 +134,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Blobfish 11";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -138,6 +148,7 @@
         private System.Windows.Forms.Label evalBox;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
+        private System.Windows.Forms.Label moveLabel;
     }
 }
 
