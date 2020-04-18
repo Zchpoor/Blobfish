@@ -13,6 +13,7 @@ namespace Blobfish_11
     public partial class Form1 : Form
     {
         PictureBox[,] Falt = new PictureBox[8,8];
+        Position currentPosition;
         int[] firstSquare = { -1, -1 };
         public Form1()
         {
@@ -42,8 +43,10 @@ namespace Blobfish_11
                         picBox.BackColor = Color.SandyBrown;
                 }
             }
+            Position startingPostition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            display(startingPostition);
         }
-        private void display(position pos)
+        private void display(Position pos)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -55,7 +58,7 @@ namespace Blobfish_11
                     {
                         if(piece > 'Z')
                         {
-                            picName = "B" + piece+ ".png";
+                            picName = "B" + piece + ".png";
                         }
                         else
                         {
@@ -63,13 +66,16 @@ namespace Blobfish_11
                         }
                     }
                     
-                    Falt[i, j].Image =Image.FromFile(picName);
+                    Falt[i, j].Image = Image.FromFile(picName);
                 }
             }
+            string temp = pos.getMovesString();
+            textBox1.Text = temp;
+            currentPosition = pos;
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            position pos = new position(fenBox.Text);
+            Position pos = new Position(fenBox.Text);
             evalBox.Text = "";
             double value = pos.eval();
             evalBox.Text += "Evaluering:\n";
@@ -78,31 +84,38 @@ namespace Blobfish_11
             evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
             evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
             evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
-            string temp = pos.getMoves();
-            textBox1.Text = temp;
             display(pos);
         }
         private void squareClick(object sender, MouseEventArgs e)
         {
-            int xVal = ((PictureBox)sender).Location.X;
-            int yVal = ((PictureBox)sender).Location.Y;
+            int xVal = ((PictureBox)sender).Location.X; //a-h
+            int yVal = ((PictureBox)sender).Location.Y; //1-8
             xVal = xVal / (boardPanel.Size.Width / 8);
-            yVal = (boardPanel.Size.Height - yVal) / (boardPanel.Size.Height / 8);
-            if (firstSquare[0] == -1) {
-                firstSquare[0] = yVal;
-                firstSquare[1] = xVal;
-                moveLabel.Text = (char)(xVal + 'a') + yVal.ToString();
+            yVal = yVal / (boardPanel.Size.Height / 8);
+            int[] newSquare = { yVal, xVal };
+            if (firstSquare[0] == -1)  //-1 indikerar att ingen ruta tidigare markerats.
+            {
+                firstSquare = newSquare;
+                moveLabel.Text = (char)(xVal + 'a') + (8-yVal).ToString();
             }
             else
             {
-                moveLabel.Text = (char)(firstSquare[1] + 'a') + firstSquare[0].ToString() + "-" +
-                    (char)(xVal + 'a') + yVal.ToString();
+                foreach (Move item in this.currentPosition.allMoves)
+                {
+                    if (firstSquare[0] == item.from[0] && firstSquare[1] == item.from[1] &&
+                        newSquare[0] == item.to[0] && newSquare[1] == item.to[1])
+                    {
+                        Square[,] newPosition = item.execute(this.currentPosition.board);
+                    }
+                }
+                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8-firstSquare[0]).ToString() + "-" +
+                    (char)(xVal + 'a') + (8-yVal).ToString();
                 firstSquare[0] = -1;
                 firstSquare[1] = -1;
             }
         }
     }
-    public class position
+    public class Position
     {
         private readonly string FEN;
         public bool whiteToMove;
@@ -115,17 +128,9 @@ namespace Blobfish_11
         public Square[,] board = new Square[8, 8];
         int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
         int[] checkingPieces = { 0, 0, 0, 0 };
-        List<Move> allMoves;
-        public string getMoves()
-        {
-            string text = "";
-            foreach (Move item in allMoves)
-            {
-                text += item.toString(board) + Environment.NewLine;
-            }
-            return text;
-        }
-        public position(string FEN)
+        public List<Move> allMoves = new List<Move>();
+        
+        public Position(string FEN)
         {
             this.FEN = FEN;
             int column = 0, row = 0;
@@ -200,7 +205,7 @@ namespace Blobfish_11
             else this.whiteToMove = false;
             int temp = FEN.IndexOf(' ');
             string infoString = FEN.Substring(FEN.IndexOf(' ') + 3, FEN.Length - FEN.IndexOf(' ') - 3);
-            int tep = infoString.IndexOf(' ');
+            temp = infoString.IndexOf(' ');
             string castlingString = infoString.Substring(0, infoString.IndexOf(' ')); //Till exempel: KQkq
             #region castlingRights
             if (castlingString == "-")
@@ -253,6 +258,30 @@ namespace Blobfish_11
             this.moveCounter = int.Parse(moveString);
             //Till exempel: "2".
 
+        }
+        public Position(Square[,] board, bool whiteToMove, bool[] castlingRights, int[] enPassantSquare,
+            int halfMoveClock, int moveCounter)
+        {
+            this.board = board;
+            this.whiteToMove = whiteToMove;
+            this.castlingRights = castlingRights;
+            this.halfMoveClock = halfMoveClock;
+            this.moveCounter = moveCounter;
+            this.enPassantSquare = enPassantSquare;
+        }
+        public string getMovesString()
+        {
+            if (allMoves.Count == 0)
+            {
+                this.eval();
+            }
+
+            string text = "";
+            foreach (Move item in allMoves)
+            {
+                text += item.toString(board) + Environment.NewLine;
+            }
+            return text;
         }
         public double eval()
         {
@@ -328,7 +357,7 @@ namespace Blobfish_11
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
             int[,] pawns = new int[2, 8]; //0=black, 1=white.
-            bool whiteSquare = true; //TODO: ordna med färgkomplex.
+            //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             //int column = 0, row = 0;
             double[] pieceValues = { 3, 3, 5, 9 };
             double pieceValue = 0;
@@ -1848,51 +1877,6 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        /*private Square[,] getInfo()
-        {
-            foreach (char tkn in FEN)
-            {
-                Square[,] board = new Square[8, 8];
-                bool done = false; //TODO: substring?
-                bool whiteSquare = true;
-                int column = 0, row = 0;
-                if (done) break;
-                switch (tkn)
-                {
-                    case 'p':
-                        board[row, column].piece = 'p';
-                        if (column > 0) board[row + 1, column - 1].bControl = true;
-                        if (column < 7) board[row + 1, column + 1].bControl = true;
-                        column++;
-                        whiteSquare = !whiteSquare;
-                        break;
-                    case 'P':
-                        board[row, column].piece = 'P';
-                        if (column > 0) board[row - 1, column - 1].wControl = true;
-                        if (column < 7) board[row - 1, column + 1].bControl = true;
-                        column++;
-                        whiteSquare = !whiteSquare;
-                        break;
-                    case '/': column = 0; row++; break;
-                    case ' ':
-                        done = true;
-                        break;
-                    case '1': column += 1; whiteSquare = !whiteSquare; break;
-                    case '2': column += 2; break;
-                    case '3': column += 3; whiteSquare = !whiteSquare; break;
-                    case '4': column += 4; break;
-                    case '5': column += 5; whiteSquare = !whiteSquare; break;
-                    case '6': column += 6; break;
-                    case '7': column += 7; whiteSquare = !whiteSquare; break;
-                    case '8': whiteSquare = !whiteSquare; break;
-                    default:
-                        column++;
-                        break;
-                }
-            }
-
-            return null;
-        } //TODO: Ta bort?*/
         private bool accessableFor(bool white, char piece)
         {
             if (white)
@@ -2046,7 +2030,6 @@ namespace Blobfish_11
         {
             if (rookFrom[1] == 7) return "0-0";
             else return "0-0-0";
-                    
         }
     }
     public class EnPassant : Move
