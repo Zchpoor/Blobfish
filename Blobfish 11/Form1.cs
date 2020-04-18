@@ -92,7 +92,7 @@ namespace Blobfish_11
         private bool[] castlingRights = new bool[4];
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
-        public square[,] board = new square[8, 8];
+        public Square[,] board = new Square[8, 8];
         int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
         int[] checkingPieces = { 0, 0, 0, 0 };
         List<Move> allMoves;
@@ -323,41 +323,41 @@ namespace Blobfish_11
                             //board[row, column].piece = tkn;
                             numberOfPawns[0]++;
                             pawns[0, column]++;
-                            posFactor[0] += placement.pawn[0, row, column];
+                            posFactor[0] += Placement.pawn[0, row, column];
                             break;
 
                         case 'P':
                             //board[row, column].piece = tkn;
                             numberOfPawns[1]++;
                             pawns[1, column]++;
-                            posFactor[1] += placement.pawn[1, row, column];
+                            posFactor[1] += Placement.pawn[1, row, column];
                             break;
 
                         case 'n':
                             //board[row, column].piece = tkn;
-                            pieceValue -= pieceValues[0] * placement.knight[row, column];
+                            pieceValue -= pieceValues[0] * Placement.knight[row, column];
                             break;
                         case 'N':
                             //board[row, column].piece = tkn;
-                            pieceValue += pieceValues[0] * placement.knight[row, column];
+                            pieceValue += pieceValues[0] * Placement.knight[row, column];
                             break;
 
                         case 'b':
                             //board[row, column].piece = tkn;
-                            pieceValue -= pieceValues[1] * placement.bishop[row, column];
+                            pieceValue -= pieceValues[1] * Placement.bishop[row, column];
                             break;
                         case 'B':
                             //board[row, column].piece = tkn;
-                            pieceValue += pieceValues[1] * placement.bishop[row, column];
+                            pieceValue += pieceValues[1] * Placement.bishop[row, column];
                             break;
 
                         case 'r':
                             //board[row, column].piece = tkn;
-                            pieceValue -= pieceValues[2] * placement.rook[row, column];
+                            pieceValue -= pieceValues[2] * Placement.rook[row, column];
                             break;
                         case 'R':
                             //board[row, column].piece = tkn;
-                            pieceValue += pieceValues[2] * placement.rook[row, column];
+                            pieceValue += pieceValues[2] * Placement.rook[row, column];
                             break;
 
                         case 'k':
@@ -373,11 +373,11 @@ namespace Blobfish_11
 
                         case 'q':
                             //board[row, column].piece = tkn;
-                            pieceValue -= pieceValues[3] * placement.queen[row, column];
+                            pieceValue -= pieceValues[3] * Placement.queen[row, column];
                             break;
                         case 'Q':
                             //board[row, column].piece = tkn;
-                            pieceValue += pieceValues[3] * placement.queen[row, column];
+                            pieceValue += pieceValues[3] * Placement.queen[row, column];
                             break;
                         default:
                             break;
@@ -1794,11 +1794,11 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        private square[,] getInfo()
+        private Square[,] getInfo()
         {
             foreach (char tkn in FEN)
             {
-                square[,] board = new square[8, 8];
+                Square[,] board = new Square[8, 8];
                 bool done = false; //TODO: substring?
                 bool whiteSquare = true;
                 int column = 0, row = 0;
@@ -1857,7 +1857,8 @@ namespace Blobfish_11
             return (row < 8) && (row >= 0) && (column < 8) && (column >= 0);
         }
     }
-    static class placement
+
+    static class Placement
     { //TODO: För hårda värden.
         public static readonly double[,,] pawn =
         {
@@ -1927,13 +1928,15 @@ namespace Blobfish_11
             { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f}
         };
     }
-    public struct square
+
+    public struct Square
     {
         public bool wControl;
         public bool bControl;
         public char piece;
     }
-    class Move
+
+    public class Move
     {
         public int[] from = new int[2];
         public int[] to = new int[2];
@@ -1941,7 +1944,7 @@ namespace Blobfish_11
             this.from = from;
             this.to = to;
         }
-        public string toString(square[,] board)
+        public virtual string toString(Square[,] board)
         {
             string ret = "";
             if(board[from[0], from[1]].piece != 'p' && board[from[0], from[1]].piece != 'P')
@@ -1961,5 +1964,70 @@ namespace Blobfish_11
             ret += 8 - to[0];
             return ret;
         }
-    }   
+        public virtual Square[,] execute(Square[,] board)
+        {
+            board[to[0], to[1]] = board[from[0], from[1]];
+            board[from[0], from[1]].piece = '\0';
+            return board;
+        }
+    }
+    public class Castle : Move
+    {
+        int[] rookFrom, rookTo;
+        public Castle(int[] kingFrom, int[] kingTo,int[] rookFrom, int[] rookTo) :
+            base(kingFrom, kingTo)
+        {
+            this.rookFrom = rookFrom;
+            this.rookTo = rookTo;
+        }
+        public override Square[,] execute(Square[,] board)
+        {
+            board[to[0], to[1]] = board[from[0], from[1]];
+            board[from[0], from[1]].piece = '\0';
+            board[rookTo[0], rookTo[1]]  = board[rookFrom[0], rookFrom[1]];
+            board[rookFrom[0], rookFrom[1]].piece = '\0';
+            return board;
+        }
+        public override string ToString()
+        {
+            if (rookFrom[1] == 7) return "0-0";
+            else return "0-0-0";
+                    
+        }
+    }
+    public class EnPassant : Move
+    {
+        int[] pawnToRemove;
+        public EnPassant(int[] from, int[] to, int[] pawnToRemove) :
+            base(from, to)
+        {
+            this.pawnToRemove = pawnToRemove;
+        }
+        public override Square[,] execute(Square[,] board)
+        {
+            board[to[0], to[1]] = board[from[0], from[1]];
+            board[from[0], from[1]].piece = '\0';
+            board[pawnToRemove[0], pawnToRemove[1]].piece = '\0';
+            return board;
+        }
+    }
+    public class Promotion : Move
+    {
+        char promoteTo;
+        public Promotion(int[] from, int[] to, char promoteTo) :
+            base(from, to)
+        {
+            this.promoteTo = promoteTo;
+        }
+        public override Square[,] execute(Square[,] board)
+        {
+            board[to[0], to[1]].piece = promoteTo;
+            board[from[0], from[1]].piece = '\0';
+            return board;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "=" + promoteTo.ToString().ToUpper();
+        }
+    }
 }
