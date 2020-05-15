@@ -44,6 +44,7 @@
             this.fenBox.Size = new System.Drawing.Size(609, 22);
             this.fenBox.TabIndex = 0;
             this.fenBox.Text = "r1bqkb1r/pppp1ppp/5n2/4n3/4P3/2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 1";
+            this.fenBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.fenBox_KeyPress);
             // 
             // label1
             // 
