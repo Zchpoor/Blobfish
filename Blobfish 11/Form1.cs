@@ -76,16 +76,25 @@ namespace Blobfish_11
         private void button1_Click(object sender, EventArgs e)
         {
             //TODO: Remove arguments?
-            Position pos = new Position(fenBox.Text);
-            evalBox.Text = "";
-            double value = pos.eval();
-            evalBox.Text += "Evaluering:\n";
-            evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
-            evalBox.Text += "Bönder: " + Math.Round(pos.pawnValues[1] - pos.pawnValues[0], 2) + "\n";
-            evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
-            evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
-            evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
-            display(pos);
+            if (fenBox.Text.ToLower() == "test")
+            {
+                bool successfulTests = runTests();
+                if (!successfulTests)
+                    fenBox.Text = "Tests failed!";
+            }
+            else
+            {
+                Position pos = new Position(fenBox.Text);
+                evalBox.Text = "";
+                double value = pos.eval();
+                evalBox.Text += "Evaluering:\n";
+                evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
+                evalBox.Text += "Bönder: " + Math.Round(pos.pawnValues[1] - pos.pawnValues[0], 2) + "\n";
+                evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
+                evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
+                evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
+                display(pos);
+            }
         }
         private void squareClick(object sender, MouseEventArgs e)
         {
@@ -119,6 +128,29 @@ namespace Blobfish_11
         {
             if (e.KeyChar == '\r')
                 button1_Click(null, null);
+        }
+        private bool runTests()
+        {
+            string fullResult = "";
+            int testCounter = 1;
+            bool testNumberOfMoves(string FEN, int moves)
+            {
+                Position pos = new Position(FEN);
+                pos.eval();
+                bool success = pos.allMoves.Count == moves;
+                if (success) fullResult+= "Test " + testCounter.ToString() + ": Success\n";
+                else fullResult += "Test " + testCounter.ToString() + ": Fail\n";
+                testCounter++;
+                return success;
+            }
+            testNumberOfMoves("8/8/1b6/8/1k6/8/3rP1K1/8 w - - 0 1", 6); //Spikad vit bonde.
+            testNumberOfMoves("kb5q/8/8/8/5R1B/8/r5PK/8 w - - 0 1", 4); //Tre spikar på vit
+            testNumberOfMoves("K6Q/2B5/8/8/7r/6n1/R5pk/8 b - - 0 1", 8); //Tre spikar på svart
+            testNumberOfMoves("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 20); //Utgångsställningen
+            testNumberOfMoves("rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3", 31); //En passant
+
+            evalBox.Text = fullResult;
+            return true;
         }
     }
     public class Position
@@ -455,9 +487,9 @@ namespace Blobfish_11
         }
         private int decisiveResult(List<Move> moves)
         {
+            /*
             int c = 0;
             if (whiteToMove) c = 1;
-
             if (whiteToMove)
             {
                 for (int i = 0; i < moves.Count; i++)
@@ -480,6 +512,8 @@ namespace Blobfish_11
                     }
                 }
             }
+            */ //TODO: Denna verkar värdelös?
+
 
             if (checkingPieces[0] != -1) //Schack
             {
@@ -497,6 +531,11 @@ namespace Blobfish_11
             else
             {
 
+            }
+
+            if(this.moveCounter > 100)
+            {
+                return 0; //Femtiodragsregeln.
             }
 
             return -2;
@@ -1021,7 +1060,7 @@ namespace Blobfish_11
         }
         private List<Move> calculateMoves()
         {
-            //TODO: Fixa olagliga kungsdrag.
+            //TODO: Fixa olagliga kungsdrag när fältet bakom kungen inte räknas som kontrollerat.
             List<Move> moves = new List<Move>();
             List<Move> newMoves = new List<Move>();
             if (whiteToMove)
@@ -2057,9 +2096,9 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        private bool accessableFor(bool white, char piece)
+        private bool accessableFor(bool forWhite, char piece)
         {
-            if (white)
+            if (forWhite)
             {
                 if (piece == '\0' || piece > 'Z') return true;
                 else return false;
