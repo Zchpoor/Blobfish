@@ -12,7 +12,7 @@ namespace Blobfish_11
 {
     public partial class Form1 : Form
     {
-        PictureBox[,] Falt = new PictureBox[8,8];
+        PictureBox[,] Falt = new PictureBox[8, 8];
         Position currentPosition;
         int[] firstSquare = { -1, -1 };
         public Form1()
@@ -26,9 +26,9 @@ namespace Blobfish_11
                 for (int j = 0; j < 8; j++)
                 {
                     PictureBox picBox = new PictureBox();
-                    Falt[i,j] = picBox;
+                    Falt[i, j] = picBox;
                     boardPanel.Controls.Add(picBox);
-                    
+
                     picBox.MinimumSize = new Size(squareSize, squareSize);
                     picBox.MaximumSize = new Size(squareSize, squareSize);
                     picBox.Dock = DockStyle.Fill;
@@ -54,9 +54,9 @@ namespace Blobfish_11
                 {
                     char piece = pos.board[i, j].piece;
                     string picName = "null.png";
-                    if(piece != '\0')
+                    if (piece != '\0')
                     {
-                        if(piece > 'Z')
+                        if (piece > 'Z')
                         {
                             picName = "B" + piece + ".png";
                         }
@@ -65,7 +65,7 @@ namespace Blobfish_11
                             picName = "W" + piece + ".png";
                         }
                     }
-                    
+
                     Falt[i, j].Image = Image.FromFile(picName);
                 }
             }
@@ -96,7 +96,7 @@ namespace Blobfish_11
             if (firstSquare[0] == -1)  //-1 indikerar att ingen ruta tidigare markerats.
             {
                 firstSquare = newSquare;
-                moveLabel.Text = (char)(xVal + 'a') + (8-yVal).ToString();
+                moveLabel.Text = (char)(xVal + 'a') + (8 - yVal).ToString();
             }
             else
             {
@@ -108,8 +108,8 @@ namespace Blobfish_11
                         Square[,] newPosition = item.execute(this.currentPosition.board);
                     }
                 }
-                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8-firstSquare[0]).ToString() + "-" +
-                    (char)(xVal + 'a') + (8-yVal).ToString();
+                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8 - firstSquare[0]).ToString() + "-" +
+                    (char)(xVal + 'a') + (8 - yVal).ToString();
                 firstSquare[0] = -1;
                 firstSquare[1] = -1;
             }
@@ -126,10 +126,10 @@ namespace Blobfish_11
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
         public Square[,] board = new Square[8, 8];
-        int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt.
-        int[] checkingPieces = { 0, 0, 0, 0 };
+        int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
+        int[] checkingPieces = { -1, -1, -1, -1 };
         public List<Move> allMoves = new List<Move>();
-        
+
         public Position(string FEN)
         {
             this.FEN = FEN;
@@ -210,7 +210,7 @@ namespace Blobfish_11
             #region castlingRights
             if (castlingString == "-")
             {
-                 castlingRights =  new bool[] { false, false, false, false };
+                castlingRights = new bool[] { false, false, false, false };
             }
             else
             {
@@ -232,7 +232,7 @@ namespace Blobfish_11
                 }
             }
             #endregion
-            string EPString = infoString.Substring(infoString.IndexOf(' ')+1, infoString.Length - infoString.IndexOf(' ')-1);
+            string EPString = infoString.Substring(infoString.IndexOf(' ') + 1, infoString.Length - infoString.IndexOf(' ') - 1);
             //Till exempel: c6 0 2
             if (EPString[0] == '-')
             {
@@ -249,7 +249,7 @@ namespace Blobfish_11
                 enPassantSquare[0] = EProw;
                 enPassantSquare[1] = EPcolumn; //Eftersom ordingen är omvänd i FEN.
             }
-            string lastString = EPString.Substring(EPString.IndexOf(' ')+1, EPString.Length - EPString.IndexOf(' ')-1);
+            string lastString = EPString.Substring(EPString.IndexOf(' ') + 1, EPString.Length - EPString.IndexOf(' ') - 1);
             //Till exempel: "1 2".
             string clockString = lastString.Substring(0, lastString.IndexOf(' '));
             //Till exempel: "1".
@@ -263,6 +263,7 @@ namespace Blobfish_11
             int halfMoveClock, int moveCounter)
         {
             this.board = board;
+            this.FEN = "";
             this.whiteToMove = whiteToMove;
             this.castlingRights = castlingRights;
             this.halfMoveClock = halfMoveClock;
@@ -304,14 +305,14 @@ namespace Blobfish_11
             if (byWhite)
             {
                 board[row, column].wControl = true;
-                if (row == kingPositions[1, 0] && row == kingPositions[1, 1])
+                if (row == kingPositions[0, 0] && column == kingPositions[0, 1])
                 {
                     if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
                     {
                         checkingPieces[0] = row;
                         checkingPieces[1] = column;
                     }
-                    else if(checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
+                    else if (checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
                     {
                         checkingPieces[2] = row;
                         checkingPieces[3] = column;
@@ -325,17 +326,17 @@ namespace Blobfish_11
             else
             {
                 board[row, column].bControl = true;
-                if (row == kingPositions[0, 0] && row == kingPositions[0, 1])
+                if (row == kingPositions[1, 0] && column == kingPositions[1, 1])
                 {
                     if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
                     {
                         checkingPieces[0] = row;
                         checkingPieces[1] = column;
                     }
-                    else if (checkingPieces[3] == -1) //Om detta är den andra pjäsen som schackar
+                    else if (checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
                     {
-                        checkingPieces[3] = row;
-                        checkingPieces[4] = column;
+                        checkingPieces[2] = row;
+                        checkingPieces[3] = column;
                     }
                     else
                     {
@@ -446,7 +447,7 @@ namespace Blobfish_11
         {
             int c = 0;
             if (whiteToMove) c = 1;
-            
+
             if (whiteToMove)
             {
                 for (int i = 0; i < moves.Count; i++)
@@ -479,7 +480,7 @@ namespace Blobfish_11
                 }
                 else //Enkelschack
                 {
-
+                    //TODO: Fixa!
                 }
 
             }
@@ -500,7 +501,8 @@ namespace Blobfish_11
                     {
                         case 'p':
                             #region blackPawnControl
-                            if (column > 0) {
+                            if (column > 0)
+                            {
                                 setControl(row + 1, column - 1, false);
                             }
                             if (column < 7)
@@ -1009,7 +1011,7 @@ namespace Blobfish_11
         }
         private List<Move> calculateMoves()
         {
-            //TODO: Spikar
+            //TODO: Fixa olagliga kungsdrag.
             List<Move> moves = new List<Move>();
             if (whiteToMove)
             {
@@ -1017,6 +1019,13 @@ namespace Blobfish_11
                 {
                     for (int column = 0; column < 8; column++)
                     {
+
+                        List<Move> pinnedMoves = movesIfPinned(row, column, true);
+                        if (pinnedMoves != null)
+                        {
+                            moves.AddRange(pinnedMoves);
+                            continue;
+                        }
                         switch (board[row, column].piece)
                         {
                             case 'P':
@@ -1091,11 +1100,11 @@ namespace Blobfish_11
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
                                 }
-                                
-                                if(column == 4 && row == 7)
+
+                                if (column == 4 && row == 7)
                                 {
                                     //Kort rockad
-                                    if(castlingRights[0] && board[7, 5].piece== '\0' && board[7, 6].piece == '\0'
+                                    if (castlingRights[0] && board[7, 5].piece == '\0' && board[7, 6].piece == '\0'
                                         && !board[7, 5].bControl && !board[7, 6].bControl)
                                     {
                                         moves.Add(new Castle(new int[] { column, row }, new int[] { 7, 6 },
@@ -1433,6 +1442,12 @@ namespace Blobfish_11
                 {
                     for (int column = 0; column < 8; column++)
                     {
+                        List<Move> pinnedMoves = movesIfPinned(row, column, false);
+                        if (pinnedMoves != null)
+                        {
+                            moves.AddRange(pinnedMoves);
+                            continue;
+                        }
                         switch (board[row, column].piece)
                         {
                             case 'p':
@@ -1509,7 +1524,7 @@ namespace Blobfish_11
                                 {
                                     moves.Add(new Move(new int[] { row, column }, new int[] { r, c }));
                                 }
-                                
+
                                 if (column == 4 && row == 0)
                                 {
                                     //Kort rockad
@@ -1855,6 +1870,113 @@ namespace Blobfish_11
             }
             return moves;
         }
+        private List<Move> movesIfPinned(int row, int column, bool whiteToMove)
+        {
+            //Funktion som räknar ut huruvida en pjäs på ett givet fält (row, column) är spikad.
+            //Om så är fallet så returneras en lista med de drag som pjäsen kan utföra, annars null.
+            char thisPiece = board[row, column].piece;
+            if (thisPiece == '\0') return null;
+            if (thisPiece == 'k') return null;
+            if (thisPiece == 'K') return null;
+
+            List<Move> moves = new List<Move>();
+            int dRow, dCol; //Skillnaden i x/y-led
+            if (whiteToMove)
+            {
+                dRow = row - this.kingPositions[1, 0];
+                dCol = column - this.kingPositions[1, 1];
+            }
+            else
+            {
+                dRow = row - this.kingPositions[0, 0];
+                dCol = column - this.kingPositions[0, 1];
+            }
+            if (dCol == 0) //Samma linje
+            {
+                string piecesToLookFor = "rq";
+                if (!whiteToMove) piecesToLookFor = "RQ";
+                int sign = Math.Sign(dRow);
+                for (int j = 1; j < Math.Abs(dRow); j++)
+                {
+                    int newRow = row - (j * sign);
+                    if (board[newRow, column].piece != '\0')
+                    {
+
+                        return null; //Om det står något emellan kungen och pjäsen ifråga.
+                    }
+                    else if (thisPiece == 'q' || thisPiece == 'Q' || thisPiece == 'r' || thisPiece == 'R')
+                    {
+                        //TODO: Fixa för bönder
+                        moves.Add(new Move(new int[] { row, column }, new int[] { newRow, column }));
+                    }
+                }
+                //Kommer endast hit om kungen står på ett sådant sätt att den kan vara spikad.
+                int i = 1;
+                while (validSquare(row + (i * sign), column))
+                {
+                    int newRow = row + (i * sign);
+                    if (piecesToLookFor.Contains(board[newRow, column].piece))
+                    {
+                        moves.Add(new Move(new int[] { row, column }, new int[] { newRow, column }));
+                        return moves; //Det står ett torn eller dam på andra sidan.
+                    }
+                    else if (board[newRow, column].piece != '\0')
+                        return null;
+                    else
+                    {
+                        moves.Add(new Move(new int[] { row, column }, new int[] { newRow, column }));
+                    }
+                    i++;
+                }
+                //TODO: Fix
+                return null; //Borde inte anropas.
+            }
+            else if (dRow == 0) //Samma rad
+            {
+                string piecesToLookFor = "rq";
+                if (!whiteToMove) piecesToLookFor = "RQ";
+                int sign = Math.Sign(dCol); //För att veta vilken riktning kungen är åt.
+                for (int j = 1; j < Math.Abs(dCol); j++)
+                {
+                    int newCol = column - (j * sign);
+                    if (board[row, newCol].piece != '\0')
+                    {
+
+                        return null; //Om det står något emellan kungen och pjäsen ifråga.
+                    }
+                    else if (thisPiece == 'q' || thisPiece == 'Q' || thisPiece == 'r' || thisPiece == 'R')
+                    {
+                        moves.Add(new Move(new int[] { row, column }, new int[] { row, newCol }));
+                    }
+                }
+                //Kommer endast hit om kungen står på ett sådant sätt att den kan vara spikad.
+                int i = 1;
+                while (validSquare(row + (i * sign), column))
+                {
+                    int newCol = column + (i * sign);
+                    if (piecesToLookFor.Contains(board[row, newCol].piece))
+                    {
+                        moves.Add(new Move(new int[] { row, column }, new int[] { row, newCol }));
+                        return moves; //Det står ett torn eller dam på andra sidan.
+                    }
+                    else if (board[row, newCol].piece != '\0')
+                        return null;
+                    else
+                    {
+                        moves.Add(new Move(new int[] { row, column }, new int[] { row, newCol }));
+                    }
+                    i++;
+                }
+                //TODO: Fix
+                return null; //Borde inte anropas.
+            }
+            else if (Math.Abs(dRow) == Math.Abs(dCol)) //Samma diagonal
+            {
+                return null;
+                //TODO: Fix
+            }
+            else return null;
+        }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
         {
             for (int c = 0; c < 2; c++)
@@ -1896,175 +2018,11 @@ namespace Blobfish_11
         }
     }
 
-    static class Placement
-    { //TODO: För hårda värden.
-        public static readonly double[,,] pawn =
-        {
-            { //Svarta bönder
-                { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }, //8
-                { 0.5f,  0.6f,  0.7f,  0.8f, 0.8f, 0.7f,  0.6f,  0.5f  }, //7
-                { 0.55f, 0.7f,  0.85f, 1f,   1f,   0.85f, 0.7f,  0.55f }, //6
-                { 0.6f,  0.75f, 1f,    1.2f, 1.2f, 1f,    0.75f, 0.6f  }, //5
-                { 0.7f,  0.9f,  1.2f,  1.4f, 1.4f, 1.2f,  0.9f,  0.7f  }, //4
-                { 1f,    1.1f,  1.5f,  1.7f, 1.7f, 1.5f,  1.1f,  1f    }, //3
-                { 1.9f,  2f,    2.1f,  2.2f, 2.2f, 2.1f,  2f,    1.9f  }, //2
-                { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }  //1
-            },
-            { //Vita bönder
-                { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }, //8
-                { 1.9f,  2f,    2.1f,  2.2f, 2.2f, 2.1f,  2f,    1.9f  }, //7
-                { 1f,    1.1f,  1.5f,  1.7f, 1.7f, 1.5f,  1.1f,  1f    }, //6
-                { 0.7f,  0.9f,  1.2f,  1.4f, 1.4f, 1.2f,  0.9f,  0.7f  }, //5
-                { 0.6f,  0.75f, 1f,    1.2f, 1.2f, 1f,    0.75f, 0.6f  }, //4
-                { 0.55f, 0.7f,  0.85f, 1f,   1f,   0.85f, 0.7f,  0.55f }, //3
-                { 0.5f,  0.6f,  0.7f,  0.8f, 0.8f, 0.7f,  0.6f,  0.5f  }, //2
-                { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }  //1
-            }
-        };
-        public static readonly double[,] knight =
-        {
-            { 0.55f, 0.65f, 0.75f, 0.9f,  0.9f,  0.75f, 0.65f, 0.55f },
-            { 0.65f, 0.8f,  1f,    1.05f, 1.05f, 1f,    0.8f,  0.65f },
-            { 0.75f, 1f,    1.35f, 1.5f,  1.5f,  1.35f, 1f,    0.75f },
-            { 0.9f,  1.05f, 1.5f,  1.6f,  1.6f,  1.5f,  1.05f, 0.9f  },
-            { 0.9f,  1.05f, 1.5f,  1.6f,  1.6f,  1.5f,  1.05f, 0.9f  },
-            { 0.75f, 1f,    1.35f, 1.5f,  1.5f,  1.35f, 1f,    0.75f },
-            { 0.65f, 0.8f,  1f,    1.05f, 1.05f, 1f,    0.8f,  0.65f },
-            { 0.55f, 0.65f, 0.75f, 0.9f,  0.9f,  0.75f, 0.65f, 0.55f }
-        };
-        public static readonly double[,] bishop =
-        {
-            { 1f,    0.95f, 0.85f, 0.8f,  0.8f,  0.85f, 0.95f, 1f    },
-            { 0.95f, 1.1f,  1f,    0.85f, 0.85f, 1f,    1.1f,  0.95f },
-            { 0.85f, 1f,    1.3f,  1.1f,  1.1f,  1.3f,  1f,    0.85f },
-            { 0.8f,  0.85f, 1.1f,  1.5f,  1.5f,  1.1f,  0.85f, 0.8f  },
-            { 0.8f,  0.85f, 1.1f,  1.5f,  1.5f,  1.1f,  0.85f, 0.8f  },
-            { 0.85f, 1f,    1.3f,  1.1f,  1.1f,  1.3f,  1f,    0.85f },
-            { 0.95f, 1.1f,  1f,    0.85f, 0.85f, 1f,    1.1f,  0.95f },
-            { 1f,    0.95f, 0.85f, 0.8f,  0.8f,  0.85f, 0.95f, 1f    }
-        };
-        public static readonly double[,] rook =
-        {
-            { 0.85f, 0.9f,  0.95f, 1f,     1f,    0.95f, 0.9f,  0.85f, },
-            { 0.9f,  0.95f, 1f,    1.05f,  1.05f, 1f,    0.95f, 0.9f,  },
-            { 0.95f, 1f,    1.05f, 1.1f,   1.1f,  1.05f, 1f,    0.95f, },
-            { 1f,    1.05f, 1.1f,  1.15f,  1.15f, 1.1f,  1.05f, 1f,    },
-            { 1f,    1.05f, 1.1f,  1.15f,  1.15f, 1.1f,  1.05f, 1f,    },
-            { 0.95f, 1f,    1.05f, 1.1f,   1.1f,  1.05f, 1f,    0.95f, },
-            { 0.9f,  0.95f, 1f,    1.05f,  1.05f, 1f,    0.95f, 0.9f,  },
-            { 0.85f, 0.9f,  0.95f, 1f,     1f,    0.95f, 0.9f,  0.85f, }
-        };
-        public static readonly double[,] queen =
-        {
-            { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f},
-            { 0.93f, 1.03f, 1.00f, 0.95f, 0.95f, 1.00f, 1.03f, 0.93f},
-            { 0.90f, 1.00f, 1.18f, 1.10f, 1.10f, 1.18f, 1.00f, 0.90f},
-            { 0.90f, 0.95f, 1.10f, 1.33f, 1.33f, 1.10f, 0.95f, 0.90f},
-            { 0.90f, 0.95f, 1.10f, 1.33f, 1.33f, 1.10f, 0.95f, 0.90f},
-            { 0.90f, 1.00f, 1.18f, 1.10f, 1.10f, 1.18f, 1.00f, 0.90f},
-            { 0.93f, 1.03f, 1.00f, 0.95f, 0.95f, 1.00f, 1.03f, 0.93f},
-            { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f}
-        };
-    }
 
     public struct Square
     {
         public bool wControl;
         public bool bControl;
         public char piece;
-    }
-
-    public class Move
-    {
-        public int[] from = new int[2];
-        public int[] to = new int[2];
-        public Move(int[] from, int[] to){
-            this.from = from;
-            this.to = to;
-        }
-        public virtual string toString(Square[,] board)
-        {
-            string ret = "";
-            if(board[from[0], from[1]].piece != 'p' && board[from[0], from[1]].piece != 'P')
-                ret += board[from[0], from[1]].piece;
-            ret = ret.ToUpper();
-            ret += ((Char) (from[1] + 'a')).ToString();
-            ret += 8 - from[0];
-            if(board[to[0], to[1]].piece != '\0')
-            {
-                ret += "x";
-            }
-            else
-            {
-                ret += "-";
-            }
-            ret += ((Char)(to[1] + 'a')).ToString();
-            ret += 8 - to[0];
-            return ret;
-        }
-        public virtual Square[,] execute(Square[,] board)
-        {
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            return board;
-        }
-    }
-    public class Castle : Move
-    {
-        int[] rookFrom, rookTo;
-        public Castle(int[] kingFrom, int[] kingTo,int[] rookFrom, int[] rookTo) :
-            base(kingFrom, kingTo)
-        {
-            this.rookFrom = rookFrom;
-            this.rookTo = rookTo;
-        }
-        public override Square[,] execute(Square[,] board)
-        {
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            board[rookTo[0], rookTo[1]]  = board[rookFrom[0], rookFrom[1]];
-            board[rookFrom[0], rookFrom[1]].piece = '\0';
-            return board;
-        }
-        public override string toString(Square[,] board)
-        {
-            if (rookFrom[1] == 7) return "0-0";
-            else return "0-0-0";
-        }
-    }
-    public class EnPassant : Move
-    {
-        int[] pawnToRemove;
-        public EnPassant(int[] from, int[] to, int[] pawnToRemove) :
-            base(from, to)
-        {
-            this.pawnToRemove = pawnToRemove;
-        }
-        public override Square[,] execute(Square[,] board)
-        {
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            board[pawnToRemove[0], pawnToRemove[1]].piece = '\0';
-            return board;
-        }
-    }
-    public class Promotion : Move
-    {
-        char promoteTo;
-        public Promotion(int[] from, int[] to, char promoteTo) :
-            base(from, to)
-        {
-            this.promoteTo = promoteTo;
-        }
-        public override Square[,] execute(Square[,] board)
-        {
-            board[to[0], to[1]].piece = promoteTo;
-            board[from[0], from[1]].piece = '\0';
-            return board;
-        }
-        public override string toString(Square[,] board)
-        {
-            return base.ToString() + "=" + promoteTo.ToString().ToUpper();
-        }
     }
 }
