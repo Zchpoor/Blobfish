@@ -1885,13 +1885,9 @@ namespace Blobfish_11
             if (thisPiece == '\0') return null;
             if (thisPiece == 'k') return null;
             if (thisPiece == 'K') return null;
+            //TODO: Pjäser av motsatt färg behöver inte kollas.
 
             List<int[]> legalSquares = new List<int[]>();
-            //
-            if (board[row, column].piece == 'P')
-            {
-            }
-            //
             int dRow, dCol; //Skillnaden i x/y-led
             if (whiteToMove)
             {
@@ -1913,7 +1909,6 @@ namespace Blobfish_11
                     int newRow = row - (j * sign);
                     if (board[newRow, column].piece != '\0')
                     {
-
                         return null; //Om det står något emellan kungen och pjäsen ifråga.
                     }
                     legalSquares.Add(new int[] { newRow, column });
@@ -1936,7 +1931,6 @@ namespace Blobfish_11
                     }
                     i++;
                 }
-                //TODO: Fix
                 return null; //Borde inte anropas.
             }
             else if (dRow == 0) //Samma rad
@@ -1972,13 +1966,46 @@ namespace Blobfish_11
                     }
                     i++;
                 }
-                //TODO: Fix
                 return null; //Borde inte anropas.
             }
             else if (Math.Abs(dRow) == Math.Abs(dCol)) //Samma diagonal
             {
-                return null;
-                //TODO: Fix
+                string piecesToLookFor = "bq";
+                if (!whiteToMove) piecesToLookFor = "BQ";
+                int signRow = Math.Sign(dRow);
+                int signCol = Math.Sign(dCol); //För att veta vilken riktning kungen är åt.
+                for (int j = 1; j < Math.Abs(dCol); j++)
+                {
+                    int newCol = column - (j * signCol);
+                    int newRow = row - (j * signRow);
+                    if (board[newRow, newCol].piece != '\0')
+                    {
+
+                        return null; //Om det står något emellan kungen och pjäsen ifråga.
+                    }
+                    legalSquares.Add(new int[] { newRow, newCol });
+                }
+                //Kommer endast hit om kungen står på ett sådant sätt att den kan vara spikad.
+                int i = 1;
+                while (validSquare(row + (i * signRow), column + (i * signCol)))
+                {
+                    //TODO: Sätt dessa tidigare.
+                    int newRow = row + (i * signRow);
+                    int newCol = column + (i * signCol);
+                    if (piecesToLookFor.Contains(board[newRow, newCol].piece))
+                    {
+                        legalSquares.Add(new int[] { newRow, newCol });
+                        return legalSquares; //Det står ett torn eller dam på andra sidan.
+                    }
+                    else if (board[newRow, newCol].piece != '\0')
+                        return null;
+                    else
+                    {
+                        legalSquares.Add(new int[] { newRow, newCol });
+                    }
+                    i++;
+                }
+                return null; //Borde inte anropas.
             }
             else return null;
         }
