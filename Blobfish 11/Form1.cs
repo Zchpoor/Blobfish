@@ -57,7 +57,6 @@ namespace Blobfish_11
                     string picName = "null.png";
                     if (piece != '\0')
                     {
-                        //TODO: Ladda dessa från undermapp.
                         if (piece > 'Z')
                         {
                             picName = "B" + piece + ".png";
