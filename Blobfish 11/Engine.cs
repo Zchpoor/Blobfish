@@ -7,8 +7,7 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    //TODO: Gör partiell
-    public sealed class Engine
+    public sealed partial class Engine
     {
         public EvalResult eval(Position pos, int depth)
         {
@@ -53,41 +52,41 @@ namespace Blobfish_11
                             //board[row, column] = tkn;
                             numberOfPawns[0]++;
                             pawns[0, column]++;
-                            posFactor[0] += Placement.pawn[0, row, column];
+                            posFactor[0] += pawn[0, row, column];
                             break;
 
                         case 'P':
                             //board[row, column] = tkn;
                             numberOfPawns[1]++;
                             pawns[1, column]++;
-                            posFactor[1] += Placement.pawn[1, row, column];
+                            posFactor[1] += pawn[1, row, column];
                             break;
 
                         case 'n':
                             //board[row, column] = tkn;
-                            pieceValue -= pieceValues[0] * Placement.knight[row, column];
+                            pieceValue -= pieceValues[0] * knight[row, column];
                             break;
                         case 'N':
                             //board[row, column] = tkn;
-                            pieceValue += pieceValues[0] * Placement.knight[row, column];
+                            pieceValue += pieceValues[0] * knight[row, column];
                             break;
 
                         case 'b':
                             //board[row, column] = tkn;
-                            pieceValue -= pieceValues[1] * Placement.bishop[row, column];
+                            pieceValue -= pieceValues[1] * bishop[row, column];
                             break;
                         case 'B':
                             //board[row, column] = tkn;
-                            pieceValue += pieceValues[1] * Placement.bishop[row, column];
+                            pieceValue += pieceValues[1] * bishop[row, column];
                             break;
 
                         case 'r':
                             //board[row, column] = tkn;
-                            pieceValue -= pieceValues[2] * Placement.rook[row, column];
+                            pieceValue -= pieceValues[2] * rook[row, column];
                             break;
                         case 'R':
                             //board[row, column] = tkn;
-                            pieceValue += pieceValues[2] * Placement.rook[row, column];
+                            pieceValue += pieceValues[2] * rook[row, column];
                             break;
 
                         case 'k':
@@ -103,11 +102,11 @@ namespace Blobfish_11
 
                         case 'q':
                             //board[row, column] = tkn;
-                            pieceValue -= pieceValues[3] * Placement.queen[row, column];
+                            pieceValue -= pieceValues[3] * queen[row, column];
                             break;
                         case 'Q':
                             //board[row, column] = tkn;
-                            pieceValue += pieceValues[3] * Placement.queen[row, column];
+                            pieceValue += pieceValues[3] * queen[row, column];
                             break;
                         default:
                             break;

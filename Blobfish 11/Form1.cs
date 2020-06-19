@@ -89,7 +89,6 @@ namespace Blobfish_11
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            //TODO: Remove arguments?
             if (fenBox.Text.ToLower() == "test")
             {
                 string testString = Tests.runTests();
@@ -104,15 +103,6 @@ namespace Blobfish_11
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
                 evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
-                /*
-                double value = pos.eval();
-                evalBox.Text += "Evaluering:\n";
-                evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
-                evalBox.Text += "Bönder: " + Math.Round(pos.pawnValues[1] - pos.pawnValues[0], 2) + "\n";
-                evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
-                evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
-                evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
-                */
                 display(pos);
             }
         }
