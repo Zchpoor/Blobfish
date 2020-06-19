@@ -19,8 +19,131 @@ namespace Blobfish_11
             {
                 return (double)gameResult; //Ställningen är avgjord.
             }
+            double numEval  = numericEval(pos);
+            return numEval;
+        }
+        public double numericEval(Position pos)
+        {
+            /* 
+             * [row, column]
+             * row==0       -> rad 8.
+             * row==7       -> rad 1.
+             * column==0    -> a-linjen.
+             * column==7    -> h-linjen.
+             */
+            int[] numberOfPawns = new int[2];
+            double[] posFactor = { 1f, 1f };
+            int[,] pawns = new int[2, 8]; //0=black, 1=white.
+            //bool whiteSquare = true; //TODO: ordna med färgkomplex.
+            //int column = 0, row = 0;
+            double[] pieceValues = { 3, 3, 5, 9 };
+            double pieceValue = 0;
+            for (int row = 0; row < 8; row++)
+            {
+                //TODO: Clean up
+                for (int column = 0; column < 8; column++)
+                {
+                    switch (pos.board[row, column].piece)
+                    {
+                        case 'p':
+                            //board[row, column].piece = tkn;
+                            numberOfPawns[0]++;
+                            pawns[0, column]++;
+                            posFactor[0] += Placement.pawn[0, row, column];
+                            break;
 
-            return 0;
+                        case 'P':
+                            //board[row, column].piece = tkn;
+                            numberOfPawns[1]++;
+                            pawns[1, column]++;
+                            posFactor[1] += Placement.pawn[1, row, column];
+                            break;
+
+                        case 'n':
+                            //board[row, column].piece = tkn;
+                            pieceValue -= pieceValues[0] * Placement.knight[row, column];
+                            break;
+                        case 'N':
+                            //board[row, column].piece = tkn;
+                            pieceValue += pieceValues[0] * Placement.knight[row, column];
+                            break;
+
+                        case 'b':
+                            //board[row, column].piece = tkn;
+                            pieceValue -= pieceValues[1] * Placement.bishop[row, column];
+                            break;
+                        case 'B':
+                            //board[row, column].piece = tkn;
+                            pieceValue += pieceValues[1] * Placement.bishop[row, column];
+                            break;
+
+                        case 'r':
+                            //board[row, column].piece = tkn;
+                            pieceValue -= pieceValues[2] * Placement.rook[row, column];
+                            break;
+                        case 'R':
+                            //board[row, column].piece = tkn;
+                            pieceValue += pieceValues[2] * Placement.rook[row, column];
+                            break;
+
+                        case 'k':
+                            //board[row, column].piece = tkn;
+                            pos.kingPositions[0, 0] = row;
+                            pos.kingPositions[0, 1] = column;
+                            break;
+                        case 'K':
+                            //board[row, column].piece = tkn;
+                            pos.kingPositions[1, 0] = row;
+                            pos.kingPositions[1, 1] = column;
+                            break;
+
+                        case 'q':
+                            //board[row, column].piece = tkn;
+                            pieceValue -= pieceValues[3] * Placement.queen[row, column];
+                            break;
+                        case 'Q':
+                            //board[row, column].piece = tkn;
+                            pieceValue += pieceValues[3] * Placement.queen[row, column];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            //calculateControl();
+            for (int i = 0; i < 2; i++)
+            {
+                if (numberOfPawns[i] == 0)
+                    posFactor[i] = 0f;
+                else
+                    posFactor[i] /= numberOfPawns[i];
+            }
+            double pawnValue = evalPawns(numberOfPawns, posFactor, pawns);
+            return pieceValue + pawnValue;
+        }
+        private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
+        {
+            double[] pawnValues = new double[2];
+            for (int c = 0; c < 2; c++)
+            {
+                int neighbours = 0;
+                int lines = 0;
+                if (pawns[c, 0] > 0) lines++; //specialfall för a-linjen.
+                if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
+                for (int i = 1; i < 7; i++) //från b till g sista. 
+                {
+                    if (pawns[c, i] > 0) lines++;
+                    if (pawns[c, i - 1] > 0) neighbours += pawns[c, 0];
+                    if (pawns[c, i + 1] > 0) neighbours += pawns[c, 0];
+                }
+                if (pawns[c, 7] > 0) lines++; //specialfall för h-linjen.
+                if (pawns[c, 6] > 0) neighbours += pawns[c, 0];
+                pawnValues[c] = ((numberOfPawns[c] * (neighbours + lines + 41)) + 9.37f) / 64;
+                //e(p,s)=(p(s+41)+9,37)/64. TODO: Förbättra formel
+                pawnValues[c] *= posFactor[c];
+            }
+            return pawnValues[1] - pawnValues[0];
         }
         private BoardAndCheckingPieces calculateControl(Position pos)
         {

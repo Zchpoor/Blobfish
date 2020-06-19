@@ -56,6 +56,7 @@ namespace Blobfish_11
                     string picName = "null.png";
                     if (piece != '\0')
                     {
+                        //TODO: Ladda dessa från undermapp.
                         if (piece > 'Z')
                         {
                             picName = "B" + piece + ".png";
@@ -86,6 +87,9 @@ namespace Blobfish_11
             {
                 Position pos = new Position(fenBox.Text);
                 evalBox.Text = "";
+                /*Engine blobFish = new Engine();
+                double eval = blobFish.eval(pos, 0);
+                evalBox.Text = "Evaluering: " + Math.Round(eval, 2);*/
                 double value = pos.eval();
                 evalBox.Text += "Evaluering:\n";
                 evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
@@ -94,6 +98,7 @@ namespace Blobfish_11
                 evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
                 evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
                 display(pos);
+                
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
