@@ -7,8 +7,8 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    //TODO: Skapa eget namespace?
-    class Engine
+    //TODO: Gör partiell
+    public sealed class Engine
     {
         public double eval(Position pos, int depth)
         {

@@ -87,9 +87,10 @@ namespace Blobfish_11
             {
                 Position pos = new Position(fenBox.Text);
                 evalBox.Text = "";
-                /*Engine blobFish = new Engine();
+                Engine blobFish = new Engine();
                 double eval = blobFish.eval(pos, 0);
-                evalBox.Text = "Evaluering: " + Math.Round(eval, 2);*/
+                evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
+                /*
                 double value = pos.eval();
                 evalBox.Text += "Evaluering:\n";
                 evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
@@ -97,8 +98,8 @@ namespace Blobfish_11
                 evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
                 evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
                 evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
+                */
                 display(pos);
-                
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
@@ -120,8 +121,9 @@ namespace Blobfish_11
                     if (firstSquare[0] == item.from[0] && firstSquare[1] == item.from[1] &&
                         newSquare[0] == item.to[0] && newSquare[1] == item.to[1])
                     {
-                        Square[,] newPosition = item.execute(this.currentPosition.board);
-                        //TODO: Detta verkar inte fungera?
+                        Position newPosition = item.execute(currentPosition);
+                        this.currentPosition = newPosition;
+                        this.display(newPosition);
                     }
                 }
                 moveLabel.Text = (char)(firstSquare[1] + 'a') + (8 - firstSquare[0]).ToString() + "-" +
@@ -166,11 +168,11 @@ namespace Blobfish_11
         public bool whiteToMove;
         public int halfMoveClock = 0;
         public int moveCounter = 0;
-        public int[] enPassantSquare = new int[2];
+        public int[] enPassantSquare = new int[2]; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
         public double material = 0; //TODO: Städa upp
         public double[] pawnValues = new double[2];
-        public Square[,] board = new Square[8, 8];
+        public Square[,] board = new Square[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
         int[] checkingPieces = { -1, -1, -1, -1 };
         public List<Move> allMoves = new List<Move>();

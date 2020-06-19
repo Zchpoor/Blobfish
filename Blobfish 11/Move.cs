@@ -36,12 +36,81 @@ namespace Blobfish_11
             ret += 8 - to[0];
             return ret;
         }
-        public virtual Square[,] execute(Square[,] board)
+        public virtual Position execute(Position oldPos)
         {
-            //TODO: return position, or other solution.
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            return board;
+            //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
+
+            //Makes a deep copy of the position.
+            Position newPos = new Position(oldPos.board, oldPos.whiteToMove, 
+                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+
+            newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
+            newPos.board[from[0], from[1]].piece = '\0';
+            if (!oldPos.whiteToMove)
+            {
+                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
+            }
+            newPos.whiteToMove = !oldPos.whiteToMove;
+            if(oldPos.board[from[0], from[1]].piece == 'p' || oldPos.board[from[0], from[1]].piece == 'P' ||
+                oldPos.board[to[0], to[1]].piece != '\0')
+            {
+                //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas tilll 0.
+                newPos.halfMoveClock = 0;
+            }
+            else
+            {
+                newPos.halfMoveClock = oldPos.halfMoveClock + 1;
+            }
+            if (oldPos.board[from[0], from[1]].piece == 'k')
+            {
+                newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
+                newPos.castlingRights[3] = false;
+            }
+            else if (oldPos.board[from[0], from[1]].piece == 'K')
+            {
+                newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
+                newPos.castlingRights[1] = false;
+            }
+            else if (oldPos.board[from[0], from[1]].piece == 'r')
+            {
+                //Ta bort en av rockadmöjligheterna om ett av svarts torn förflyttas.
+
+                if (from[1] == 0)//Om tornet står på a-linjen
+                {
+                    newPos.castlingRights[3] = false;
+                }
+                else if (from[1] == 7) //Om tornet står på h-linjen.
+                {
+                    newPos.castlingRights[2] = false;
+                }
+            }
+            else if (oldPos.board[from[0], from[1]].piece == 'R')
+            {
+                //Ta bort en av rockadmöjligheterna om ett av vits torn förflyttas.
+
+                if (from[1] == 0)//Om tornet står på a-linjen
+                {
+                    newPos.castlingRights[1] = false;
+                }
+                else if (from[1] == 7) //Om tornet står på h-linjen.
+                {
+                    newPos.castlingRights[0] = false;
+                }
+            }
+
+            //Beräkna en passant-fält
+            if(oldPos.board[from[0], from[1]].piece.ToString().ToUpper() == "P") //Om den förflyttade pjäsen är en bonde
+            {
+               if(Math.Abs(from[0] - to[0]) == 2) //Om förflyttningen är två steg.
+                {
+                    newPos.enPassantSquare = new int[2] {(from[0] - to[0])/2, from[1]};
+                }
+            }
+            else
+            {
+                newPos.enPassantSquare = new int[2] { -1, -1 };
+            }
+            return newPos;
         }
     }
     public class Castle : Move
@@ -53,13 +122,34 @@ namespace Blobfish_11
             this.rookFrom = rookFrom;
             this.rookTo = rookTo;
         }
-        public override Square[,] execute(Square[,] board)
+        public override Position execute(Position oldPos)
         {
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            board[rookTo[0], rookTo[1]] = board[rookFrom[0], rookFrom[1]];
-            board[rookFrom[0], rookFrom[1]].piece = '\0';
-            return board;
+            //Makes a deep copy of the position.
+            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+
+            newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
+            newPos.board[from[0], from[1]].piece = '\0';
+            newPos.board[rookTo[0], rookTo[1]] = oldPos.board[rookFrom[0], rookFrom[1]];
+            newPos.board[rookFrom[0], rookFrom[1]].piece = '\0';
+            if (oldPos.whiteToMove) //Ta bort ala rockadmöjligheter för spelaren som rockerar.
+            {
+                newPos.castlingRights[0] = false; 
+                newPos.castlingRights[1] = false;
+            }
+            else
+            {
+                newPos.castlingRights[2] = false;
+                newPos.castlingRights[3] = false;
+            }
+            if (!oldPos.whiteToMove)
+            {
+                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
+            }
+            newPos.enPassantSquare = new int[2] { -1, -1 };
+            newPos.halfMoveClock = 0;
+            newPos.whiteToMove = !oldPos.whiteToMove;
+            return newPos;
         }
         public override string toString(Square[,] board)
         {
@@ -75,12 +165,23 @@ namespace Blobfish_11
         {
             this.pawnToRemove = pawnToRemove;
         }
-        public override Square[,] execute(Square[,] board)
+        public override Position execute(Position oldPos)
         {
-            board[to[0], to[1]] = board[from[0], from[1]];
-            board[from[0], from[1]].piece = '\0';
-            board[pawnToRemove[0], pawnToRemove[1]].piece = '\0';
-            return board;
+            //Makes a deep copy of the position.
+            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+
+            newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
+            newPos.board[from[0], from[1]].piece = '\0';
+            newPos.board[pawnToRemove[0], pawnToRemove[1]].piece = '\0';
+            if (!oldPos.whiteToMove)
+            {
+                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
+            }
+            newPos.enPassantSquare = new int[2] { -1, -1 };
+            newPos.halfMoveClock = 0;
+            newPos.whiteToMove = !oldPos.whiteToMove;
+            return newPos;
         }
     }
     public class Promotion : Move
@@ -91,11 +192,22 @@ namespace Blobfish_11
         {
             this.promoteTo = promoteTo;
         }
-        public override Square[,] execute(Square[,] board)
+        public override Position execute(Position oldPos)
         {
-            board[to[0], to[1]].piece = promoteTo;
-            board[from[0], from[1]].piece = '\0';
-            return board;
+            //Makes a deep copy of the position.
+            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+
+            newPos.board[to[0], to[1]].piece = promoteTo;
+            newPos.board[from[0], from[1]].piece = '\0';
+            if (!oldPos.whiteToMove)
+            {
+                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
+            }
+            newPos.enPassantSquare = new int[2] { -1, -1 };
+            newPos.halfMoveClock = 0;
+            newPos.whiteToMove = !oldPos.whiteToMove;
+            return newPos;
         }
         public override string toString(Square[,] board)
         {
