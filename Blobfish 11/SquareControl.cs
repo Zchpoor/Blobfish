@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Blobfish_11
 {
-    public struct Square
+    public struct SquareControl
     {
         public bool wControl;
         public bool bControl;
-        public char piece;
     }
 }

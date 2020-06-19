@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blobfish_11
 {
+    //TODO: Flytta in i Engine
     static class Placement
     { //TODO: För hårda värden.
         public static readonly double[,,] pawn =

@@ -55,9 +55,10 @@
     </Compile>
     <Compile Include="Move.cs" />
     <Compile Include="Placement.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Square.cs" />
+    <Compile Include="SquareControl.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
