@@ -31,10 +31,10 @@
             this.fenBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.evalBox = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
             this.moveLabel = new System.Windows.Forms.Label();
+            this.evalBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // fenBox
@@ -64,16 +64,6 @@
             this.button1.Text = "OK";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // evalBox
-            // 
-            this.evalBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.evalBox.Dock = System.Windows.Forms.DockStyle.Right;
-            this.evalBox.Location = new System.Drawing.Point(1055, 0);
-            this.evalBox.Name = "evalBox";
-            this.evalBox.Size = new System.Drawing.Size(259, 560);
-            this.evalBox.TabIndex = 3;
-            this.evalBox.Text = "N/A";
             // 
             // textBox1
             // 
@@ -122,15 +112,27 @@
             this.moveLabel.Size = new System.Drawing.Size(0, 17);
             this.moveLabel.TabIndex = 6;
             // 
+            // evalBox
+            // 
+            this.evalBox.AcceptsReturn = true;
+            this.evalBox.AcceptsTab = true;
+            this.evalBox.Location = new System.Drawing.Point(1058, 0);
+            this.evalBox.Multiline = true;
+            this.evalBox.Name = "evalBox";
+            this.evalBox.ReadOnly = true;
+            this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.evalBox.Size = new System.Drawing.Size(258, 560);
+            this.evalBox.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1314, 560);
+            this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.evalBox);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
@@ -146,10 +148,10 @@
         private System.Windows.Forms.TextBox fenBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label evalBox;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
         private System.Windows.Forms.Label moveLabel;
+        private System.Windows.Forms.TextBox evalBox;
     }
 }
 

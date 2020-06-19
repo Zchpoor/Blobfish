@@ -57,7 +57,6 @@ namespace Blobfish_11
                     string picName = "null.png";
                     if (piece != '\0')
                     {
-                        //TODO: Ladda dessa från undermapp.
                         if (piece > 'Z')
                         {
                             picName = "B" + piece + ".png";
@@ -90,12 +89,10 @@ namespace Blobfish_11
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            //TODO: Remove arguments?
             if (fenBox.Text.ToLower() == "test")
             {
-                bool successfulTests = runTests();
-                if (!successfulTests)
-                    fenBox.Text = "Tests failed!";
+                string testString = Tests.runTests();
+                evalBox.Text = testString;
             }
             else
             {
@@ -106,15 +103,6 @@ namespace Blobfish_11
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
                 evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
-                /*
-                double value = pos.eval();
-                evalBox.Text += "Evaluering:\n";
-                evalBox.Text += "Pjäser: " + Math.Round(pos.material, 2) + "\n";
-                evalBox.Text += "Bönder: " + Math.Round(pos.pawnValues[1] - pos.pawnValues[0], 2) + "\n";
-                evalBox.Text += "    Vita: " + Math.Round(pos.pawnValues[1], 2) + "\n";
-                evalBox.Text += "    Svarta: " + Math.Round(pos.pawnValues[0], 2) + "\n";
-                evalBox.Text += "Totalt: " + Math.Round(value, 2) + "\n";
-                */
                 display(pos);
             }
         }
@@ -152,32 +140,6 @@ namespace Blobfish_11
         {
             if (e.KeyChar == '\r')
                 button1_Click(null, null);
-        }
-        private bool runTests()
-        {
-            string fullResult = "";
-            int testCounter = 1;
-            Engine blobfish = new Engine();
-
-            bool testNumberOfMoves(string FEN, int moves)
-            {
-                Position pos = new Position(FEN);
-                EvalResult result = blobfish.eval(pos, 0);
-                bool success = result.allMoves.Count == moves;
-                if (success) fullResult+= "Test " + testCounter.ToString() + ": Success\n";
-                else fullResult += "Test " + testCounter.ToString() + ": Fail\n";
-                testCounter++;
-                return success;
-            }
-            testNumberOfMoves("8/8/1b6/8/1k6/8/3rP1K1/8 w - - 0 1", 6); //Spikad vit bonde.
-            testNumberOfMoves("kb5q/8/8/8/5R1B/8/r5PK/8 w - - 0 1", 4); //Tre spikar på vit
-            testNumberOfMoves("K6Q/2B5/8/8/7r/6n1/R5pk/8 b - - 0 1", 8); //Tre spikar på svart
-            testNumberOfMoves("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 20); //Utgångsställningen
-            testNumberOfMoves("rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3", 31); //En passant
-
-            //TODO: More tests.
-            evalBox.Text = fullResult;
-            return true;
         }
     }
 }

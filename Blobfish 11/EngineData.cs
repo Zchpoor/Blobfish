@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    //TODO: Flytta in i Engine
-    static class Placement
-    { //TODO: För hårda värden.
-        public static readonly double[,,] pawn =
+    public sealed partial class Engine
+    {
+        //TODO: För hårda värden.
+        private static readonly double[,,] pawn =
         {
             { //Svarta bönder
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }, //8
@@ -32,7 +33,7 @@ namespace Blobfish_11
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }  //1
             }
         };
-        public static readonly double[,] knight =
+        private static readonly double[,] knight =
         {
             { 0.55f, 0.65f, 0.75f, 0.9f,  0.9f,  0.75f, 0.65f, 0.55f },
             { 0.65f, 0.8f,  1f,    1.05f, 1.05f, 1f,    0.8f,  0.65f },
@@ -43,7 +44,7 @@ namespace Blobfish_11
             { 0.65f, 0.8f,  1f,    1.05f, 1.05f, 1f,    0.8f,  0.65f },
             { 0.55f, 0.65f, 0.75f, 0.9f,  0.9f,  0.75f, 0.65f, 0.55f }
         };
-        public static readonly double[,] bishop =
+        private static readonly double[,] bishop =
         {
             { 1f,    0.95f, 0.85f, 0.8f,  0.8f,  0.85f, 0.95f, 1f    },
             { 0.95f, 1.1f,  1f,    0.85f, 0.85f, 1f,    1.1f,  0.95f },
@@ -54,7 +55,7 @@ namespace Blobfish_11
             { 0.95f, 1.1f,  1f,    0.85f, 0.85f, 1f,    1.1f,  0.95f },
             { 1f,    0.95f, 0.85f, 0.8f,  0.8f,  0.85f, 0.95f, 1f    }
         };
-        public static readonly double[,] rook =
+        private static readonly double[,] rook =
         {
             { 0.85f, 0.9f,  0.95f, 1f,     1f,    0.95f, 0.9f,  0.85f, },
             { 0.9f,  0.95f, 1f,    1.05f,  1.05f, 1f,    0.95f, 0.9f,  },
@@ -65,7 +66,7 @@ namespace Blobfish_11
             { 0.9f,  0.95f, 1f,    1.05f,  1.05f, 1f,    0.95f, 0.9f,  },
             { 0.85f, 0.9f,  0.95f, 1f,     1f,    0.95f, 0.9f,  0.85f, }
         };
-        public static readonly double[,] queen =
+        private static readonly double[,] queen =
         {
             { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f},
             { 0.93f, 1.03f, 1.00f, 0.95f, 0.95f, 1.00f, 1.03f, 0.93f},
@@ -77,5 +78,4 @@ namespace Blobfish_11
             { 0.93f, 0.93f, 0.90f, 0.90f, 0.90f, 0.90f, 0.93f, 0.93f}
         };
     }
-
 }
