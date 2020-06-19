@@ -15,16 +15,16 @@ namespace Blobfish_11
             this.from = from;
             this.to = to;
         }
-        public virtual string toString(Square[,] board)
+        public virtual string toString(char[,] board)
         {
             //TODO: Checks etc.
             string ret = "";
-            if (board[from[0], from[1]].piece != 'p' && board[from[0], from[1]].piece != 'P')
-                ret += board[from[0], from[1]].piece;
+            if (board[from[0], from[1]] != 'p' && board[from[0], from[1]] != 'P')
+                ret += board[from[0], from[1]];
             ret = ret.ToUpper();
             ret += ((Char)(from[1] + 'a')).ToString();
             ret += 8 - from[0];
-            if (board[to[0], to[1]].piece != '\0')
+            if (board[to[0], to[1]] != '\0')
             {
                 ret += "x";
             }
@@ -45,14 +45,14 @@ namespace Blobfish_11
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
-            newPos.board[from[0], from[1]].piece = '\0';
+            newPos.board[from[0], from[1]] = '\0';
             if (!oldPos.whiteToMove)
             {
                 newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
             }
             newPos.whiteToMove = !oldPos.whiteToMove;
-            if(oldPos.board[from[0], from[1]].piece == 'p' || oldPos.board[from[0], from[1]].piece == 'P' ||
-                oldPos.board[to[0], to[1]].piece != '\0')
+            if(oldPos.board[from[0], from[1]] == 'p' || oldPos.board[from[0], from[1]] == 'P' ||
+                oldPos.board[to[0], to[1]] != '\0')
             {
                 //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas tilll 0.
                 newPos.halfMoveClock = 0;
@@ -61,17 +61,17 @@ namespace Blobfish_11
             {
                 newPos.halfMoveClock = oldPos.halfMoveClock + 1;
             }
-            if (oldPos.board[from[0], from[1]].piece == 'k')
+            if (oldPos.board[from[0], from[1]] == 'k')
             {
                 newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[3] = false;
             }
-            else if (oldPos.board[from[0], from[1]].piece == 'K')
+            else if (oldPos.board[from[0], from[1]] == 'K')
             {
                 newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[1] = false;
             }
-            else if (oldPos.board[from[0], from[1]].piece == 'r')
+            else if (oldPos.board[from[0], from[1]] == 'r')
             {
                 //Ta bort en av rockadmöjligheterna om ett av svarts torn förflyttas.
 
@@ -84,7 +84,7 @@ namespace Blobfish_11
                     newPos.castlingRights[2] = false;
                 }
             }
-            else if (oldPos.board[from[0], from[1]].piece == 'R')
+            else if (oldPos.board[from[0], from[1]] == 'R')
             {
                 //Ta bort en av rockadmöjligheterna om ett av vits torn förflyttas.
 
@@ -99,7 +99,7 @@ namespace Blobfish_11
             }
 
             //Beräkna en passant-fält
-            if(oldPos.board[from[0], from[1]].piece.ToString().ToUpper() == "P") //Om den förflyttade pjäsen är en bonde
+            if(oldPos.board[from[0], from[1]].ToString().ToUpper() == "P") //Om den förflyttade pjäsen är en bonde
             {
                if(Math.Abs(from[0] - to[0]) == 2) //Om förflyttningen är två steg.
                 {
@@ -129,9 +129,9 @@ namespace Blobfish_11
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
-            newPos.board[from[0], from[1]].piece = '\0';
+            newPos.board[from[0], from[1]] = '\0';
             newPos.board[rookTo[0], rookTo[1]] = oldPos.board[rookFrom[0], rookFrom[1]];
-            newPos.board[rookFrom[0], rookFrom[1]].piece = '\0';
+            newPos.board[rookFrom[0], rookFrom[1]] = '\0';
             if (oldPos.whiteToMove) //Ta bort ala rockadmöjligheter för spelaren som rockerar.
             {
                 newPos.castlingRights[0] = false; 
@@ -151,7 +151,7 @@ namespace Blobfish_11
             newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
         }
-        public override string toString(Square[,] board)
+        public override string toString(char[,] board)
         {
             if (rookFrom[1] == 7) return "0-0";
             else return "0-0-0";
@@ -172,8 +172,8 @@ namespace Blobfish_11
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
-            newPos.board[from[0], from[1]].piece = '\0';
-            newPos.board[pawnToRemove[0], pawnToRemove[1]].piece = '\0';
+            newPos.board[from[0], from[1]] = '\0';
+            newPos.board[pawnToRemove[0], pawnToRemove[1]] = '\0';
             if (!oldPos.whiteToMove)
             {
                 newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
@@ -198,8 +198,8 @@ namespace Blobfish_11
             Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
 
-            newPos.board[to[0], to[1]].piece = promoteTo;
-            newPos.board[from[0], from[1]].piece = '\0';
+            newPos.board[to[0], to[1]] = promoteTo;
+            newPos.board[from[0], from[1]] = '\0';
             if (!oldPos.whiteToMove)
             {
                 newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
@@ -209,7 +209,7 @@ namespace Blobfish_11
             newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
         }
-        public override string toString(Square[,] board)
+        public override string toString(char[,] board)
         {
             return base.ToString() + "=" + promoteTo.ToString().ToUpper();
         }
