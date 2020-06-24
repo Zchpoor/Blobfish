@@ -7,14 +7,23 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public sealed partial class Engine
+    public partial class Engine
     {
         public EvalResult eval(Position pos, int depth)
         {
+
+            //TEST
+            //List<Move> testMoves =  allPossibleMoves(pos);
+            //TEST
+
             EvalResult result = new EvalResult();
             ControlAndCheckingPieces controlResult = calculateControl(pos);
             List<Move> moves = calculateMoves(pos, controlResult.board);
             int gameResult = decisiveResult(pos, controlResult.checkingPieces, controlResult);
+            if(!validPosition(pos, controlResult.board))
+            {
+                throw new Exception("Felaktig ställning!");
+            }
             if(gameResult != -2)
             {
                 result.evaluation = (double)gameResult;
@@ -25,7 +34,7 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public double numericEval(Position pos)
+        private double numericEval(Position pos)
         {
             /* 
              * [row, column]
@@ -43,69 +52,56 @@ namespace Blobfish_11
             double pieceValue = 0;
             for (int row = 0; row < 8; row++)
             {
-                //TODO: Clean up
                 for (int column = 0; column < 8; column++)
                 {
                     switch (pos.board[row, column])
                     {
                         case 'p':
-                            //board[row, column] = tkn;
                             numberOfPawns[0]++;
                             pawns[0, column]++;
                             posFactor[0] += pawn[0, row, column];
                             break;
 
                         case 'P':
-                            //board[row, column] = tkn;
                             numberOfPawns[1]++;
                             pawns[1, column]++;
                             posFactor[1] += pawn[1, row, column];
                             break;
 
                         case 'n':
-                            //board[row, column] = tkn;
                             pieceValue -= pieceValues[0] * knight[row, column];
                             break;
                         case 'N':
-                            //board[row, column] = tkn;
                             pieceValue += pieceValues[0] * knight[row, column];
                             break;
 
                         case 'b':
-                            //board[row, column] = tkn;
                             pieceValue -= pieceValues[1] * bishop[row, column];
                             break;
                         case 'B':
-                            //board[row, column] = tkn;
                             pieceValue += pieceValues[1] * bishop[row, column];
                             break;
 
                         case 'r':
-                            //board[row, column] = tkn;
                             pieceValue -= pieceValues[2] * rook[row, column];
                             break;
                         case 'R':
-                            //board[row, column] = tkn;
                             pieceValue += pieceValues[2] * rook[row, column];
                             break;
 
                         case 'k':
-                            //board[row, column] = tkn;
                             pos.kingPositions[0, 0] = row;
                             pos.kingPositions[0, 1] = column;
                             break;
                         case 'K':
-                            //board[row, column] = tkn;
                             pos.kingPositions[1, 0] = row;
                             pos.kingPositions[1, 1] = column;
                             break;
 
                         case 'q':
-                            //board[row, column] = tkn;
                             pieceValue -= pieceValues[3] * queen[row, column];
                             break;
                         case 'Q':
-                            //board[row, column] = tkn;
                             pieceValue += pieceValues[3] * queen[row, column];
                             break;
                         default:
@@ -114,7 +110,6 @@ namespace Blobfish_11
                 }
             }
 
-            //calculateControl();
             for (int i = 0; i < 2; i++)
             {
                 if (numberOfPawns[i] == 0)
@@ -150,10 +145,8 @@ namespace Blobfish_11
         }
         private ControlAndCheckingPieces calculateControl(Position pos)
         {
-            //TODO: Ändra från Square.
             SquareControl[,] board = new SquareControl[8, 8];
             
-            //TODO: Returnera denna på något vis.
             int[] checkingPieces = { -1, -1, -1, -1 };
             
 
@@ -410,7 +403,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
+                            while (row - i >= 0 && column + i < 8 && !done)
                             {
                                 setControl(row - i, column + i, true);
                                 if (pos.board[row - i, column + i] != '\0')
@@ -421,7 +414,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
+                            while (row + i < 8 && column - i >= 0 && !done)
                             {
                                 setControl(row + i, column - i, true);
                                 if (pos.board[row + i, column - i] != '\0')
@@ -432,7 +425,7 @@ namespace Blobfish_11
                             }
                             i = 1;
                             done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
+                            while (row - i >= 0 && column - i >= 0 && !done)
                             {
                                 setControl(row - i, column - i, true);
                                 if (pos.board[row - i, column - i] != '\0')
@@ -732,7 +725,7 @@ namespace Blobfish_11
             result.checkingPieces = checkingPieces;
             return result;
         }
-        public int decisiveResult(Position pos, int[] checkingPieces, ControlAndCheckingPieces controlResult)
+        private int decisiveResult(Position pos, int[] checkingPieces, ControlAndCheckingPieces controlResult)
         {
             // 1=vit vinst, -1=svart vinst, 0=remi, -2=oklart.
             if (checkingPieces[0] != -1) //Schack
@@ -753,7 +746,7 @@ namespace Blobfish_11
 
             }
 
-            if (pos.moveCounter > 100)
+            if (pos.moveCounter >= 100)
             {
                 return 0; //Femtiodragsregeln.
             }
@@ -762,7 +755,7 @@ namespace Blobfish_11
         }
 
         //TODO: Gör denna funktion mindre
-        public List<Move> calculateMoves(Position pos, SquareControl[,] controlledSquares)
+        private List<Move> calculateMoves(Position pos, SquareControl[,] controlledSquares)
         {
             char[,] board = pos.board;
 
@@ -1782,33 +1775,5 @@ namespace Blobfish_11
             }
             return moves;
         }
-        private bool accessableFor(bool forWhite, char piece)
-        {
-            if (forWhite)
-            {
-                if (piece == '\0' || piece > 'Z') return true;
-                else return false;
-            }
-            else
-            {
-                if (piece < 'Z') return true;
-                else return false;
-            }
-        }
-        private bool validSquare(int row, int column)
-        {
-            return (row < 8) && (row >= 0) && (column < 8) && (column >= 0);
-        }
-
-    }
-    public struct ControlAndCheckingPieces
-    {
-        public SquareControl[,] board;
-        public int[] checkingPieces;
-    }
-    public struct EvalResult
-    {
-        public double evaluation;
-        public List<Move> allMoves;
     }
 }

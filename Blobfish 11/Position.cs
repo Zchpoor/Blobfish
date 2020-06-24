@@ -8,6 +8,8 @@ namespace Blobfish_11
 {
     public class Position
     {
+        //TODO: Gör om till struct?
+        //TODO: Ändra allt till Square.
         private readonly string FEN;
         public bool whiteToMove;
         public int halfMoveClock = 0;
@@ -150,7 +152,7 @@ namespace Blobfish_11
 
         }
         public Position(char[,] board, bool whiteToMove, bool[] castlingRights, int[] enPassantSquare,
-            int halfMoveClock, int moveCounter)
+            int halfMoveClock, int moveCounter, int[,] kingPositions)
         {
             this.board = board;
             this.FEN = "";
@@ -159,6 +161,7 @@ namespace Blobfish_11
             this.halfMoveClock = halfMoveClock;
             this.moveCounter = moveCounter;
             this.enPassantSquare = enPassantSquare;
+            this.kingPositions = kingPositions;
         }
     }
 }
