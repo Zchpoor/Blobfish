@@ -233,23 +233,24 @@ namespace Blobfish_11
                 if (validSquare(currentSquare))
                 {
                     int promotionRank = pieceIsWhite ? 0 : 8;
-                    if (currentSquare.rank == promotionRank) //Promotering.
+                    char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                    if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
                     {
-                        addPromotions(pieceSquare, currentSquare);
-                    }
-                    else
-                    {
-                        char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                        if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
+                        if (currentSquare.rank == promotionRank) //Promotering.
+                        {
+                            addPromotions(pieceSquare, currentSquare);
+                        }
+                        else
                         {
                             possibleMoves.Add(new Move(pieceSquare, currentSquare)); //Slag
                         }
-                        else if (currentSquare.rank == pos.enPassantSquare[0] && currentSquare.line == pos.enPassantSquare[1])
-                        {
-                            Square pawnToRemove = new Square(pieceSquare.rank, currentSquare.line);
-                            possibleMoves.Add(new EnPassant(pieceSquare, currentSquare, pawnToRemove)); //En passant
-                        }
                     }
+                    else if (currentSquare.rank == pos.enPassantSquare[0] && currentSquare.line == pos.enPassantSquare[1])
+                    {
+                        Square pawnToRemove = new Square(pieceSquare.rank, currentSquare.line);
+                        possibleMoves.Add(new EnPassant(pieceSquare, currentSquare, pawnToRemove)); //En passant
+                    }
+                    
                 }
             }
             return possibleMoves;
