@@ -138,7 +138,7 @@ namespace Blobfish_11
                 {
                     throw new Exception("Felaktig FEN."); //TODO: Hantera
                 }
-                enPassantSquare[0] = EProw;
+                enPassantSquare[0] = 7 - EProw;
                 enPassantSquare[1] = EPcolumn; //Eftersom ordingen är omvänd i FEN.
             }
             string lastString = EPString.Substring(EPString.IndexOf(' ') + 1, EPString.Length - EPString.IndexOf(' ') - 1);

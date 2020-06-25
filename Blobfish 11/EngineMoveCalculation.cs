@@ -12,7 +12,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
-        private List<Move> allPossibleMoves(Position pos) 
+        private List<Move> allValidMoves(Position pos) 
         {
             List<Move> allMoves = new List<Move>();
             for (int i = 0; i < 8; i++)
@@ -28,13 +28,15 @@ namespace Blobfish_11
             for (int i = 0; i < allMoves.Count; i++)
             {
                 Position newPos = allMoves[i].execute(pos);
-                if (newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 0]), true))
+                if (newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
+                    i--;
                 }
-                else if (!newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 0]), false))
+                else if (!newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]), false))
                 {
                     allMoves.RemoveAt(i);
+                    i--;
                 }
             }
             return allMoves;
@@ -43,6 +45,8 @@ namespace Blobfish_11
         {
             char pieceChar = pos.board[pieceSquare.rank, pieceSquare.line];
             bool pieceIsWhite = isWhite(pieceChar);
+            if (pieceIsWhite != pos.whiteToMove)
+                return null;
             switch (pieceChar.ToString().ToUpper())
             {
                 case "" : return null;
@@ -51,6 +55,7 @@ namespace Blobfish_11
                 case "B": return bishopMoves(pos, pieceSquare, pieceIsWhite);
                 case "R": return rookMoves(pos, pieceSquare, pieceIsWhite);
                 case "Q": return queenMoves(pos, pieceSquare, pieceIsWhite);
+                case "K": return kingMoves(pos, pieceSquare, pieceIsWhite);
                 default: return null;
             }
         }
@@ -107,7 +112,7 @@ namespace Blobfish_11
             List<Move> possibleMoves = new List<Move>();
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
+                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -121,7 +126,7 @@ namespace Blobfish_11
             List<Move> possibleMoves = new List<Move>();
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
+                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -142,7 +147,7 @@ namespace Blobfish_11
             List<Move> possibleMoves = new List<Move>();
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
+                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -156,7 +161,7 @@ namespace Blobfish_11
             List<Move> possibleMoves = new List<Move>();
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
+                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare =='\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -221,7 +226,7 @@ namespace Blobfish_11
                     }
                 }
             }
-            for (int i = -1; i <= 1; i++)
+            for (int i = -1; i <= 1; i+=2) //Kommer bli -1 och 1.
             {
                 currentSquare.rank = pieceSquare.rank + moveDirection;
                 currentSquare.line = pieceSquare.line + i;
@@ -230,16 +235,12 @@ namespace Blobfish_11
                     int promotionRank = pieceIsWhite ? 0 : 8;
                     if (currentSquare.rank == promotionRank) //Promotering.
                     {
-                        string allPromotions = pieceIsWhite ? "QRBN" : "qrbn";
-                        foreach (char tkn in allPromotions)
-                        {
-                            addPromotions(pieceSquare, currentSquare);
-                        }
+                        addPromotions(pieceSquare, currentSquare);
                     }
                     else
                     {
                         char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                        if (isWhite(pieceOnCurrentSquare) != pieceIsWhite) //Om den är av motsatt färg.
+                        if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
                         {
                             possibleMoves.Add(new Move(pieceSquare, currentSquare)); //Slag
                         }
@@ -273,7 +274,6 @@ namespace Blobfish_11
         }
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            List<Move> possibleMoves = new List<Move>();
             for (int i = -2; i < 3; i++)
             {
                 for (int j = -2; j < 3; j++)
@@ -364,6 +364,7 @@ namespace Blobfish_11
         }
         private int[] calculateLine(Square firstSquare, Square secondSquare)
         {
+            //TODO: Ta bort.
             int dr = firstSquare.rank - secondSquare.rank;
             int dl = firstSquare.line - secondSquare.line;
             if(dl == 0)
@@ -423,20 +424,8 @@ namespace Blobfish_11
                     }
                 }
             }
-            
-
             return false;
 
         }
     }
 }
-
-/*
- *  Är ställningen laglig?
- *  Hur många pjäser schackar?
- *      0 -> Fortsätt som vanligt
- *      1 -> Filtrera bort alla !(kungsdrag || blockerar)
- *      2 -> Filtrera bort alla !kungsdrag
- * 
- * 
- */

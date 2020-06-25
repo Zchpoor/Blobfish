@@ -46,7 +46,7 @@ namespace Blobfish_11
             //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
 
             //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove, oldPos.castlingRights, 
+            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove, oldPos.castlingRights, 
                 oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
@@ -59,7 +59,7 @@ namespace Blobfish_11
             if(oldPos.board[from[0], from[1]] == 'p' || oldPos.board[from[0], from[1]] == 'P' ||
                 oldPos.board[to[0], to[1]] != '\0')
             {
-                //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas tilll 0.
+                //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas till 0.
                 newPos.halfMoveClock = 0;
             }
             else
@@ -112,7 +112,7 @@ namespace Blobfish_11
             {
                if(Math.Abs(from[0] - to[0]) == 2) //Om förflyttningen är två steg.
                 {
-                    newPos.enPassantSquare = new int[2] {(from[0] - to[0])/2, from[1]};
+                    newPos.enPassantSquare = new int[2] {(from[0] + to[0])/2, from[1]};
                 }
             }
             else
@@ -134,7 +134,7 @@ namespace Blobfish_11
         public override Position execute(Position oldPos)
         {
             //Make a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
@@ -181,13 +181,12 @@ namespace Blobfish_11
         public EnPassant(Square fromSquare, Square toSquare, Square pawnToRemove) :
             base(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
         {
-            this.pawnToRemove[0] = pawnToRemove.rank;
-            this.pawnToRemove[1] = pawnToRemove.line;
+            this.pawnToRemove = new int[] { pawnToRemove.rank, pawnToRemove.line };
         }
         public override Position execute(Position oldPos)
         {
             //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
@@ -219,7 +218,7 @@ namespace Blobfish_11
         public override Position execute(Position oldPos)
         {
             //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
+            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
                 oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = promoteTo;

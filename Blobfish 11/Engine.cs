@@ -13,7 +13,7 @@ namespace Blobfish_11
         {
 
             //TEST
-            //List<Move> testMoves =  allPossibleMoves(pos);
+            List<Move> testMoves =  allValidMoves(pos);
             //TEST
 
             EvalResult result = new EvalResult();
@@ -31,7 +31,7 @@ namespace Blobfish_11
                 return result; //Ställningen är avgjord.
             }
             result.evaluation  = numericEval(pos);
-            result.allMoves = moves;
+            result.allMoves = testMoves;
             return result;
         }
         private double numericEval(Position pos)
