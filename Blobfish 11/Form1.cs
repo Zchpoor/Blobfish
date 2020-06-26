@@ -95,14 +95,22 @@ namespace Blobfish_11
             }
             else
             {
-                Position pos = new Position(fenBox.Text);
-                evalBox.Text = "";
-                Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, 1);
-                double eval = result.evaluation;
-                currentMoves = result.allMoves;
-                evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
-                display(pos);
+                try
+                {
+                    Position pos = new Position(fenBox.Text);
+                    evalBox.Text = "";
+                    Engine blobFish = new Engine();
+                    EvalResult result = blobFish.eval(pos, 1);
+                    double eval = result.evaluation;
+                    currentMoves = result.allMoves;
+                    evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
+                    display(pos);
+                }
+                catch
+                {
+                    evalBox.Text = "Felaktig FEN!";
+                    return;
+                }
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
@@ -145,11 +153,10 @@ namespace Blobfish_11
 
 /*
  * TODO:
- * Spikar
- * Schackar
  * +/#
- * En passant?
- * Promotering
  * Byt ut: row -> rank, column -> line. 
  * Byt ut int[] -> Square.
+ * Fler tester.
+ * Ta tillbaka drag.
+ * Få FEN
  */

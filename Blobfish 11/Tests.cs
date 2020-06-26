@@ -47,12 +47,20 @@ namespace Blobfish_11
             makeTest("4nbn1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 13); //Dubbel promotering.
             makeTest("4n1n1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 17); //Trippel promotering.
             //10
+            makeTest("4k3/8/8/8/8/4b3/P6P/R3K2R w KQ - 0 1", 12); //Bägge rockaderna otillåtna för vit.
+            makeTest("4k3/8/8/8/8/3b4/P6P/R3K2R w KQ - 0 1", 13); //b1 garderat. Kort rockad ej tillåtet.
+            makeTest("4k3/8/8/8/4b3/8/P6P/R3K2R w KQ - 0 1", 16); //b1 och h1 garderat. Bägge rockaderna tillåtna.
+            makeTest("r3k2r/p6p/8/8/8/1Q6/8/4K3 b kq - 0 1", 14); //b8 garderat. Kort rockad otillåtet för svart.
+            makeTest("r3k2r/p6p/8/8/8/8/4R3/4K3 b kq - 0 1", 4); //Svart står i schack, med rockadmöjligheter.
+            //15
             makeTest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 20); //Utgångsställningen
             makeTest("r1b1qr2/ppp1k1pp/2np4/2bnp1N1/2B1P3/8/PPPP1PPP/R1BQ1RK1 w - - 0 10", 31); //Traxler
             makeTest("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13", 33); //Mar del plata
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b kq - 0 16", 36); //Kozul
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b - - 4 18", 34); //Kozul utan rockader
-            //15
+            //20
+            makeTest("rnbqkbnr/pp2pppp/3p4/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3", 4); //Moskva
+            
 
             if (testFailed)
                 return detailedResult;

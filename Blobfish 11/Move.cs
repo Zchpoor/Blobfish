@@ -45,9 +45,7 @@ namespace Blobfish_11
         {
             //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
 
-            //Makes a deep copy of the position.
-            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove, (bool[])oldPos.castlingRights.Clone(), 
-                oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -139,9 +137,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            //Make a deep copy of the position.
-            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -191,9 +187,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            //Makes a deep copy of the position.
-            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -223,9 +217,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            //Makes a deep copy of the position.
-            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = promoteTo;
             newPos.board[from[0], from[1]] = '\0';

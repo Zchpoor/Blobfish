@@ -28,12 +28,12 @@ namespace Blobfish_11
             for (int i = 0; i < allMoves.Count; i++)
             {
                 Position newPos = allMoves[i].execute(pos);
-                if (newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]), true))
+                if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
                     i--;
                 }
-                else if (!newPos.whiteToMove && isControlledBy(newPos, new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]), false))
+                else if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[1, 0], newPos.kingPositions[1, 1]), false))
                 {
                     allMoves.RemoveAt(i);
                     i--;

@@ -163,5 +163,11 @@ namespace Blobfish_11
             this.enPassantSquare = enPassantSquare;
             this.kingPositions = kingPositions;
         }
+        public Position deepCopy()
+        {
+           return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
+                (int[])enPassantSquare.Clone(), halfMoveClock, moveCounter, (int[,])kingPositions.Clone());
+
+        }
     }
 }
