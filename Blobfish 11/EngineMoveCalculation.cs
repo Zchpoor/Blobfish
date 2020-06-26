@@ -174,11 +174,33 @@ namespace Blobfish_11
             {
                 //Kungen står på ett fält där rockad skulle kunna vara möjligt.
                 char correctRook = pieceIsWhite ? 'R' : 'r';
-                if(pos.board[castlingRank, 0] == correctRook)
+                int castlingRightOffset = pieceIsWhite ? 0 : 2;
+                if(pos.board[castlingRank, 0] == correctRook && pos.castlingRights[castlingRightOffset +1])
                 {
-
+                    //Lång rockad
+                    Square rookTo = new Square(castlingRank, 3);
+                    Square kingTo = new Square(castlingRank, 2);
+                    if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
+                        !isControlledBy(pos, rookTo, !pieceIsWhite) && !isControlledBy(pos, kingTo, !pieceIsWhite &&
+                        !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
+                    {
+                        Square rookFrom = new Square(castlingRank, 0);
+                        possibleMoves.Add(new Castle(pieceSquare, kingTo, rookFrom, rookTo));
+                    }
                 }
-                //TODO: Fixa med rockad.
+                if(pos.board[castlingRank, 7] == correctRook && pos.castlingRights[castlingRightOffset])
+                {
+                    //Kort rockad
+                    Square rookTo = new Square(castlingRank, 5);
+                    Square kingTo = new Square(castlingRank, 6);
+                    if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
+                        !isControlledBy(pos, rookTo, !pieceIsWhite) && !isControlledBy(pos, kingTo, !pieceIsWhite &&
+                        !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
+                    {
+                        Square rookFrom = new Square(castlingRank, 7);
+                        possibleMoves.Add(new Castle(pieceSquare, kingTo, rookFrom, rookTo));
+                    }
+                }
             }
             return possibleMoves;
         }

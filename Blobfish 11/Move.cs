@@ -46,7 +46,7 @@ namespace Blobfish_11
             //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
 
             //Makes a deep copy of the position.
-            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove, oldPos.castlingRights, 
+            Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove, (bool[])oldPos.castlingRights.Clone(), 
                 oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
@@ -131,11 +131,17 @@ namespace Blobfish_11
             this.rookFrom = rookFrom;
             this.rookTo = rookTo;
         }
+        public Castle(Square kingFrom, Square kingTo, Square rookFrom, Square rookTo):
+            this(new int[] { kingFrom.rank, kingFrom.line }, new int[] { kingTo.rank, kingTo.line },
+                new int[] { rookFrom.rank, rookFrom.line }, new int[] { rookTo.rank, rookTo.line })
+        {
+
+        }
         public override Position execute(Position oldPos)
         {
             //Make a deep copy of the position.
             Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -187,7 +193,7 @@ namespace Blobfish_11
         {
             //Makes a deep copy of the position.
             Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -219,7 +225,7 @@ namespace Blobfish_11
         {
             //Makes a deep copy of the position.
             Position newPos = new Position((char[,])oldPos.board.Clone(), oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
+                (bool[])oldPos.castlingRights.Clone(), oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter, oldPos.kingPositions);
 
             newPos.board[to[0], to[1]] = promoteTo;
             newPos.board[from[0], from[1]] = '\0';

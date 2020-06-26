@@ -148,8 +148,8 @@ namespace Blobfish_11
  * Spikar
  * Schackar
  * +/#
- * Fält bakom kungen
  * En passant?
  * Promotering
  * Byt ut: row -> rank, column -> line. 
+ * Byt ut int[] -> Square.
  */

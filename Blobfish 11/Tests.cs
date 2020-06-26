@@ -34,6 +34,7 @@ namespace Blobfish_11
                 testCounter++;
                 return success;
             }
+
             makeTest("8/8/1b6/8/1k6/8/3rP1K1/8 w - - 0 1", 6); //Spikad vit bonde.
             makeTest("5k2/8/3r4/3B4/3K4/8/8/8 w - - 0 1", 7); //Spikad vit löpare.
             makeTest("kb5q/8/8/8/5R1B/8/r5PK/8 w - - 0 1", 4); //Tre spikar på vit
@@ -51,6 +52,7 @@ namespace Blobfish_11
             makeTest("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13", 33); //Mar del plata
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b kq - 0 16", 36); //Kozul
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b - - 4 18", 34); //Kozul utan rockader
+            //15
 
             if (testFailed)
                 return detailedResult;
