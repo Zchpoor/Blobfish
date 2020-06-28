@@ -8,6 +8,8 @@ namespace Blobfish_11
 {
     public class Position
     {
+        //TODO: Gör om till struct?
+        //TODO: Ändra allt till Square.
         private readonly string FEN;
         public bool whiteToMove;
         public int halfMoveClock = 0;
@@ -136,7 +138,7 @@ namespace Blobfish_11
                 {
                     throw new Exception("Felaktig FEN."); //TODO: Hantera
                 }
-                enPassantSquare[0] = EProw;
+                enPassantSquare[0] = 7 - EProw;
                 enPassantSquare[1] = EPcolumn; //Eftersom ordingen är omvänd i FEN.
             }
             string lastString = EPString.Substring(EPString.IndexOf(' ') + 1, EPString.Length - EPString.IndexOf(' ') - 1);
@@ -150,7 +152,7 @@ namespace Blobfish_11
 
         }
         public Position(char[,] board, bool whiteToMove, bool[] castlingRights, int[] enPassantSquare,
-            int halfMoveClock, int moveCounter)
+            int halfMoveClock, int moveCounter, int[,] kingPositions)
         {
             this.board = board;
             this.FEN = "";
@@ -159,6 +161,13 @@ namespace Blobfish_11
             this.halfMoveClock = halfMoveClock;
             this.moveCounter = moveCounter;
             this.enPassantSquare = enPassantSquare;
+            this.kingPositions = kingPositions;
+        }
+        public Position deepCopy()
+        {
+           return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
+                (int[])enPassantSquare.Clone(), halfMoveClock, moveCounter, (int[,])kingPositions.Clone());
+
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public sealed partial class Engine
+    public partial class Engine
     {
         //TODO: För hårda värden.
         private static readonly double[,,] pawn =

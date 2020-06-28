@@ -15,6 +15,11 @@ namespace Blobfish_11
             this.from = from;
             this.to = to;
         }
+        public Move(Square fromSquare, Square toSquare) : 
+            this(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
+        {
+
+        }
         public virtual string toString(char[,] board)
         {
             //TODO: Checks etc.
@@ -40,9 +45,7 @@ namespace Blobfish_11
         {
             //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
 
-            //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove, 
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -54,7 +57,7 @@ namespace Blobfish_11
             if(oldPos.board[from[0], from[1]] == 'p' || oldPos.board[from[0], from[1]] == 'P' ||
                 oldPos.board[to[0], to[1]] != '\0')
             {
-                //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas tilll 0.
+                //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas till 0.
                 newPos.halfMoveClock = 0;
             }
             else
@@ -65,11 +68,15 @@ namespace Blobfish_11
             {
                 newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[3] = false;
+                newPos.kingPositions[0, 0] = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[0, 1] = this.to[1];
             }
             else if (oldPos.board[from[0], from[1]] == 'K')
             {
                 newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[1] = false;
+                newPos.kingPositions[1, 0] = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[1, 1] = this.to[1];
             }
             else if (oldPos.board[from[0], from[1]] == 'r')
             {
@@ -103,7 +110,7 @@ namespace Blobfish_11
             {
                if(Math.Abs(from[0] - to[0]) == 2) //Om förflyttningen är två steg.
                 {
-                    newPos.enPassantSquare = new int[2] {(from[0] - to[0])/2, from[1]};
+                    newPos.enPassantSquare = new int[2] {(from[0] + to[0])/2, from[1]};
                 }
             }
             else
@@ -122,11 +129,15 @@ namespace Blobfish_11
             this.rookFrom = rookFrom;
             this.rookTo = rookTo;
         }
+        public Castle(Square kingFrom, Square kingTo, Square rookFrom, Square rookTo):
+            this(new int[] { kingFrom.rank, kingFrom.line }, new int[] { kingTo.rank, kingTo.line },
+                new int[] { rookFrom.rank, rookFrom.line }, new int[] { rookTo.rank, rookTo.line })
+        {
+
+        }
         public override Position execute(Position oldPos)
         {
-            //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -136,11 +147,15 @@ namespace Blobfish_11
             {
                 newPos.castlingRights[0] = false; 
                 newPos.castlingRights[1] = false;
+                newPos.kingPositions[1, 0] = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[1, 1] = this.to[1];
             }
             else
             {
                 newPos.castlingRights[2] = false;
                 newPos.castlingRights[3] = false;
+                newPos.kingPositions[0, 0] = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[0, 1] = this.to[1];
             }
             if (!oldPos.whiteToMove)
             {
@@ -165,11 +180,14 @@ namespace Blobfish_11
         {
             this.pawnToRemove = pawnToRemove;
         }
+        public EnPassant(Square fromSquare, Square toSquare, Square pawnToRemove) :
+            base(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
+        {
+            this.pawnToRemove = new int[] { pawnToRemove.rank, pawnToRemove.line };
+        }
         public override Position execute(Position oldPos)
         {
-            //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = oldPos.board[from[0], from[1]];
             newPos.board[from[0], from[1]] = '\0';
@@ -192,11 +210,14 @@ namespace Blobfish_11
         {
             this.promoteTo = promoteTo;
         }
+        public Promotion(Square fromSquare, Square toSquare, char promoteTo) :
+            base(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
+        {
+            this.promoteTo = promoteTo;
+        }
         public override Position execute(Position oldPos)
         {
-            //Makes a deep copy of the position.
-            Position newPos = new Position(oldPos.board, oldPos.whiteToMove,
-                oldPos.castlingRights, oldPos.enPassantSquare, oldPos.halfMoveClock, oldPos.moveCounter);
+            Position newPos = oldPos.deepCopy();
 
             newPos.board[to[0], to[1]] = promoteTo;
             newPos.board[from[0], from[1]] = '\0';

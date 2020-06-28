@@ -71,13 +71,12 @@ namespace Blobfish_11
                 }
             }
             Engine blobFish = new Engine();
-            EvalResult result = blobFish.eval(pos, 0);
+            EvalResult result = blobFish.eval(pos, 1);
             currentMoves = result.allMoves;
             currentPosition = pos;
             string temp = getMovesString(currentMoves, currentPosition.board);
             textBox1.Text = temp;
         }
-
         public string getMovesString(List<Move> moves, char[,] board)
         {
             string text = "";
@@ -96,14 +95,22 @@ namespace Blobfish_11
             }
             else
             {
-                Position pos = new Position(fenBox.Text);
-                evalBox.Text = "";
-                Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, 0);
-                double eval = result.evaluation;
-                currentMoves = result.allMoves;
-                evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
-                display(pos);
+                try
+                {
+                    Position pos = new Position(fenBox.Text);
+                    evalBox.Text = "";
+                    Engine blobFish = new Engine();
+                    EvalResult result = blobFish.eval(pos, 1);
+                    double eval = result.evaluation;
+                    currentMoves = result.allMoves;
+                    evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
+                    display(pos);
+                }
+                catch
+                {
+                    evalBox.Text = "Felaktig FEN!";
+                    return;
+                }
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
@@ -143,3 +150,13 @@ namespace Blobfish_11
         }
     }
 }
+
+/*
+ * TODO:
+ * +/#
+ * Byt ut: row -> rank, column -> line. 
+ * Byt ut int[] -> Square.
+ * Fler tester.
+ * Ta tillbaka drag.
+ * Få FEN
+ */
