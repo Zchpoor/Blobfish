@@ -59,53 +59,6 @@ namespace Blobfish_11
                 default: return null;
             }
         }
-        private PieceData bishopCalculation(PieceData pieceData, Position pos, Square pieceSquare, char pieceChar, char oppositeKing)
-        {
-            //TODO: Ta bort.
-            int rank = pieceSquare.rank, line = pieceSquare.line;
-            for (int i = -1; i < 2; i+=2)
-            {
-                for (int j = -1; j < 2; j+=2)
-                {
-                    int counter = 1;
-                    bool done = false;
-                    Square currentSquare = new Square(rank + (i * counter), line + (j * counter));
-
-                    while (validSquare(currentSquare) && !done)
-                    {
-                        pieceData.controlledSquares.Add(currentSquare);
-
-                        char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                        if (pieceOnCurrentSquare == '\0')
-                        {
-                            pieceData.moves.Add(new Move(pieceSquare, currentSquare));
-                        }
-                        else if (pieceOnCurrentSquare == oppositeKing)
-                        {
-                            pieceData.givesCheck = true;
-                            Square squareBehindKing = new Square(rank + (i * (counter + 1)), line + (j * (counter + 1)));
-                            if (validSquare(squareBehindKing)) 
-                            {
-                                //Fältet bakom kungen markeras som kontrollerat.
-                                pieceData.controlledSquares.Add(squareBehindKing);
-                            }
-                            done = true;
-                        }
-                        else 
-                        {
-                            done = true;
-                            if(isWhite(pieceOnCurrentSquare) != isWhite(pieceChar))
-                            {
-                                //Om pjäsen är av motsatt färg, så går denna att slå.
-                                pieceData.moves.Add(new Move(pieceSquare, currentSquare));
-                            }
-                        }
-                        i++;
-                    }
-                }
-            }
-            return pieceData;
-        }
 
         private List<Move> bishopMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
         {
