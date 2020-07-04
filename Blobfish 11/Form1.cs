@@ -22,6 +22,7 @@ namespace Blobfish_11
 
             int squareSize = 50;
             boardPanel.AutoSize = true;
+            moveLabel.Text = "";
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -72,9 +73,12 @@ namespace Blobfish_11
             }
             Engine blobFish = new Engine();
             EvalResult result = blobFish.eval(pos, 1);
+            double eval = result.evaluation;
             currentMoves = result.allMoves;
             currentPosition = pos;
+            evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
             string temp = getMovesString(currentMoves, currentPosition.board);
+            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
             textBox1.Text = temp;
         }
         public string getMovesString(List<Move> moves, char[,] board)
@@ -95,22 +99,25 @@ namespace Blobfish_11
             }
             else
             {
+                Position pos = new Position(fenBox.Text);
+                display(pos);
+                /*
                 try
                 {
                     Position pos = new Position(fenBox.Text);
-                    evalBox.Text = "";
-                    Engine blobFish = new Engine();
-                    EvalResult result = blobFish.eval(pos, 1);
-                    double eval = result.evaluation;
-                    currentMoves = result.allMoves;
-                    evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
+                    //evalBox.Text = "";
+                    //Engine blobFish = new Engine();
+                    //EvalResult result = blobFish.eval(pos, 1);
+                    //double eval = result.evaluation;
+                    //currentMoves = result.allMoves;
+                    //evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
                     display(pos);
                 }
                 catch
                 {
                     evalBox.Text = "Felaktig FEN!";
                     return;
-                }
+                }*/
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
@@ -159,4 +166,5 @@ namespace Blobfish_11
  * Fler tester.
  * Ta tillbaka drag.
  * Få FEN
+ * Sortera efter ungefärlig kvalitet på draget.
  */

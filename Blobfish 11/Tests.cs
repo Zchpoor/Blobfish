@@ -47,7 +47,7 @@ namespace Blobfish_11
             makeTest("4nbn1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 13); //Dubbel promotering.
             makeTest("4n1n1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 17); //Trippel promotering.
             //10
-            makeTest("4k3/8/8/8/8/4b3/P6P/R3K2R w KQ - 0 1", 12); //Bägge rockaderna otillåtna för vit.
+            makeTest("4k3/8/8/8/8/4b3/P6P/R3K2R w KQ - 0 1", 12); //Ingen rockad tillåten för vit.
             makeTest("4k3/8/8/8/8/3b4/P6P/R3K2R w KQ - 0 1", 13); //b1 garderat. Kort rockad ej tillåtet.
             makeTest("4k3/8/8/8/4b3/8/P6P/R3K2R w KQ - 0 1", 16); //b1 och h1 garderat. Bägge rockaderna tillåtna.
             makeTest("r3k2r/p6p/8/8/8/1Q6/8/4K3 b kq - 0 1", 14); //b8 garderat. Kort rockad otillåtet för svart.

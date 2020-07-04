@@ -35,6 +35,7 @@
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
             this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
+            this.toMoveLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // fenBox
@@ -109,8 +110,9 @@
             this.moveLabel.AutoSize = true;
             this.moveLabel.Location = new System.Drawing.Point(704, 31);
             this.moveLabel.Name = "moveLabel";
-            this.moveLabel.Size = new System.Drawing.Size(0, 17);
+            this.moveLabel.Size = new System.Drawing.Size(87, 17);
             this.moveLabel.TabIndex = 6;
+            this.moveLabel.Text = "(default text)";
             // 
             // evalBox
             // 
@@ -124,11 +126,21 @@
             this.evalBox.Size = new System.Drawing.Size(258, 560);
             this.evalBox.TabIndex = 7;
             // 
+            // toMoveLabel
+            // 
+            this.toMoveLabel.AutoSize = true;
+            this.toMoveLabel.Location = new System.Drawing.Point(550, 31);
+            this.toMoveLabel.Name = "toMoveLabel";
+            this.toMoveLabel.Size = new System.Drawing.Size(87, 17);
+            this.toMoveLabel.TabIndex = 8;
+            this.toMoveLabel.Text = "(default text)";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1314, 560);
+            this.Controls.Add(this.toMoveLabel);
             this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
@@ -152,6 +164,7 @@
         private System.Windows.Forms.TableLayoutPanel boardPanel;
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
+        private System.Windows.Forms.Label toMoveLabel;
     }
 }
 

@@ -27,7 +27,19 @@ namespace Blobfish_11
 
             for (int i = 0; i < allMoves.Count; i++)
             {
-                Position newPos = allMoves[i].execute(pos);
+                Position newPos = allMoves[i].execute(pos); 
+                
+                //TODO: Gör bättre uppdelning
+                if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
+                {
+                    allMoves[i].isCheck = true;
+                }
+                else if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[1, 0], newPos.kingPositions[1, 1]), false))
+                {
+                    allMoves[i].isCheck = true;
+                }
+
+
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
@@ -38,6 +50,7 @@ namespace Blobfish_11
                     allMoves.RemoveAt(i);
                     i--;
                 }
+               
             }
             return allMoves;
         }

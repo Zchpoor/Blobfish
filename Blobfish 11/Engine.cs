@@ -11,10 +11,7 @@ namespace Blobfish_11
     {
         public EvalResult eval(Position pos, int depth)
         {
-
-            //TEST
             List<Move> moves =  allValidMoves(pos);
-            //TEST
 
             EvalResult result = new EvalResult();
 
@@ -27,11 +24,16 @@ namespace Blobfish_11
             int gameResult = decisiveResult(pos, isCheck, moves);
             if(gameResult != -2)
             {
-                result.evaluation = (double)gameResult;
+                if (gameResult == 1)
+                    result.evaluation = 1000;
+                else if (gameResult == -1)
+                    result.evaluation = -1000;
+                else
+                    result.evaluation = (double)gameResult;
                 result.allMoves = new List<Move>();
                 return result; //Ställningen är avgjord.
             }
-            result.evaluation  = numericEval(pos);
+            result.evaluation = alphaBeta(pos, 6, double.NegativeInfinity, double.PositiveInfinity, pos.whiteToMove);
             result.allMoves = moves;
             return result;
         }
@@ -744,6 +746,37 @@ namespace Blobfish_11
             }
 
             return -2;
+        }
+        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove)
+        {
+            //TODO: Fixa horisonten.
+            if (depth == 0)
+                return numericEval(pos);
+            List<Move> moves = allValidMoves(pos);
+            if (whiteToMove)
+            {
+                double value = double.NegativeInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false));
+                    alpha = Math.Max(alpha, value);
+                    if (alpha >= beta)
+                        break; //Pruning
+                }
+                return value;
+            }
+            else
+            {
+                double value = double.PositiveInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true));
+                    beta = Math.Min(beta, value);
+                    if (beta <= alpha)
+                        break; //Pruning
+                }
+                return value;
+            }
         }
     }
 }
