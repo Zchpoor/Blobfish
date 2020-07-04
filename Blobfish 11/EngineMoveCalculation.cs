@@ -12,8 +12,9 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
-        private List<Move> allValidMoves(Position pos) 
+        public List<Move> allValidMoves(Position pos) 
         {
+            //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
             for (int i = 0; i < 8; i++)
             {
@@ -400,7 +401,7 @@ namespace Blobfish_11
             if (isControlled) return true;
 
             //Bönder
-            int riktning = byWhite ? -1 : 1;
+            int riktning = byWhite ? 1 : -1;
             for (int i = -1; i <= 1; i++)
             {
                 Square currentSquare = new Square(relevantSquare.rank + riktning, relevantSquare.line + i);

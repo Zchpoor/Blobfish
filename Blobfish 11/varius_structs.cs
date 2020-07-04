@@ -16,6 +16,8 @@ namespace Blobfish_11
     {
         public double evaluation;
         public List<Move> allMoves;
+        public List<double> allEvals;
+        public Move bestMove;
     }
     public struct Square
     {

@@ -8,7 +8,9 @@ namespace Blobfish_11
 {
     public class Move
     {
+        //TODO: Ta bort?
         public bool isCheck;
+
         public int[] from = new int[2];
         public int[] to = new int[2];
         public Move(int[] from, int[] to)

@@ -16,12 +16,12 @@ namespace Blobfish_11
             EvalResult result = new EvalResult();
 
             //TODO: Överflödigt att beräkna detta här också.
-            Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-                new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
-            bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
+            //Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
+            //    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+            //bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
 
 
-            int gameResult = decisiveResult(pos, isCheck, moves);
+            int gameResult = decisiveResult(pos, moves);
             if(gameResult != -2)
             {
                 if (gameResult == 1)
@@ -31,9 +31,34 @@ namespace Blobfish_11
                 else
                     result.evaluation = (double)gameResult;
                 result.allMoves = new List<Move>();
+                result.allEvals = null;
                 return result; //Ställningen är avgjord.
             }
-            result.evaluation = alphaBeta(pos, 6, double.NegativeInfinity, double.PositiveInfinity, pos.whiteToMove);
+            else
+            {
+                List<double> allEvals = new List<double>();
+                double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    double currentEval = alphaBeta(currentMove.execute(pos), depth-1, double.NegativeInfinity, double.PositiveInfinity, pos.whiteToMove);
+                    allEvals.Add(currentEval);
+                    if (pos.whiteToMove)
+                    {
+                        bestValue = Math.Max(bestValue, currentEval);
+                    }
+                    else
+                    {
+                        bestValue = Math.Min(bestValue, currentEval);
+                    }
+
+                    //TODO: Gör finare
+                    if (bestValue == currentEval)
+                        result.bestMove = currentMove;
+                }
+                result.evaluation = bestValue;
+                result.allEvals = allEvals;
+            }
+
             result.allMoves = moves;
             return result;
         }
@@ -728,14 +753,17 @@ namespace Blobfish_11
             result.checkingPieces = checkingPieces;
             return result;
         }
-        private int decisiveResult(Position pos, bool isCheck,  List<Move> moves)
+        private int decisiveResult(Position pos,  List<Move> moves)
         {
-            if(moves.Count == 0)
+            if (moves.Count == 0)
             {
+                Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
+                    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+                bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
-                    if (pos.whiteToMove) return -1;
-                    else return 1;
+                    if (pos.whiteToMove) return -1000;
+                    else return 1000;
                 }
                 else return 0; //Patt
             }
@@ -749,10 +777,13 @@ namespace Blobfish_11
         }
         private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove)
         {
+            List<Move> moves = allValidMoves(pos);
+            if (moves.Count == 0)
+                return decisiveResult(pos, moves);
+
             //TODO: Fixa horisonten.
             if (depth == 0)
                 return numericEval(pos);
-            List<Move> moves = allValidMoves(pos);
             if (whiteToMove)
             {
                 double value = double.NegativeInfinity;

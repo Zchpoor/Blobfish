@@ -23,8 +23,8 @@ namespace Blobfish_11
             bool makeTest(string FEN, int moves)
             {
                 Position pos = new Position(FEN);
-                EvalResult result = blobfish.eval(pos, 1);
-                bool success = result.allMoves.Count == moves;
+                List<Move> allMoves = blobfish.allValidMoves(pos);
+                bool success = allMoves.Count == moves;
                 if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
                 else
                 {
@@ -60,6 +60,8 @@ namespace Blobfish_11
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b - - 4 18", 34); //Kozul utan rockader
             //20
             makeTest("rnbqkbnr/pp2pppp/3p4/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3", 4); //Moskva
+            makeTest("rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2", 22); //1.c4 c6
+            makeTest("1rb4Q/ppppk2p/2n2P2/4p3/2Bb4/2N5/PPP2PPP/R3K1NR b KQ - 0 1", 1); //Udda ställning. 1 giltigt drag.
             
 
             if (testFailed)
