@@ -75,14 +75,8 @@ namespace Blobfish_11
             //TODO: Flytta ut
             //TODO: Få bort globala variabler.
             currentPosition = pos;
-            if (radioButton1.Checked)
+            if((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
-                Engine blobFish = new Engine();
-                currentMoves = blobFish.allValidMoves(pos);
-                string temp = getMovesString(currentMoves, currentPosition.board);
-                textBox1.Text = temp;
-            }
-            else{
                 Engine blobFish = new Engine();
                 EvalResult result = blobFish.eval(pos, 3);
                 double eval = result.evaluation;
@@ -92,17 +86,21 @@ namespace Blobfish_11
                 string temp = getMovesString(currentMoves, result.allEvals, currentPosition.board);
                 textBox1.Text = temp;
 
-                if (radioButton2.Checked && pos.whiteToMove)
-                {
-                    display(result.bestMove.execute(pos));
-                }
-                else if (radioButton3.Checked && !pos.whiteToMove)
-                {
-                    display(result.bestMove.execute(pos));
-                }
+                display(result.bestMove.execute(pos));
+            }
+            else
+            {
+                Engine blobFish = new Engine();
+                currentMoves = blobFish.allValidMoves(pos);
+                string temp = getMovesString(currentMoves, currentPosition.board);
+                textBox1.Text = temp;
             }
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
-            
+
+            //TEST
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            //TEST
         }
         public string getMovesString(List<Move> moves, char[,] board)
         {
@@ -193,6 +191,10 @@ namespace Blobfish_11
             if (e.KeyChar == '\r')
                 button1_Click(null, null);
         }
+        private void radioButtons_CheckedChanged(object sender, EventArgs e)
+        {
+            display(currentPosition);
+        }
     }
 }
 
@@ -204,5 +206,9 @@ namespace Blobfish_11
  * Fler tester.
  * Ta tillbaka drag.
  * Få FEN
- * Sortera efter ungefärlig kvalitet på draget.
+ * 
+ * Effektiviseringar:
+ *  Sortera efter uppskattad kvalitet på draget.
+ *  Manuell minneshantering
+ *  Effektivisera algoritmer för dragberäkning.
  */

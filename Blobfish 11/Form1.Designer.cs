@@ -155,6 +155,7 @@
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
+            this.radioButton3.Checked = true;
             this.radioButton3.Location = new System.Drawing.Point(6, 75);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(62, 21);
@@ -162,6 +163,7 @@
             this.radioButton3.TabStop = true;
             this.radioButton3.Text = "Svart";
             this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
             // 
             // radioButton2
             // 
@@ -170,21 +172,20 @@
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(45, 21);
             this.radioButton2.TabIndex = 4;
-            this.radioButton2.TabStop = true;
             this.radioButton2.Text = "Vit";
             this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
             // 
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
             this.radioButton1.Location = new System.Drawing.Point(6, 21);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(101, 21);
             this.radioButton1.TabIndex = 3;
-            this.radioButton1.TabStop = true;
             this.radioButton1.Text = "Ingen dator";
             this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
             // 
             // Form1
             // 

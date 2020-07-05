@@ -33,7 +33,7 @@ namespace Blobfish_11
             ret = ret.ToUpper();
             ret += ((Char)(from[1] + 'a')).ToString();
             ret += 8 - from[0];
-            if (board[to[0], to[1]] != '\0')
+            if (isCapture(board))
             {
                 ret += "x";
             }
@@ -124,6 +124,10 @@ namespace Blobfish_11
             }
             return newPos;
         }
+        public virtual bool isCapture(char [,] board)
+        {
+            return board[to[0], to[1]] != '\0';
+        }
     }
     public class Castle : Move
     {
@@ -206,6 +210,10 @@ namespace Blobfish_11
             newPos.halfMoveClock = 0;
             newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
+        }
+        public override bool isCapture(char[,] board)
+        {
+            return true;
         }
     }
     public class Promotion : Move
