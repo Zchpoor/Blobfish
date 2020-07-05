@@ -23,8 +23,8 @@ namespace Blobfish_11
             bool makeTest(string FEN, int moves)
             {
                 Position pos = new Position(FEN);
-                EvalResult result = blobfish.eval(pos, 1);
-                bool success = result.allMoves.Count == moves;
+                List<Move> allMoves = blobfish.allValidMoves(pos);
+                bool success = allMoves.Count == moves;
                 if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
                 else
                 {
@@ -47,7 +47,7 @@ namespace Blobfish_11
             makeTest("4nbn1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 13); //Dubbel promotering.
             makeTest("4n1n1/5P2/8/8/k7/8/8/5K2 w - - 0 1", 17); //Trippel promotering.
             //10
-            makeTest("4k3/8/8/8/8/4b3/P6P/R3K2R w KQ - 0 1", 12); //Bägge rockaderna otillåtna för vit.
+            makeTest("4k3/8/8/8/8/4b3/P6P/R3K2R w KQ - 0 1", 12); //Ingen rockad tillåten för vit.
             makeTest("4k3/8/8/8/8/3b4/P6P/R3K2R w KQ - 0 1", 13); //b1 garderat. Kort rockad ej tillåtet.
             makeTest("4k3/8/8/8/4b3/8/P6P/R3K2R w KQ - 0 1", 16); //b1 och h1 garderat. Bägge rockaderna tillåtna.
             makeTest("r3k2r/p6p/8/8/8/1Q6/8/4K3 b kq - 0 1", 14); //b8 garderat. Kort rockad otillåtet för svart.
@@ -60,6 +60,8 @@ namespace Blobfish_11
             makeTest("r3k2r/3b1p1p/pq1ppp2/1p2bP2/4P3/3Q2P1/PPP1N2P/1K1R1B1R b - - 4 18", 34); //Kozul utan rockader
             //20
             makeTest("rnbqkbnr/pp2pppp/3p4/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3", 4); //Moskva
+            makeTest("rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2", 22); //1.c4 c6
+            makeTest("1rb4Q/ppppk2p/2n2P2/4p3/2Bb4/2N5/PPP2PPP/R3K1NR b KQ - 0 1", 1); //Udda ställning. 1 giltigt drag.
             
 
             if (testFailed)

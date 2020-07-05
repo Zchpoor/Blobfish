@@ -22,6 +22,7 @@ namespace Blobfish_11
 
             int squareSize = 50;
             boardPanel.AutoSize = true;
+            moveLabel.Text = "";
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -70,12 +71,38 @@ namespace Blobfish_11
                     Falt[i, j].Image = Image.FromFile(picName);
                 }
             }
-            Engine blobFish = new Engine();
-            EvalResult result = blobFish.eval(pos, 1);
-            currentMoves = result.allMoves;
+
+            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
+
+            //TODO: Flytta ut
+            //TODO: Få bort globala variabler.
             currentPosition = pos;
-            string temp = getMovesString(currentMoves, currentPosition.board);
-            textBox1.Text = temp;
+            if((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
+            {
+                Engine blobFish = new Engine();
+                EvalResult result = blobFish.eval(pos, 3);
+                double eval = result.evaluation;
+                currentMoves = result.allMoves;
+                if (result.bestMove != null)
+                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
+                string temp = getMovesString(currentMoves, result.allEvals, currentPosition.board);
+                textBox1.Text = temp;
+
+                display(result.bestMove.execute(pos));
+            }
+            else
+            {
+                Engine blobFish = new Engine();
+                currentMoves = blobFish.allValidMoves(pos);
+                string temp = getMovesString(currentMoves, currentPosition.board);
+                textBox1.Text = temp;
+            }
+
+
+            //TEST
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            //TEST
         }
         public string getMovesString(List<Move> moves, char[,] board)
         {
@@ -83,6 +110,19 @@ namespace Blobfish_11
             foreach (Move item in moves)
             {
                 text += item.toString(board) + Environment.NewLine;
+            }
+            return text;
+        }
+        public string getMovesString(List<Move> moves, List<Double> evals, char[,] board)
+        {
+            if (moves == null || evals == null) return "";
+            if (moves.Count != evals.Count)
+                throw new Exception("Olika antal evalueringar och drag!");
+
+            string text = "";
+            for (int i = 0; i < moves.Count; i++)
+            {
+                text += moves[i].toString(board) + "    " + Math.Round(evals[i].value, 2).ToString() + Environment.NewLine;
             }
             return text;
         }
@@ -95,22 +135,25 @@ namespace Blobfish_11
             }
             else
             {
+                Position pos = new Position(fenBox.Text);
+                display(pos);
+                /*
                 try
                 {
                     Position pos = new Position(fenBox.Text);
-                    evalBox.Text = "";
-                    Engine blobFish = new Engine();
-                    EvalResult result = blobFish.eval(pos, 1);
-                    double eval = result.evaluation;
-                    currentMoves = result.allMoves;
-                    evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
+                    //evalBox.Text = "";
+                    //Engine blobFish = new Engine();
+                    //EvalResult result = blobFish.eval(pos, 1);
+                    //double eval = result.evaluation;
+                    //currentMoves = result.allMoves;
+                    //evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
                     display(pos);
                 }
                 catch
                 {
                     evalBox.Text = "Felaktig FEN!";
                     return;
-                }
+                }*/
             }
         }
         private void squareClick(object sender, MouseEventArgs e)
@@ -127,6 +170,8 @@ namespace Blobfish_11
             }
             else
             {
+                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8 - firstSquare[0]).ToString() + "-" +
+                    (char)(xVal + 'a') + (8 - yVal).ToString();
                 foreach (Move item in currentMoves)
                 {
                     if (firstSquare[0] == item.from[0] && firstSquare[1] == item.from[1] &&
@@ -135,18 +180,22 @@ namespace Blobfish_11
                         Position newPosition = item.execute(currentPosition);
                         this.currentPosition = newPosition;
                         this.display(newPosition);
+                        break;
                     }
                 }
-                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8 - firstSquare[0]).ToString() + "-" +
-                    (char)(xVal + 'a') + (8 - yVal).ToString();
                 firstSquare[0] = -1;
                 firstSquare[1] = -1;
+                moveLabel.Text = "";
             }
         }
         private void fenBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
                 button1_Click(null, null);
+        }
+        private void radioButtons_CheckedChanged(object sender, EventArgs e)
+        {
+            display(currentPosition);
         }
     }
 }
@@ -159,4 +208,9 @@ namespace Blobfish_11
  * Fler tester.
  * Ta tillbaka drag.
  * Få FEN
+ * 
+ * Effektiviseringar:
+ *  Sortera efter uppskattad kvalitet på draget.
+ *  Manuell minneshantering
+ *  Effektivisera algoritmer för dragberäkning.
  */

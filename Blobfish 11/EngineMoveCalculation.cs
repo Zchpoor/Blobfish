@@ -12,8 +12,9 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
-        private List<Move> allValidMoves(Position pos) 
+        public List<Move> allValidMoves(Position pos) 
         {
+            //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
             for (int i = 0; i < 8; i++)
             {
@@ -27,7 +28,19 @@ namespace Blobfish_11
 
             for (int i = 0; i < allMoves.Count; i++)
             {
-                Position newPos = allMoves[i].execute(pos);
+                Position newPos = allMoves[i].execute(pos); 
+                
+                //TODO: Gör bättre uppdelning
+                if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
+                {
+                    allMoves[i].isCheck = true;
+                }
+                else if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[1, 0], newPos.kingPositions[1, 1]), false))
+                {
+                    allMoves[i].isCheck = true;
+                }
+
+
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
@@ -38,6 +51,7 @@ namespace Blobfish_11
                     allMoves.RemoveAt(i);
                     i--;
                 }
+               
             }
             return allMoves;
         }
@@ -58,53 +72,6 @@ namespace Blobfish_11
                 case "K": return kingMoves(pos, pieceSquare, pieceIsWhite);
                 default: return null;
             }
-        }
-        private PieceData bishopCalculation(PieceData pieceData, Position pos, Square pieceSquare, char pieceChar, char oppositeKing)
-        {
-            //TODO: Ta bort.
-            int rank = pieceSquare.rank, line = pieceSquare.line;
-            for (int i = -1; i < 2; i+=2)
-            {
-                for (int j = -1; j < 2; j+=2)
-                {
-                    int counter = 1;
-                    bool done = false;
-                    Square currentSquare = new Square(rank + (i * counter), line + (j * counter));
-
-                    while (validSquare(currentSquare) && !done)
-                    {
-                        pieceData.controlledSquares.Add(currentSquare);
-
-                        char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                        if (pieceOnCurrentSquare == '\0')
-                        {
-                            pieceData.moves.Add(new Move(pieceSquare, currentSquare));
-                        }
-                        else if (pieceOnCurrentSquare == oppositeKing)
-                        {
-                            pieceData.givesCheck = true;
-                            Square squareBehindKing = new Square(rank + (i * (counter + 1)), line + (j * (counter + 1)));
-                            if (validSquare(squareBehindKing)) 
-                            {
-                                //Fältet bakom kungen markeras som kontrollerat.
-                                pieceData.controlledSquares.Add(squareBehindKing);
-                            }
-                            done = true;
-                        }
-                        else 
-                        {
-                            done = true;
-                            if(isWhite(pieceOnCurrentSquare) != isWhite(pieceChar))
-                            {
-                                //Om pjäsen är av motsatt färg, så går denna att slå.
-                                pieceData.moves.Add(new Move(pieceSquare, currentSquare));
-                            }
-                        }
-                        i++;
-                    }
-                }
-            }
-            return pieceData;
         }
 
         private List<Move> bishopMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
@@ -434,7 +401,7 @@ namespace Blobfish_11
             if (isControlled) return true;
 
             //Bönder
-            int riktning = byWhite ? -1 : 1;
+            int riktning = byWhite ? 1 : -1;
             for (int i = -1; i <= 1; i++)
             {
                 Square currentSquare = new Square(relevantSquare.rank + riktning, relevantSquare.line + i);

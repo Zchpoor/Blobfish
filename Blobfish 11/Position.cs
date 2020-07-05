@@ -166,7 +166,7 @@ namespace Blobfish_11
         public Position deepCopy()
         {
            return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
-                (int[])enPassantSquare.Clone(), halfMoveClock, moveCounter, (int[,])kingPositions.Clone());
+                new int[] { -1, 1 }, halfMoveClock, moveCounter, (int[,])kingPositions.Clone());
 
         }
     }

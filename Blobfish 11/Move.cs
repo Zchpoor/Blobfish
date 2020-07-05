@@ -8,12 +8,16 @@ namespace Blobfish_11
 {
     public class Move
     {
+        //TODO: Ta bort?
+        public bool isCheck;
+
         public int[] from = new int[2];
         public int[] to = new int[2];
         public Move(int[] from, int[] to)
         {
             this.from = from;
             this.to = to;
+            isCheck = false;
         }
         public Move(Square fromSquare, Square toSquare) : 
             this(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
@@ -29,7 +33,7 @@ namespace Blobfish_11
             ret = ret.ToUpper();
             ret += ((Char)(from[1] + 'a')).ToString();
             ret += 8 - from[0];
-            if (board[to[0], to[1]] != '\0')
+            if (isCapture(board))
             {
                 ret += "x";
             }
@@ -39,6 +43,7 @@ namespace Blobfish_11
             }
             ret += ((Char)(to[1] + 'a')).ToString();
             ret += 8 - to[0];
+            if(this.isCheck) ret += '+';
             return ret;
         }
         public virtual Position execute(Position oldPos)
@@ -119,6 +124,10 @@ namespace Blobfish_11
             }
             return newPos;
         }
+        public virtual bool isCapture(char [,] board)
+        {
+            return board[to[0], to[1]] != '\0';
+        }
     }
     public class Castle : Move
     {
@@ -168,8 +177,9 @@ namespace Blobfish_11
         }
         public override string toString(char[,] board)
         {
-            if (rookFrom[1] == 7) return "0-0";
-            else return "0-0-0";
+            string ret = rookFrom[1] == 7 ? "0-0" : "0-0-0";
+            if (this.isCheck) ret += '+';
+            return ret;
         }
     }
     public class EnPassant : Move
@@ -200,6 +210,10 @@ namespace Blobfish_11
             newPos.halfMoveClock = 0;
             newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
+        }
+        public override bool isCapture(char[,] board)
+        {
+            return true;
         }
     }
     public class Promotion : Move
@@ -232,7 +246,15 @@ namespace Blobfish_11
         }
         public override string toString(char[,] board)
         {
-            return base.ToString() + "=" + promoteTo.ToString().ToUpper();
+            string ret = base.toString(board);
+            if(ret[ret.Length-1] == '+' || ret[ret.Length-1] == '#')
+            {
+                ret = ret.Insert(ret.Length - 1, "=" + promoteTo.ToString().ToUpper());
+            }
+            else
+                ret += "=" + promoteTo.ToString().ToUpper();
+            return ret;
+
         }
     }
 }

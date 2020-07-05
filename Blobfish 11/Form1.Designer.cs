@@ -35,6 +35,12 @@
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
             this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
+            this.toMoveLabel = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
@@ -109,8 +115,9 @@
             this.moveLabel.AutoSize = true;
             this.moveLabel.Location = new System.Drawing.Point(704, 31);
             this.moveLabel.Name = "moveLabel";
-            this.moveLabel.Size = new System.Drawing.Size(0, 17);
+            this.moveLabel.Size = new System.Drawing.Size(87, 17);
             this.moveLabel.TabIndex = 6;
+            this.moveLabel.Text = "(default text)";
             // 
             // evalBox
             // 
@@ -124,11 +131,69 @@
             this.evalBox.Size = new System.Drawing.Size(258, 560);
             this.evalBox.TabIndex = 7;
             // 
+            // toMoveLabel
+            // 
+            this.toMoveLabel.AutoSize = true;
+            this.toMoveLabel.Location = new System.Drawing.Point(550, 31);
+            this.toMoveLabel.Name = "toMoveLabel";
+            this.toMoveLabel.Size = new System.Drawing.Size(87, 17);
+            this.toMoveLabel.TabIndex = 8;
+            this.toMoveLabel.Text = "(default text)";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.radioButton3);
+            this.groupBox1.Controls.Add(this.radioButton2);
+            this.groupBox1.Controls.Add(this.radioButton1);
+            this.groupBox1.Location = new System.Drawing.Point(643, 409);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(130, 115);
+            this.groupBox1.TabIndex = 9;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Dator";
+            // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Checked = true;
+            this.radioButton3.Location = new System.Drawing.Point(6, 75);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(62, 21);
+            this.radioButton3.TabIndex = 5;
+            this.radioButton3.TabStop = true;
+            this.radioButton3.Text = "Svart";
+            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(6, 48);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(45, 21);
+            this.radioButton2.TabIndex = 4;
+            this.radioButton2.Text = "Vit";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(6, 21);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(101, 21);
+            this.radioButton1.TabIndex = 3;
+            this.radioButton1.Text = "Ingen dator";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1314, 560);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.toMoveLabel);
             this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
@@ -138,6 +203,8 @@
             this.Controls.Add(this.fenBox);
             this.Name = "Form1";
             this.Text = "Blobfish 11";
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -152,6 +219,11 @@
         private System.Windows.Forms.TableLayoutPanel boardPanel;
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
+        private System.Windows.Forms.Label toMoveLabel;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton radioButton1;
     }
 }
 
