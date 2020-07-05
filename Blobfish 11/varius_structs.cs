@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,7 +17,7 @@ namespace Blobfish_11
     {
         public double evaluation;
         public List<Move> allMoves;
-        public List<double> allEvals;
+        public List<Double> allEvals;
         public Move bestMove;
     }
     public struct Square
@@ -37,5 +38,28 @@ namespace Blobfish_11
         public List<Square> controlledSquares;
 
         public bool givesCheck;
+    }
+
+    public class myThreadParams
+    {
+        public Position pos;
+        public int depth;
+        public bool whiteToMove;
+        public Double ansPlace;
+        public myThreadParams(Position pos, int depth, bool whiteToMove)
+        {
+            this.pos = pos;
+            this.depth = depth;
+            this.whiteToMove = whiteToMove;
+        }
+    }
+    public class Double
+    {
+        public Mutex mutex;
+        public double value;
+        public Double(){
+            this.value = double.NaN;
+            this.mutex = new Mutex();
+        }
     }
 }

@@ -72,6 +72,8 @@ namespace Blobfish_11
                 }
             }
 
+            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
+
             //TODO: Flytta ut
             //TODO: Få bort globala variabler.
             currentPosition = pos;
@@ -95,7 +97,7 @@ namespace Blobfish_11
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
             }
-            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
+
 
             //TEST
             GC.Collect();
@@ -111,7 +113,7 @@ namespace Blobfish_11
             }
             return text;
         }
-        public string getMovesString(List<Move> moves, List<double> evals, char[,] board)
+        public string getMovesString(List<Move> moves, List<Double> evals, char[,] board)
         {
             if (moves == null || evals == null) return "";
             if (moves.Count != evals.Count)
@@ -120,7 +122,7 @@ namespace Blobfish_11
             string text = "";
             for (int i = 0; i < moves.Count; i++)
             {
-                text += moves[i].toString(board) + "    " + Math.Round(evals[i], 2).ToString() + Environment.NewLine;
+                text += moves[i].toString(board) + "    " + Math.Round(evals[i].value, 2).ToString() + Environment.NewLine;
             }
             return text;
         }

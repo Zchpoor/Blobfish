@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -36,24 +37,53 @@ namespace Blobfish_11
             }
             else
             {
-                List<double> allEvals = new List<double>();
+                List<Double> allEvals = new List<Double>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    double currentEval = alphaBeta(currentMove.execute(pos), depth-1, double.NegativeInfinity, double.PositiveInfinity, !pos.whiteToMove);
-                    allEvals.Add(currentEval);
-                    if (pos.whiteToMove)
+                    Double newDouble = new Double();
+                    allEvals.Add(newDouble);
+                    Thread thread = new Thread(delegate ()
                     {
-                        bestValue = Math.Max(bestValue, currentEval);
-                    }
-                    else
+                        threadStart(currentMove.execute(pos), depth - 1, !pos.whiteToMove, newDouble) ;
+                    });
+                    thread.Start();
+                }
+                Thread.Sleep(100);
+                for (int i = 0; i < allEvals.Count; i++)
+                {
+                    Double threadResult = allEvals[i];
+                    try
                     {
-                        bestValue = Math.Min(bestValue, currentEval);
+                        threadResult.mutex.WaitOne();
+                        double value = threadResult.value;
+                        if(value != value) //Kollar om talet är odefinierat.
+                        {//Om resultatet inte hunnit beräknas.
+                            Thread.Sleep(5);
+                            i--;
+                        }
+                        else
+                        { //Om resultatet är klart.
+                            if (pos.whiteToMove)
+                            {
+                                bestValue = Math.Max(bestValue, value);
+                            }
+                            else
+                            {
+                                bestValue = Math.Min(bestValue, value);
+                            }
+                            
+                            //TODO: Gör finare
+                            if(bestValue == value)
+                            {
+                                result.bestMove = moves[i];
+                            }
+                        }
                     }
-
-                    //TODO: Gör finare
-                    if (bestValue == currentEval)
-                        result.bestMove = currentMove;
+                    finally
+                    {
+                        threadResult.mutex.ReleaseMutex();
+                    }
                 }
                 result.evaluation = bestValue;
                 result.allEvals = allEvals;
@@ -61,6 +91,19 @@ namespace Blobfish_11
 
             result.allMoves = moves;
             return result;
+        }
+        public void threadStart(Position pos, int depth, bool whiteToMove, Double ansPlace)
+        {
+            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove);
+            try
+            {
+                ansPlace.mutex.WaitOne();
+                ansPlace.value = value;
+            }
+            finally
+            {
+                ansPlace.mutex.ReleaseMutex();
+            }
         }
         private double numericEval(Position pos)
         {
