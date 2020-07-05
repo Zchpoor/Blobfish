@@ -13,14 +13,7 @@ namespace Blobfish_11
         public EvalResult eval(Position pos, int depth)
         {
             List<Move> moves =  allValidMoves(pos);
-
             EvalResult result = new EvalResult();
-
-            //TODO: Överflödigt att beräkna detta här också.
-            //Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-            //    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
-            //bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
-
 
             int gameResult = decisiveResult(pos, moves);
             if(gameResult != -2)
@@ -37,11 +30,11 @@ namespace Blobfish_11
             }
             else
             {
-                List<Double> allEvals = new List<Double>();
+                List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    Double newDouble = new Double();
+                    SecureDouble newDouble = new SecureDouble();
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
@@ -52,14 +45,14 @@ namespace Blobfish_11
                 Thread.Sleep(100);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
-                    Double threadResult = allEvals[i];
+                    SecureDouble threadResult = allEvals[i];
                     try
                     {
                         threadResult.mutex.WaitOne();
                         double value = threadResult.value;
                         if(value != value) //Kollar om talet är odefinierat.
                         {//Om resultatet inte hunnit beräknas.
-                            Thread.Sleep(5);
+                            Thread.Sleep(100);
                             i--;
                         }
                         else
@@ -92,7 +85,7 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, int depth, bool whiteToMove, Double ansPlace)
+        public void threadStart(Position pos, int depth, bool whiteToMove, SecureDouble ansPlace)
         {
             double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove);
             try
@@ -821,7 +814,7 @@ namespace Blobfish_11
         private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove)
         {
             //TODO: Fixa horisonten.
-            if (depth == 0)
+            if (depth <= 0)
                 return numericEval(pos);
 
             List<Move> moves = allValidMoves(pos);
@@ -870,7 +863,7 @@ namespace Blobfish_11
         }
         private bool extraDepth(Move move, char[,] board, int currentDepth)
         {
-            return currentDepth < 3 && move.isCapture(board);
+            return currentDepth < 2 && move.isCapture(board);
         }
     }
 }

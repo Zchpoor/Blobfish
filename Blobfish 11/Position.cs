@@ -10,7 +10,6 @@ namespace Blobfish_11
     {
         //TODO: Gör om till struct?
         //TODO: Ändra allt till Square.
-        private readonly string FEN;
         public bool whiteToMove;
         public int halfMoveClock = 0;
         public int moveCounter = 0;
@@ -24,7 +23,6 @@ namespace Blobfish_11
 
         public Position(string FEN)
         {
-            this.FEN = FEN;
             int column = 0, row = 0;
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
@@ -155,7 +153,6 @@ namespace Blobfish_11
             int halfMoveClock, int moveCounter, int[,] kingPositions)
         {
             this.board = board;
-            this.FEN = "";
             this.whiteToMove = whiteToMove;
             this.castlingRights = castlingRights;
             this.halfMoveClock = halfMoveClock;

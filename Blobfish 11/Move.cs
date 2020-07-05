@@ -8,16 +8,12 @@ namespace Blobfish_11
 {
     public class Move
     {
-        //TODO: Ta bort?
-        public bool isCheck;
-
         public int[] from = new int[2];
         public int[] to = new int[2];
         public Move(int[] from, int[] to)
         {
             this.from = from;
             this.to = to;
-            isCheck = false;
         }
         public Move(Square fromSquare, Square toSquare) : 
             this(new int[] { fromSquare.rank, fromSquare.line }, new int[] { toSquare.rank, toSquare.line })
@@ -43,7 +39,6 @@ namespace Blobfish_11
             }
             ret += ((Char)(to[1] + 'a')).ToString();
             ret += 8 - to[0];
-            if(this.isCheck) ret += '+';
             return ret;
         }
         public virtual Position execute(Position oldPos)
@@ -178,7 +173,6 @@ namespace Blobfish_11
         public override string toString(char[,] board)
         {
             string ret = rookFrom[1] == 7 ? "0-0" : "0-0-0";
-            if (this.isCheck) ret += '+';
             return ret;
         }
     }

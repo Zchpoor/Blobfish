@@ -31,7 +31,7 @@ namespace Blobfish_11
                 Position newPos = allMoves[i].execute(pos); 
                 
                 //TODO: Gör bättre uppdelning
-                if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
+                /*if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves[i].isCheck = true;
                 }
@@ -39,7 +39,7 @@ namespace Blobfish_11
                 {
                     allMoves[i].isCheck = true;
                 }
-
+                */
 
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {

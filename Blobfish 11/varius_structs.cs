@@ -17,7 +17,7 @@ namespace Blobfish_11
     {
         public double evaluation;
         public List<Move> allMoves;
-        public List<Double> allEvals;
+        public List<SecureDouble> allEvals;
         public Move bestMove;
     }
     public struct Square
@@ -39,25 +39,11 @@ namespace Blobfish_11
 
         public bool givesCheck;
     }
-
-    public class myThreadParams
-    {
-        public Position pos;
-        public int depth;
-        public bool whiteToMove;
-        public Double ansPlace;
-        public myThreadParams(Position pos, int depth, bool whiteToMove)
-        {
-            this.pos = pos;
-            this.depth = depth;
-            this.whiteToMove = whiteToMove;
-        }
-    }
-    public class Double
+    public class SecureDouble
     {
         public Mutex mutex;
         public double value;
-        public Double(){
+        public SecureDouble(){
             this.value = double.NaN;
             this.mutex = new Mutex();
         }

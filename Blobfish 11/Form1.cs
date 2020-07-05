@@ -100,8 +100,8 @@ namespace Blobfish_11
 
 
             //TEST
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
             //TEST
         }
         public string getMovesString(List<Move> moves, char[,] board)
@@ -113,7 +113,7 @@ namespace Blobfish_11
             }
             return text;
         }
-        public string getMovesString(List<Move> moves, List<Double> evals, char[,] board)
+        public string getMovesString(List<Move> moves, List<SecureDouble> evals, char[,] board)
         {
             if (moves == null || evals == null) return "";
             if (moves.Count != evals.Count)
@@ -213,4 +213,5 @@ namespace Blobfish_11
  *  Sortera efter uppskattad kvalitet på draget.
  *  Manuell minneshantering
  *  Effektivisera algoritmer för dragberäkning.
+ *  Minimera minnesanvändning
  */
