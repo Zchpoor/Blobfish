@@ -10,7 +10,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        public EvalResult eval(Position pos, int depth)
+        public EvalResult eval(Position pos, int baseDepth)
         {
             List<Move> moves =  allValidMoves(pos);
             EvalResult result = new EvalResult();
@@ -38,7 +38,7 @@ namespace Blobfish_11
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), depth - 1, !pos.whiteToMove, newDouble) ;
+                        threadStart(currentMove.execute(pos), baseDepth - 1, !pos.whiteToMove, newDouble) ;
                     });
                     thread.Start();
                 }
@@ -789,8 +789,9 @@ namespace Blobfish_11
             result.checkingPieces = checkingPieces;
             return result;
         }
-        private int decisiveResult(Position pos, List<Move> moves)
+        public int decisiveResult(Position pos, List<Move> moves)
         {
+            //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
                 Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :

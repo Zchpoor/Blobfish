@@ -83,12 +83,33 @@ namespace Blobfish_11
                 EvalResult result = blobFish.eval(pos, 3);
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
-                if (result.bestMove != null)
+                string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
+                textBox1.Text = movesString;
+                int res = blobFish.decisiveResult(pos, currentMoves);
+                if (res != -2)
+                {
+                    if (res == 1000)
+                    {
+                        MessageBox.Show("Vit vann på schack matt!");
+                    }
+                    else if(res == -1000)
+                    {
+                        MessageBox.Show("Svart vann på schack matt!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Partiet slutade remi!");
+                    }
+                }
+                else if (result.bestMove != null)
+                {
                     evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
-                string temp = getMovesString(currentMoves, result.allEvals, currentPosition.board);
-                textBox1.Text = temp;
-
-                display(result.bestMove.execute(pos));
+                    display(result.bestMove.execute(pos));
+                }
+                else
+                {
+                    throw new Exception("Odefinierat bästa drag.");
+                }
             }
             else
             {
@@ -208,10 +229,17 @@ namespace Blobfish_11
  * Fler tester.
  * Ta tillbaka drag.
  * Få FEN
+ * Meddelande vid pariets slut.
+ * Välja pjäs att promotera till.
+ * Lägga till rockad tidigare.
+ * Justera matriserna.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
  *  Manuell minneshantering
  *  Effektivisera algoritmer för dragberäkning.
  *  Minimera minnesanvändning
+ *  Kapa de längsta slagväxlingarna.
+ *  
+ *  Variera djup utifrån antal drag i ställningen.
  */

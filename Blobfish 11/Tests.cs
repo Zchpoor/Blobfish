@@ -62,7 +62,7 @@ namespace Blobfish_11
             makeTest("rnbqkbnr/pp2pppp/3p4/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3", 4); //Moskva
             makeTest("rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2", 22); //1.c4 c6
             makeTest("1rb4Q/ppppk2p/2n2P2/4p3/2Bb4/2N5/PPP2PPP/R3K1NR b KQ - 0 1", 1); //Udda ställning. 1 giltigt drag.
-            
+            makeTest("8/p5pp/4p1k1/4P3/P3P2P/1P1K1b2/8/8 b - - 0 1", 14); //Slutspel med en bonde för pjäs.
 
             if (testFailed)
                 return detailedResult;

@@ -30,17 +30,6 @@ namespace Blobfish_11
             {
                 Position newPos = allMoves[i].execute(pos); 
                 
-                //TODO: Gör bättre uppdelning
-                /*if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
-                {
-                    allMoves[i].isCheck = true;
-                }
-                else if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[1, 0], newPos.kingPositions[1, 1]), false))
-                {
-                    allMoves[i].isCheck = true;
-                }
-                */
-
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
@@ -246,7 +235,6 @@ namespace Blobfish_11
         }
         private void foreachKingSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            List<Move> possibleMoves = new List<Move>();
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
@@ -256,7 +244,6 @@ namespace Blobfish_11
                     Square currentSquare = new Square(pieceSquare.rank + i, pieceSquare.line + j);
                     if (validSquare(currentSquare))
                     {
-                        char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
                         callback(currentSquare);
                     }
                 }
@@ -402,7 +389,7 @@ namespace Blobfish_11
 
             //Bönder
             int riktning = byWhite ? 1 : -1;
-            for (int i = -1; i <= 1; i++)
+            for (int i = -1; i <= 1; i+=2)
             {
                 Square currentSquare = new Square(relevantSquare.rank + riktning, relevantSquare.line + i);
                 if (validSquare(currentSquare))
