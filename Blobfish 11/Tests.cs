@@ -65,7 +65,7 @@ namespace Blobfish_11
             makeTest("8/p5pp/4p1k1/4P3/P3P2P/1P1K1b2/8/8 b - - 0 1", 14); //Slutspel med en bonde för pjäs.
             makeTest("r1bqk2r/pp2ppbp/2np1np1/8/3NP3/4BP2/PPPQ2PP/RN2KB1R w KQkq - 3 8", 42); //Sic, springare blockerar lång rockad.
             //25
-
+            makeTest("6k1/8/8/8/8/8/4p3/1K6 b - - 0 1", 9); //Promotering för svart.
 
 
             if (testFailed)

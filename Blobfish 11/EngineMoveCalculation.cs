@@ -126,7 +126,7 @@ namespace Blobfish_11
             foreachKingSquare(pos, pieceSquare, addMoveIfValid);
 
             int castlingRank = pieceIsWhite ? 7 : 0;
-            if(pieceSquare.rank == castlingRank && pieceSquare.line == 4)
+            if(pieceSquare.rank == castlingRank && pieceSquare.line == 4 && !isControlledBy(pos, pieceSquare, !pieceIsWhite))
             {
                 //Kungen står på ett fält där rockad skulle kunna vara möjligt.
                 char correctRook = pieceIsWhite ? 'R' : 'r';
@@ -181,7 +181,7 @@ namespace Blobfish_11
                 if (pieceOnCurrentSquare == '\0')
                 {
 
-                    int promotionRank = pieceIsWhite ? 0 : 8;
+                    int promotionRank = pieceIsWhite ? 0 : 7;
                     if (currentSquare.rank == promotionRank)//Promotering.
                     {
                         addPromotions(pieceSquare, currentSquare);
@@ -338,28 +338,6 @@ namespace Blobfish_11
         private bool isWhite(char piece)
         {
             return piece <= 'Z';
-        }
-        private int[] calculateLine(Square firstSquare, Square secondSquare)
-        {
-            //TODO: Ta bort.
-            int dr = firstSquare.rank - secondSquare.rank;
-            int dl = firstSquare.line - secondSquare.line;
-            if(dl == 0)
-            {
-                return new int[] { Math.Sign(dr), 0 };
-            }
-            else if(dr == 0)
-            {
-                return new int[] { 0, Math.Sign(dl) };
-            }
-            else if(Math.Abs(dr) == Math.Abs(dl))
-            {
-                return new int[] { Math.Sign(dr), Math.Sign(dl) };
-            }
-            else
-            {
-                return new int[] { 0, 0 }; //Ingen delad diagonal.
-            }
         }
         private bool isControlledBy(Position pos, Square relevantSquare, bool byWhite)
         {

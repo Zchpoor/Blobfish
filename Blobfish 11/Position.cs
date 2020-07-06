@@ -15,8 +15,6 @@ namespace Blobfish_11
         public int moveCounter = 0;
         public int[] enPassantSquare = new int[2]; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
-        public double material = 0; //TODO: Städa upp
-        public double[] pawnValues = new double[2];
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 

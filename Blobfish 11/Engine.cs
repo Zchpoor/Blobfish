@@ -50,7 +50,9 @@ namespace Blobfish_11
                     {
                         threadResult.mutex.WaitOne();
                         double value = threadResult.value;
-                        if(value != value) //Kollar om talet är odefinierat.
+#pragma warning disable CS1718 // Comparison made to same variable
+                        if (value != value) //Kollar om talet är odefinierat.
+#pragma warning restore CS1718 // Comparison made to same variable
                         {//Om resultatet inte hunnit beräknas.
                             Thread.Sleep(100);
                             i--;
