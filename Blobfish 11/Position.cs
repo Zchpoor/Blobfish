@@ -19,7 +19,6 @@ namespace Blobfish_11
         public double[] pawnValues = new double[2];
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
-        int[] checkingPieces = { -1, -1, -1, -1 };
 
         public Position(string FEN)
         {

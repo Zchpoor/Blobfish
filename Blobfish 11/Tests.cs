@@ -63,6 +63,10 @@ namespace Blobfish_11
             makeTest("rnbqkbnr/pp1ppppp/2p5/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2", 22); //1.c4 c6
             makeTest("1rb4Q/ppppk2p/2n2P2/4p3/2Bb4/2N5/PPP2PPP/R3K1NR b KQ - 0 1", 1); //Udda ställning. 1 giltigt drag.
             makeTest("8/p5pp/4p1k1/4P3/P3P2P/1P1K1b2/8/8 b - - 0 1", 14); //Slutspel med en bonde för pjäs.
+            makeTest("r1bqk2r/pp2ppbp/2np1np1/8/3NP3/4BP2/PPPQ2PP/RN2KB1R w KQkq - 3 8", 42); //Sic, springare blockerar lång rockad.
+            //25
+
+
 
             if (testFailed)
                 return detailedResult;

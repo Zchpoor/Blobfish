@@ -72,12 +72,17 @@ namespace Blobfish_11
                 }
             }
 
+            //TEST
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
+            //TEST
+
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             //TODO: Flytta ut
             //TODO: Få bort globala variabler.
             currentPosition = pos;
-            if((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
+            if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
                 Engine blobFish = new Engine();
                 EvalResult result = blobFish.eval(pos, 3);
@@ -92,7 +97,7 @@ namespace Blobfish_11
                     {
                         MessageBox.Show("Vit vann på schack matt!");
                     }
-                    else if(res == -1000)
+                    else if (res == -1000)
                     {
                         MessageBox.Show("Svart vann på schack matt!");
                     }
@@ -117,13 +122,25 @@ namespace Blobfish_11
                 currentMoves = blobFish.allValidMoves(pos);
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
+
+                //TODO: Fakorera ut detta med identisk kod ovan.
+                int res = blobFish.decisiveResult(pos, currentMoves);
+                if (res != -2)
+                {
+                    if (res == 1000)
+                    {
+                        MessageBox.Show("Vit vann på schack matt!");
+                    }
+                    else if (res == -1000)
+                    {
+                        MessageBox.Show("Svart vann på schack matt!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Partiet slutade remi!");
+                    }
+                }
             }
-
-
-            //TEST
-            //GC.Collect();
-            //GC.WaitForPendingFinalizers();
-            //TEST
         }
         public string getMovesString(List<Move> moves, char[,] board)
         {
@@ -229,14 +246,16 @@ namespace Blobfish_11
  * Fler tester.
  * Ta tillbaka drag.
  * Få FEN
- * Meddelande vid pariets slut.
  * Välja pjäs att promotera till.
- * Lägga till rockad tidigare.
- * Justera matriserna.
+ * Vända på brädet.
+ * 
+ * Justera matriserna.:
+ * Gör torn assymmetriska?
+ * Variera utifrån material kvar på brädet, i synnerhet kung.
+ * Gör dam separat från torn/löpare.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
- *  Manuell minneshantering
  *  Effektivisera algoritmer för dragberäkning.
  *  Minimera minnesanvändning
  *  Kapa de längsta slagväxlingarna.

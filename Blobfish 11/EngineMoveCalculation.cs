@@ -137,11 +137,11 @@ namespace Blobfish_11
                     Square rookTo = new Square(castlingRank, 3);
                     Square kingTo = new Square(castlingRank, 2);
                     if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
-                        !isControlledBy(pos, rookTo, !pieceIsWhite) && !isControlledBy(pos, kingTo, !pieceIsWhite &&
-                        !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
+                        pos.board[kingTo.rank, kingTo.line-1] == '\0' &&!isControlledBy(pos, rookTo, !pieceIsWhite) && 
+                        !isControlledBy(pos, kingTo, !pieceIsWhite  && !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
                         Square rookFrom = new Square(castlingRank, 0);
-                        possibleMoves.Add(new Castle(pieceSquare, kingTo, rookFrom, rookTo));
+                        possibleMoves.Insert(0, new Castle(pieceSquare, kingTo, rookFrom, rookTo));
                     }
                 }
                 if(pos.board[castlingRank, 7] == correctRook && pos.castlingRights[castlingRightOffset])
@@ -154,7 +154,7 @@ namespace Blobfish_11
                         !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
                         Square rookFrom = new Square(castlingRank, 7);
-                        possibleMoves.Add(new Castle(pieceSquare, kingTo, rookFrom, rookTo));
+                        possibleMoves.Insert(0, new Castle(pieceSquare, kingTo, rookFrom, rookTo));
                     }
                 }
             }
