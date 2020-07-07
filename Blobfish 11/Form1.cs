@@ -317,28 +317,31 @@ namespace Blobfish_11
 
 /*
  * TODO:
- * +/#
- * Byt ut: row -> rank, column -> line. 
- * Byt ut int[] -> Square.
- * Fler tester.
- * Ta tillbaka drag.
- * Få FEN
- * Välja pjäs att promotera till.
- * Vända på brädet.
+ * Bekvämligheter:
+ *  +/#
+ *  Byt ut: row -> rank, column -> line. 
+ *  Byt ut int[] -> Square.
+ *  Fler tester.
+ *  Få FEN
+ *  Välja pjäs att promotera till.
+ *  Vända på brädet.
+ *  Se matieral.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Variera utifrån material kvar på brädet, i synnerhet kung.
- *  Gör dam separat från torn/löpare.
+ *  Gör dam separat från torn/löpare.*
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
  *  Minimera minnesanvändning
  *  Kapa de längsta slagväxlingarna.
+ *  Få alfa/beta mellan de olika trådarna.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal drag i ställningen.
- *  0-0 istället för Tf1/Tf8.
- *  Löparpar
+ *  0-0 istället för Tf1/Tf8.*
+ *  Löparpar*
+ *  Kungssäkerhet
  */

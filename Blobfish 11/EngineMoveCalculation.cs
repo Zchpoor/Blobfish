@@ -210,7 +210,7 @@ namespace Blobfish_11
                 currentSquare.line = pieceSquare.line + i;
                 if (validSquare(currentSquare))
                 {
-                    int promotionRank = pieceIsWhite ? 0 : 8;
+                    int promotionRank = pieceIsWhite ? 0 : 7;
                     char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                     if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
                     {

@@ -32,6 +32,8 @@ namespace Blobfish_11
             {
                 List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+                if (moves.Count < 8) 
+                    baseDepth++;
                 foreach (Move currentMove in moves)
                 {
                     SecureDouble newDouble = new SecureDouble();
@@ -53,7 +55,8 @@ namespace Blobfish_11
 #pragma warning disable CS1718 // Comparison made to same variable
                         if (value != value) //Kollar om talet är odefinierat.
 #pragma warning restore CS1718 // Comparison made to same variable
-                        {//Om resultatet inte hunnit beräknas.
+                        {
+                            //Om resultatet inte hunnit beräknas.
                             Thread.Sleep(100);
                             i--;
                         }
@@ -115,6 +118,7 @@ namespace Blobfish_11
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             //int column = 0, row = 0;
             double[] pieceValues = { 3, 3, 5, 9 };
+            bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
             for (int row = 0; row < 8; row++)
             {
@@ -143,9 +147,17 @@ namespace Blobfish_11
 
                         case 'b':
                             pieceValue -= pieceValues[1] * bishop[row, column];
+                            if (row + column % 2 == 0)
+                                bishopColors[2] = true; //Svart löpare på vitt fält
+                            else
+                                bishopColors[3] = true; //Svart löpare på svart fält
                             break;
                         case 'B':
                             pieceValue += pieceValues[1] * bishop[row, column];
+                            if (row + column % 2 == 0)
+                                bishopColors[0] = true; //Vit löpare på vitt fält
+                            else
+                                bishopColors[1] = true; //Vit löpare på svart fält
                             break;
 
                         case 'r':
@@ -174,6 +186,15 @@ namespace Blobfish_11
                             break;
                     }
                 }
+            }
+            double bishopPairValue = 0.4f;
+            if (bishopColors[0] && bishopColors[1])
+            {
+                //pieceValue += bishopPairValue;
+            }
+            if (bishopColors[2] && bishopColors[3])
+            {
+                //pieceValue -= bishopPairValue;
             }
 
             for (int i = 0; i < 2; i++)
