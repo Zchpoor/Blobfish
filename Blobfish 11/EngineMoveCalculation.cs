@@ -12,7 +12,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
-        public List<Move> allValidMoves(Position pos) 
+        public List<Move> allValidMoves(Position pos)
         {
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
@@ -28,8 +28,8 @@ namespace Blobfish_11
 
             for (int i = 0; i < allMoves.Count; i++)
             {
-                Position newPos = allMoves[i].execute(pos); 
-                
+                Position newPos = allMoves[i].execute(pos);
+
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
                 {
                     allMoves.RemoveAt(i);
@@ -40,7 +40,7 @@ namespace Blobfish_11
                     allMoves.RemoveAt(i);
                     i--;
                 }
-               
+
             }
             return allMoves;
         }
@@ -52,7 +52,7 @@ namespace Blobfish_11
                 return null;
             switch (pieceChar.ToString().ToUpper())
             {
-                case "" : return null;
+                case "": return null;
                 case "P": return pawnMoves(pos, pieceSquare, pieceIsWhite);
                 case "N": return knightMoves(pos, pieceSquare, pieceIsWhite);
                 case "B": return bishopMoves(pos, pieceSquare, pieceIsWhite);
@@ -74,7 +74,7 @@ namespace Blobfish_11
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
                 }
             }
-            foreachBishopSquare(pos, pieceSquare,addMoveIfValid);
+            foreachBishopSquare(pos, pieceSquare, addMoveIfValid);
             return possibleMoves;
         }
         private List<Move> rookMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
@@ -118,7 +118,7 @@ namespace Blobfish_11
             void addMoveIfValid(Square currentSquare)
             {
                 char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                if (pieceOnCurrentSquare =='\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
+                if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
                 }
@@ -126,25 +126,25 @@ namespace Blobfish_11
             foreachKingSquare(pos, pieceSquare, addMoveIfValid);
 
             int castlingRank = pieceIsWhite ? 7 : 0;
-            if(pieceSquare.rank == castlingRank && pieceSquare.line == 4 && !isControlledBy(pos, pieceSquare, !pieceIsWhite))
+            if (pieceSquare.rank == castlingRank && pieceSquare.line == 4 && !isControlledBy(pos, pieceSquare, !pieceIsWhite))
             {
                 //Kungen står på ett fält där rockad skulle kunna vara möjligt.
                 char correctRook = pieceIsWhite ? 'R' : 'r';
                 int castlingRightOffset = pieceIsWhite ? 0 : 2;
-                if(pos.board[castlingRank, 0] == correctRook && pos.castlingRights[castlingRightOffset +1])
+                if (pos.board[castlingRank, 0] == correctRook && pos.castlingRights[castlingRightOffset + 1])
                 {
                     //Lång rockad
                     Square rookTo = new Square(castlingRank, 3);
                     Square kingTo = new Square(castlingRank, 2);
                     if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
-                        pos.board[kingTo.rank, kingTo.line-1] == '\0' &&!isControlledBy(pos, rookTo, !pieceIsWhite) && 
-                        !isControlledBy(pos, kingTo, !pieceIsWhite  && !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
+                        pos.board[kingTo.rank, kingTo.line - 1] == '\0' && !isControlledBy(pos, rookTo, !pieceIsWhite) &&
+                        !isControlledBy(pos, kingTo, !pieceIsWhite && !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
                         Square rookFrom = new Square(castlingRank, 0);
                         possibleMoves.Insert(0, new Castle(pieceSquare, kingTo, rookFrom, rookTo));
                     }
                 }
-                if(pos.board[castlingRank, 7] == correctRook && pos.castlingRights[castlingRightOffset])
+                if (pos.board[castlingRank, 7] == correctRook && pos.castlingRights[castlingRightOffset])
                 {
                     //Kort rockad
                     Square rookTo = new Square(castlingRank, 5);
@@ -204,7 +204,7 @@ namespace Blobfish_11
                     }
                 }
             }
-            for (int i = -1; i <= 1; i+=2) //Kommer bli -1 och 1.
+            for (int i = -1; i <= 1; i += 2) //Kommer bli -1 och 1.
             {
                 currentSquare.rank = pieceSquare.rank + moveDirection;
                 currentSquare.line = pieceSquare.line + i;
@@ -228,7 +228,7 @@ namespace Blobfish_11
                         Square pawnToRemove = new Square(pieceSquare.rank, currentSquare.line);
                         possibleMoves.Add(new EnPassant(pieceSquare, currentSquare, pawnToRemove)); //En passant
                     }
-                    
+
                 }
             }
             return possibleMoves;
@@ -251,17 +251,22 @@ namespace Blobfish_11
         }
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            for (int i = -2; i < 3; i++)
+            void callbackByOffset(int rankOffset, int lineOffset)
             {
-                for (int j = -2; j < 3; j++)
+                Square currentSquare = new Square(pieceSquare.rank + rankOffset, pieceSquare.line + lineOffset);
+                if (validSquare(currentSquare))
                 {
-                    Square currentSquare = new Square(pieceSquare.rank + i, pieceSquare.line + j);
-                    if (Math.Abs(i) + Math.Abs(j) == 3 && validSquare(currentSquare))
-                    {
-                        callback(currentSquare);
-                    }
+                    callback(currentSquare);
                 }
             }
+            callbackByOffset(2, 1);
+            callbackByOffset(2, -1);
+            callbackByOffset(1, 2);
+            callbackByOffset(1, -2);
+            callbackByOffset(-1, 2);
+            callbackByOffset(-1, -2);
+            callbackByOffset(-2, 1);
+            callbackByOffset(-2, -1);
         }
         private void foreachBishopSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
