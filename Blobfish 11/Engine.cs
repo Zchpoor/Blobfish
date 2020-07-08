@@ -40,8 +40,9 @@ namespace Blobfish_11
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), baseDepth - 1, !pos.whiteToMove, newDouble) ;
+                        threadStart(currentMove.execute(pos), baseDepth - 1, !pos.whiteToMove, newDouble);
                     });
+                    thread.Name = currentMove.toString(pos.board);
                     thread.Start();
                 }
                 Thread.Sleep(100);
@@ -92,7 +93,7 @@ namespace Blobfish_11
         }
         public void threadStart(Position pos, int depth, bool whiteToMove, SecureDouble ansPlace)
         {
-            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove);
+            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove, false);
             try
             {
                 ansPlace.mutex.WaitOne();
@@ -114,7 +115,9 @@ namespace Blobfish_11
              */
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
-            int[,] pawns = new int[2, 8]; //0=black, 1=white.
+            double[] kingSaftey = new double[] { 0f, 0f};
+            int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
+            int[,] pawns = new int[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             //int column = 0, row = 0;
             double[] pieceValues = { 3, 3, 5, 9 };
@@ -140,21 +143,25 @@ namespace Blobfish_11
 
                         case 'n':
                             pieceValue -= pieceValues[0] * knight[row, column];
+                            heavyMaterial[1] += 3;
                             break;
                         case 'N':
                             pieceValue += pieceValues[0] * knight[row, column];
+                            heavyMaterial[0] += 3;
                             break;
 
                         case 'b':
                             pieceValue -= pieceValues[1] * bishop[row, column];
-                            if (row + column % 2 == 0)
+                            heavyMaterial[1] += 3;
+                            if ((row + column) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
                             else
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
                         case 'B':
                             pieceValue += pieceValues[1] * bishop[row, column];
-                            if (row + column % 2 == 0)
+                            heavyMaterial[0] += 3;
+                            if ((row + column) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
                             else
                                 bishopColors[1] = true; //Vit löpare på svart fält
@@ -162,14 +169,17 @@ namespace Blobfish_11
 
                         case 'r':
                             pieceValue -= pieceValues[2] * rook[row, column];
+                            heavyMaterial[1] += 5;
                             break;
                         case 'R':
                             pieceValue += pieceValues[2] * rook[row, column];
+                            heavyMaterial[0] += 5;
                             break;
 
                         case 'k':
                             pos.kingPositions[0, 0] = row;
                             pos.kingPositions[0, 1] = column;
+                            
                             break;
                         case 'K':
                             pos.kingPositions[1, 0] = row;
@@ -178,23 +188,40 @@ namespace Blobfish_11
 
                         case 'q':
                             pieceValue -= pieceValues[3] * queen[row, column];
+                            heavyMaterial[1] += 9;
                             break;
                         case 'Q':
                             pieceValue += pieceValues[3] * queen[row, column];
+                            heavyMaterial[0] += 9;
                             break;
                         default:
                             break;
                     }
                 }
             }
+
+            //TODO: fixa denna.
+            for (int i = 0; i < 2; i++)
+            {
+                if (heavyMaterial[i] > 6) //Om det inte är "sluspel"
+                {
+                    kingSaftey[i] += 4* king[0, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
+                }
+                else
+                {
+                    kingSaftey[i] += 4* king[1, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
+                }
+            }
+            double kingSafteyDifference = kingSaftey[1] - kingSaftey[0];
+
             double bishopPairValue = 0.4f;
             if (bishopColors[0] && bishopColors[1])
             {
-                //pieceValue += bishopPairValue;
+                pieceValue += bishopPairValue;
             }
             if (bishopColors[2] && bishopColors[3])
             {
-                //pieceValue -= bishopPairValue;
+                pieceValue -= bishopPairValue;
             }
 
             for (int i = 0; i < 2; i++)
@@ -205,7 +232,19 @@ namespace Blobfish_11
                     posFactor[i] /= numberOfPawns[i];
             }
             double pawnValue = evalPawns(numberOfPawns, posFactor, pawns);
-            return pieceValue + pawnValue;
+            return pieceValue + pawnValue + kingSafteyDifference;
+        }
+        private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
+        {
+            const double kingValue = 4f;
+            if(oppHeavyMaterial > 6)
+            {
+                return 0;
+            }
+            else
+            {
+                return 0;
+            }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
         {
@@ -253,11 +292,15 @@ namespace Blobfish_11
 
             return -2;
         }
-        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove)
+        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove, bool forceBranching)
         {
-            if (depth <= 0)
+            if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
+            if(depth <= -8) //Maximalt antal slagväxlingar som får ta plats.
+            {
+                return numericEval(pos);
+            }
             List<Move> moves = allValidMoves(pos);
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
@@ -270,11 +313,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extraDepth(currentMove, pos.board, depth))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth, alpha, beta, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, true));
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, false));
                     }
                     alpha = Math.Max(alpha, value);
                     if (alpha >= beta)
@@ -289,11 +332,11 @@ namespace Blobfish_11
                 {
                     if (extraDepth(currentMove, pos.board, depth))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth, alpha, beta, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, true));
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, false));
                     }
                     beta = Math.Min(beta, value);
                     if (beta <= alpha)

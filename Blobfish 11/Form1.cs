@@ -326,11 +326,11 @@ namespace Blobfish_11
  *  Välja pjäs att promotera till.
  *  Vända på brädet.
  *  Se matieral.
+ *  Se bästa variant
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
- *  Variera utifrån material kvar på brädet, i synnerhet kung.
- *  Gör dam separat från torn/löpare.*
+ *  Minska behov av terräng.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
@@ -340,8 +340,6 @@ namespace Blobfish_11
  *  Få alfa/beta mellan de olika trådarna.
  *  
  * Förbättringar:
- *  Variera djup utifrån antal drag i ställningen.
- *  0-0 istället för Tf1/Tf8.*
- *  Löparpar*
+ *  Variera djup utifrån antal pjäser.
  *  Kungssäkerhet
  */
