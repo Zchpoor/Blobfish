@@ -32,8 +32,12 @@ namespace Blobfish_11
             {
                 List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+
                 if (moves.Count < 8) 
                     baseDepth++;
+
+                //TODO: Öka längden om antalet pjäser är få.
+
                 foreach (Move currentMove in moves)
                 {
                     SecureDouble newDouble = new SecureDouble();
@@ -236,14 +240,15 @@ namespace Blobfish_11
         }
         private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
         {
+            //TODO: Använd.
             const double kingValue = 4f;
             if(oppHeavyMaterial > 6)
             {
-                return 0;
+                return kingValue * king[0, kingSquare.rank, kingSquare.line];
             }
             else
             {
-                return 0;
+                return kingValue * king[1, kingSquare.rank, kingSquare.line];
             }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)

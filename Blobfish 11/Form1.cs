@@ -331,6 +331,7 @@ namespace Blobfish_11
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Minska behov av terräng.
+ *  Föredra springare före löpare.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
@@ -342,4 +343,5 @@ namespace Blobfish_11
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Kungssäkerhet
+ *  Få schackar att också förlänga varianterna.
  */
