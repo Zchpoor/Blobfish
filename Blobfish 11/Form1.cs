@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Deployment.Application;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,6 +16,8 @@ namespace Blobfish_11
     public partial class Form1 : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
+        List<Position> gamePositions = new List<Position>();
+        List<Move> gameMoves = new List<Move>();
         Position currentPosition;
         List<Move> currentMoves = new List<Move>();
         int[] firstSquare = { -1, -1 };
@@ -50,6 +55,7 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
+            gamePositions.Add(pos);
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -72,23 +78,51 @@ namespace Blobfish_11
                 }
             }
 
+            //TEST
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
+            //TEST
+
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             //TODO: Flytta ut
-            //TODO: Få bort globala variabler.
+            //TODO: Få bort "globala" variabler.
             currentPosition = pos;
-            if((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
+            if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
                 Engine blobFish = new Engine();
                 EvalResult result = blobFish.eval(pos, 3);
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
-                if (result.bestMove != null)
-                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
-                string temp = getMovesString(currentMoves, result.allEvals, currentPosition.board);
-                textBox1.Text = temp;
-
-                display(result.bestMove.execute(pos));
+                string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
+                textBox1.Text = movesString;
+                int res = blobFish.decisiveResult(pos, currentMoves);
+                if (res != -2)
+                {
+                    if (res == 1000)
+                    {
+                        MessageBox.Show("Vit vann på schack matt!");
+                    }
+                    else if (res == -1000)
+                    {
+                        MessageBox.Show("Svart vann på schack matt!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Partiet slutade remi!");
+                    }
+                }
+                else if (result.bestMove != null)
+                {
+                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + 
+                        Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
+                    gameMoves.Add(result.bestMove);
+                    display(result.bestMove.execute(pos));
+                }
+                else
+                {
+                    throw new Exception("Odefinierat bästa drag.");
+                }
             }
             else
             {
@@ -96,65 +130,116 @@ namespace Blobfish_11
                 currentMoves = blobFish.allValidMoves(pos);
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
-            }
 
-
-            //TEST
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            //TEST
-        }
-        public string getMovesString(List<Move> moves, char[,] board)
-        {
-            string text = "";
-            foreach (Move item in moves)
-            {
-                text += item.toString(board) + Environment.NewLine;
+                //TODO: Fakorera ut detta med identisk kod ovan.
+                int res = blobFish.decisiveResult(pos, currentMoves);
+                if (res != -2)
+                {
+                    if (res == 1000)
+                    {
+                        MessageBox.Show("Vit vann på schack matt!");
+                    }
+                    else if (res == -1000)
+                    {
+                        MessageBox.Show("Svart vann på schack matt!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Partiet slutade remi!");
+                    }
+                }
             }
-            return text;
-        }
-        public string getMovesString(List<Move> moves, List<Double> evals, char[,] board)
-        {
-            if (moves == null || evals == null) return "";
-            if (moves.Count != evals.Count)
-                throw new Exception("Olika antal evalueringar och drag!");
-
-            string text = "";
-            for (int i = 0; i < moves.Count; i++)
-            {
-                text += moves[i].toString(board) + "    " + Math.Round(evals[i].value, 2).ToString() + Environment.NewLine;
-            }
-            return text;
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            if (fenBox.Text.ToLower() == "test")
+            string inputText = fenBox.Text;
+            string lowerInput = inputText.ToLower();
+
+            switch (lowerInput)
             {
-                string testString = Tests.runTests();
-                evalBox.Text = testString;
+                case "test":
+                    evalBox.Text = Tests.runTests();
+                    break;
+                case "takeback":
+                    takeback(2);
+                    break;
+                case "tb":
+                    takeback(2);
+                    break;
+                case "återta":
+                    takeback(2);
+                    break;
+                case "stb":
+                    takeback(1);
+                    break;
+                case "scoresheet":
+                    evalBox.Text = scoresheet();
+                    break;
+                case "protokoll":
+                    evalBox.Text = scoresheet();
+                    break;
+                case "reset":
+                    reset();
+                    break;
+                case "omstart":
+                    reset();
+                    break;
+                default:
+                    try
+                    {
+                        Position pos = new Position(inputText);
+                        this.gamePositions.Clear();
+                        this.gameMoves.Clear();
+                        display(pos);
+
+                    }
+                    catch
+                    {
+                        evalBox.Text = "Felaktig FEN!";
+                        return;
+                    }
+                    break;
+            }
+        }
+        private void takeback(int numberOfMoves)
+        {
+            if (gamePositions.Count > numberOfMoves)
+            {
+                for (int i = 0; i < numberOfMoves; i++)
+                {
+                    gamePositions.RemoveAt(gamePositions.Count - 1);
+                    gameMoves.RemoveAt(gameMoves.Count - 1);
+                }
+                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
+                gamePositions.RemoveAt(gamePositions.Count - 1);
+
+                display(newCurrentPosition);
             }
             else
             {
-                Position pos = new Position(fenBox.Text);
-                display(pos);
-                /*
-                try
-                {
-                    Position pos = new Position(fenBox.Text);
-                    //evalBox.Text = "";
-                    //Engine blobFish = new Engine();
-                    //EvalResult result = blobFish.eval(pos, 1);
-                    //double eval = result.evaluation;
-                    //currentMoves = result.allMoves;
-                    //evalBox.Text = "Evaluering: " + Math.Round(eval, 2);
-                    display(pos);
-                }
-                catch
-                {
-                    evalBox.Text = "Felaktig FEN!";
-                    return;
-                }*/
+                evalBox.Text = "För få drag har spelats!";
             }
+            //TODO: Ta bort ytterligare ett drag?
+        }
+        private string scoresheet()
+        {
+            string scoresheet = "";
+            if(gamePositions.Count != gameMoves.Count+1)
+            {
+                throw new Exception("Fel antal drag/ställningar har spelats!");
+            }
+            else if(gameMoves.Count == 0)
+            {
+                scoresheet = "Inga drag har spelats!";
+            }
+            else
+            {
+                for (int i = 0; i < gameMoves.Count; i++)
+                {
+                    scoresheet += gameMoves[i].toString(gamePositions[i].board) + Environment.NewLine;
+                }
+            }
+            return scoresheet;
         }
         private void squareClick(object sender, MouseEventArgs e)
         {
@@ -179,6 +264,7 @@ namespace Blobfish_11
                     {
                         Position newPosition = item.execute(currentPosition);
                         this.currentPosition = newPosition;
+                        this.gameMoves.Add(item);
                         this.display(newPosition);
                         break;
                     }
@@ -195,22 +281,67 @@ namespace Blobfish_11
         }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
+            gamePositions.RemoveAt(gamePositions.Count - 1);
             display(currentPosition);
+        }
+        public string getMovesString(List<Move> moves, char[,] board)
+        {
+            string text = "";
+            foreach (Move item in moves)
+            {
+                text += item.toString(board) + Environment.NewLine;
+            }
+            return text;
+        }
+        public string getMovesString(List<Move> moves, List<SecureDouble> evals, char[,] board)
+        {
+            if (moves == null || evals == null) return "";
+            if (moves.Count != evals.Count)
+                throw new Exception("Olika antal evalueringar och drag!");
+
+            string text = "";
+            for (int i = 0; i < moves.Count; i++)
+            {
+                text += moves[i].toString(board) + "    " + Math.Round(evals[i].value, 2).ToString() + Environment.NewLine;
+            }
+            return text;
+        }
+        private void reset()
+        {
+            gamePositions.Clear();
+            gameMoves.Clear();
+            display(new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
         }
     }
 }
 
 /*
  * TODO:
- * +/#
- * Byt ut: row -> rank, column -> line. 
- * Byt ut int[] -> Square.
- * Fler tester.
- * Ta tillbaka drag.
- * Få FEN
+ * Bekvämligheter:
+ *  +/#
+ *  Byt ut: row -> rank, column -> line. 
+ *  Byt ut int[] -> Square.
+ *  Fler tester.
+ *  Få FEN
+ *  Välja pjäs att promotera till.
+ *  Vända på brädet.
+ *  Se matieral.
+ *  Se bästa variant
+ * 
+ * Justera matriserna:
+ *  Gör torn assymmetriska?
+ *  Minska behov av terräng.
+ *  Föredra springare före löpare.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
- *  Manuell minneshantering
  *  Effektivisera algoritmer för dragberäkning.
+ *  Minimera minnesanvändning
+ *  Kapa de längsta slagväxlingarna.
+ *  Få alfa/beta mellan de olika trådarna.
+ *  
+ * Förbättringar:
+ *  Variera djup utifrån antal pjäser.
+ *  Kungssäkerhet
+ *  Få schackar att också förlänga varianterna.
  */

@@ -10,17 +10,10 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        public EvalResult eval(Position pos, int depth)
+        public EvalResult eval(Position pos, int baseDepth)
         {
             List<Move> moves =  allValidMoves(pos);
-
             EvalResult result = new EvalResult();
-
-            //TODO: Överflödigt att beräkna detta här också.
-            //Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-            //    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
-            //bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
-
 
             int gameResult = decisiveResult(pos, moves);
             if(gameResult != -2)
@@ -37,29 +30,39 @@ namespace Blobfish_11
             }
             else
             {
-                List<Double> allEvals = new List<Double>();
+                List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+
+                if (moves.Count < 8) 
+                    baseDepth++;
+
+                //TODO: Öka längden om antalet pjäser är få.
+
                 foreach (Move currentMove in moves)
                 {
-                    Double newDouble = new Double();
+                    SecureDouble newDouble = new SecureDouble();
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), depth - 1, !pos.whiteToMove, newDouble) ;
+                        threadStart(currentMove.execute(pos), baseDepth - 1, !pos.whiteToMove, newDouble);
                     });
+                    thread.Name = currentMove.toString(pos.board);
                     thread.Start();
                 }
                 Thread.Sleep(100);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
-                    Double threadResult = allEvals[i];
+                    SecureDouble threadResult = allEvals[i];
                     try
                     {
                         threadResult.mutex.WaitOne();
                         double value = threadResult.value;
-                        if(value != value) //Kollar om talet är odefinierat.
-                        {//Om resultatet inte hunnit beräknas.
-                            Thread.Sleep(5);
+#pragma warning disable CS1718 // Comparison made to same variable
+                        if (value != value) //Kollar om talet är odefinierat.
+#pragma warning restore CS1718 // Comparison made to same variable
+                        {
+                            //Om resultatet inte hunnit beräknas.
+                            Thread.Sleep(100);
                             i--;
                         }
                         else
@@ -92,9 +95,9 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, int depth, bool whiteToMove, Double ansPlace)
+        public void threadStart(Position pos, int depth, bool whiteToMove, SecureDouble ansPlace)
         {
-            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove);
+            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove, false);
             try
             {
                 ansPlace.mutex.WaitOne();
@@ -116,10 +119,13 @@ namespace Blobfish_11
              */
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
-            int[,] pawns = new int[2, 8]; //0=black, 1=white.
+            double[] kingSaftey = new double[] { 0f, 0f};
+            int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
+            int[,] pawns = new int[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             //int column = 0, row = 0;
             double[] pieceValues = { 3, 3, 5, 9 };
+            bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
             for (int row = 0; row < 8; row++)
             {
@@ -141,28 +147,43 @@ namespace Blobfish_11
 
                         case 'n':
                             pieceValue -= pieceValues[0] * knight[row, column];
+                            heavyMaterial[1] += 3;
                             break;
                         case 'N':
                             pieceValue += pieceValues[0] * knight[row, column];
+                            heavyMaterial[0] += 3;
                             break;
 
                         case 'b':
                             pieceValue -= pieceValues[1] * bishop[row, column];
+                            heavyMaterial[1] += 3;
+                            if ((row + column) % 2 == 0)
+                                bishopColors[2] = true; //Svart löpare på vitt fält
+                            else
+                                bishopColors[3] = true; //Svart löpare på svart fält
                             break;
                         case 'B':
                             pieceValue += pieceValues[1] * bishop[row, column];
+                            heavyMaterial[0] += 3;
+                            if ((row + column) % 2 == 0)
+                                bishopColors[0] = true; //Vit löpare på vitt fält
+                            else
+                                bishopColors[1] = true; //Vit löpare på svart fält
                             break;
 
                         case 'r':
                             pieceValue -= pieceValues[2] * rook[row, column];
+                            heavyMaterial[1] += 5;
                             break;
                         case 'R':
                             pieceValue += pieceValues[2] * rook[row, column];
+                            heavyMaterial[0] += 5;
                             break;
 
                         case 'k':
                             pos.kingPositions[0, 0] = row;
                             pos.kingPositions[0, 1] = column;
+                            
                             break;
                         case 'K':
                             pos.kingPositions[1, 0] = row;
@@ -171,14 +192,40 @@ namespace Blobfish_11
 
                         case 'q':
                             pieceValue -= pieceValues[3] * queen[row, column];
+                            heavyMaterial[1] += 9;
                             break;
                         case 'Q':
                             pieceValue += pieceValues[3] * queen[row, column];
+                            heavyMaterial[0] += 9;
                             break;
                         default:
                             break;
                     }
                 }
+            }
+
+            //TODO: fixa denna.
+            for (int i = 0; i < 2; i++)
+            {
+                if (heavyMaterial[i] > 6) //Om det inte är "sluspel"
+                {
+                    kingSaftey[i] += 4* king[0, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
+                }
+                else
+                {
+                    kingSaftey[i] += 4* king[1, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
+                }
+            }
+            double kingSafteyDifference = kingSaftey[1] - kingSaftey[0];
+
+            double bishopPairValue = 0.4f;
+            if (bishopColors[0] && bishopColors[1])
+            {
+                pieceValue += bishopPairValue;
+            }
+            if (bishopColors[2] && bishopColors[3])
+            {
+                pieceValue -= bishopPairValue;
             }
 
             for (int i = 0; i < 2; i++)
@@ -189,7 +236,20 @@ namespace Blobfish_11
                     posFactor[i] /= numberOfPawns[i];
             }
             double pawnValue = evalPawns(numberOfPawns, posFactor, pawns);
-            return pieceValue + pawnValue;
+            return pieceValue + pawnValue + kingSafteyDifference;
+        }
+        private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
+        {
+            //TODO: Använd.
+            const double kingValue = 4f;
+            if(oppHeavyMaterial > 6)
+            {
+                return kingValue * king[0, kingSquare.rank, kingSquare.line];
+            }
+            else
+            {
+                return kingValue * king[1, kingSquare.rank, kingSquare.line];
+            }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
         {
@@ -214,590 +274,9 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        private ControlAndCheckingPieces calculateControl(Position pos)
+        public int decisiveResult(Position pos, List<Move> moves)
         {
-            SquareControl[,] board = new SquareControl[8, 8];
-            
-            int[] checkingPieces = { -1, -1, -1, -1 };
-            
-
-            //Lokal funktion för att göra ett fält kontrollerat av en färg.
-            int[] setControl(int row, int column, bool byWhite)
-                {
-                    /*
-                     * Sätter wControl respektive bControl till true på ett givet fält, beroende på byWhite
-                     * Returnerar en int[] med storlek 4, med koordinater för den första och andra schackande pjäsen
-                     * om sådana finns, annars sätts de till -1.
-                     * 
-                     * Kastar undantag om det finns fler än 2 schackande pjäser.
-                     */
-                    if (byWhite)
-                    {
-                        board[row, column].wControl = true;
-                        if (row == pos.kingPositions[0, 0] && column == pos.kingPositions[0, 1])
-                        {
-                            if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
-                            {
-                                checkingPieces[0] = row;
-                                checkingPieces[1] = column;
-                            }
-                            else if (checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
-                            {
-                                checkingPieces[2] = row;
-                                checkingPieces[3] = column;
-                            }
-                            else
-                            {
-                                throw new Exception("Fler än 2 schackande pjäser!");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        board[row, column].bControl = true;
-                        if (row == pos.kingPositions[1, 0] && column == pos.kingPositions[1, 1])
-                        {
-                            if (checkingPieces[0] == -1) //Om detta är den första pjäsen som schackar
-                            {
-                                checkingPieces[0] = row;
-                                checkingPieces[1] = column;
-                            }
-                            else if (checkingPieces[2] == -1) //Om detta är den andra pjäsen som schackar
-                            {
-                                checkingPieces[2] = row;
-                                checkingPieces[3] = column;
-                            }
-                            else
-                            {
-                                throw new Exception("Fler än 2 schackande pjäser!");
-                            }
-                        }
-                    }
-                    return checkingPieces;
-                }
-            
-            for (int row = 0; row < 8; row++)
-            {
-                for (int column = 0; column < 8; column++)
-                {
-                    switch (pos.board[row, column])
-                    {
-                        case 'p':
-                            #region blackPawnControl
-                            if (column > 0)
-                            {
-                                setControl(row + 1, column - 1, false);
-                            }
-                            if (column < 7)
-                            {
-                                setControl(row + 1, column + 1, false);
-                            }
-                            #endregion
-                            break;
-                        case 'P':
-                            #region whitePawnControl
-                            if (column > 0)
-                            {
-                                setControl(row - 1, column - 1, true);
-                            }
-                            if (column < 7)
-                            {
-                                setControl(row - 1, column + 1, true);
-                            }
-                            #endregion
-                            break;
-                        case 'k':
-                            #region blackKingControl
-
-                            if (column > 0)
-                            {
-                                setControl(row, column - 1, false);
-                                if (row > 0)
-                                {
-                                    setControl(row - 1, column - 1, false);
-                                    setControl(row - 1, column, false);
-                                }
-                                if (row < 7)
-                                {
-                                    setControl(row + 1, column - 1, false);
-                                    setControl(row + 1, column, false);
-                                }
-                            }
-                            if (column < 7)
-                            {
-                                setControl(row, column + 1, false);
-                                if (row > 0)
-                                {
-                                    setControl(row - 1, column + 1, false);
-                                    setControl(row - 1, column, false);
-                                }
-                                if (row < 7)
-                                {
-                                    setControl(row + 1, column + 1, false);
-                                    setControl(row + 1, column, false);
-                                }
-                            }
-                            #endregion
-                            break;
-                        case 'K':
-                            #region whiteKingControl
-                            if (column > 0)
-                            {
-                                setControl(row, column - 1, true);
-                                if (row > 0)
-                                {
-                                    setControl(row - 1, column - 1, true);
-                                    setControl(row - 1, column, true);
-                                }
-                                if (row < 7)
-                                {
-                                    setControl(row + 1, column - 1, true);
-                                    setControl(row + 1, column, true);
-                                }
-                            }
-                            if (column < 7)
-                            {
-                                setControl(row, column + 1, true);
-                                if (row > 0)
-                                {
-                                    setControl(row - 1, column + 1, true);
-                                    setControl(row - 1, column, true);
-                                }
-                                if (row < 7)
-                                {
-                                    setControl(row + 1, column + 1, true);
-                                    setControl(row + 1, column, true);
-                                }
-                            }
-                            #endregion
-                            break;
-                        case 'n': //TODO: Förbättra!
-                            #region blackKnightControl
-                            if (row + 2 < 8 && column + 1 < 8)
-                                setControl(row + 2, column + 1, false);
-                            if (row + 2 < 8 && column - 1 >= 0)
-                                setControl(row + 2, column - 1, false);
-                            if (row + 1 < 8 && column + 2 < 8)
-                                setControl(row + 1, column + 2, false);
-                            if (row + 1 < 8 && column - 2 >= 0)
-                                setControl(row + 1, column - 2, false);
-                            if (row - 1 >= 0 && column + 2 < 8)
-                                setControl(row - 1, column + 2, false);
-                            if (row - 1 >= 0 && column - 2 >= 0)
-                                setControl(row - 1, column - 2, false);
-                            if (row - 2 >= 0 && column + 1 < 8)
-                                setControl(row - 2, column + 1, false);
-                            if (row - 2 >= 0 && column - 1 >= 0)
-                                setControl(row - 2, column - 1, false);
-                            #endregion
-                            break;
-                        case 'N': //TODO: Förbättra!
-                            #region whiteKnightControl
-                            if (row + 2 < 8 && column + 1 < 8)
-                                setControl(row + 2, column + 1, true);
-                            if (row + 2 < 8 && column - 1 >= 0)
-                                setControl(row + 2, column - 1, true);
-                            if (row + 1 < 8 && column + 2 < 8)
-                                setControl(row + 1, column + 2, true);
-                            if (row + 1 < 8 && column - 2 >= 0)
-                                setControl(row + 1, column - 2, true);
-                            if (row - 1 >= 0 && column + 2 < 8)
-                                setControl(row - 1, column + 2, true);
-                            if (row - 1 >= 0 && column - 2 >= 0)
-                                setControl(row - 1, column - 2, true);
-                            if (row - 2 >= 0 && column + 1 < 8)
-                                setControl(row - 2, column + 1, true);
-                            if (row - 2 >= 0 && column - 1 >= 0)
-                                setControl(row - 2, column - 1, true);
-                            #endregion
-                            break;
-                        case 'b':
-                            #region blackBishopControl
-                            int i = 1;
-                            bool done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                setControl(row + i, column + i, false);
-                                if (pos.board[row + i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
-                            {
-                                setControl(row - i, column + i, false);
-                                if (pos.board[row - i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
-                            {
-                                setControl(row + i, column - i, false);
-                                if (pos.board[row + i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
-                            {
-                                setControl(row - i, column - i, false);
-                                if (pos.board[row - i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'B':
-                            #region whiteBishopControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                setControl(row + i, column + i, true);
-                                if (pos.board[row + i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i >= 0 && column + i < 8 && !done)
-                            {
-                                setControl(row - i, column + i, true);
-                                if (pos.board[row - i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column - i >= 0 && !done)
-                            {
-                                setControl(row + i, column - i, true);
-                                if (pos.board[row + i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i >= 0 && column - i >= 0 && !done)
-                            {
-                                setControl(row - i, column - i, true);
-                                if (pos.board[row - i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'r':
-                            #region blackRookControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
-                            {
-                                setControl(row + i, column, false);
-                                if (pos.board[row + i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
-                            {
-                                setControl(row - i, column, false);
-                                if (pos.board[row - i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
-                            {
-                                setControl(row, column + i, false);
-                                if (pos.board[row, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
-                            {
-                                setControl(row, column - i, false);
-                                if (pos.board[row, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'R':
-                            #region whiteRookControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
-                            {
-                                setControl(row + i, column, true);
-                                if (pos.board[row + i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
-                            {
-                                setControl(row - i, column, true);
-                                if (pos.board[row - i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
-                            {
-                                setControl(row, column + i, true);
-                                if (pos.board[row, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
-                            {
-                                setControl(row, column - i, true);
-                                if (pos.board[row, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'q': //TODO: Förbättra
-                            #region blackQueenControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
-                            {
-                                setControl(row + i, column, false);
-                                if (pos.board[row + i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
-                            {
-                                setControl(row - i, column, false);
-                                if (pos.board[row - i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
-                            {
-                                setControl(row, column + i, false);
-                                if (pos.board[row, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
-                            {
-                                setControl(row, column - i, false);
-                                if (pos.board[row, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                setControl(row + i, column + i, false);
-                                if (pos.board[row + i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
-                            {
-                                setControl(row - i, column + i, false);
-                                if (pos.board[row - i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
-                            {
-                                setControl(row + i, column - i, false);
-                                if (pos.board[row + i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
-                            {
-                                setControl(row - i, column - i, false);
-                                if (pos.board[row - i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        case 'Q': //TODO: Förbättra
-                            #region whiteQueenControl
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && !done)
-                            {
-                                setControl(row + i, column, true);
-                                if (pos.board[row + i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && !done)
-                            {
-                                setControl(row - i, column, true);
-                                if (pos.board[row - i, column] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column + i < 8 && !done)
-                            {
-                                setControl(row, column + i, true);
-                                if (pos.board[row, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (column - i > 0 && !done)
-                            {
-                                setControl(row, column - i, true);
-                                if (pos.board[row, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column + i < 8 && !done)
-                            {
-                                setControl(row + i, column + i, true);
-                                if (pos.board[row + i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column + i < 8 && !done)
-                            {
-                                setControl(row - i, column + i, true);
-                                if (pos.board[row - i, column + i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row + i < 8 && column - i > 0 && !done)
-                            {
-                                setControl(row + i, column - i, true);
-                                if (pos.board[row + i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            i = 1;
-                            done = false;
-                            while (row - i > 0 && column - i > 0 && !done)
-                            {
-                                setControl(row - i, column - i, true);
-                                if (pos.board[row - i, column - i] != '\0')
-                                {
-                                    done = true;
-                                }
-                                i++;
-                            }
-                            #endregion
-                            break;
-                        default: break;
-                    }
-                }
-            }
-            ControlAndCheckingPieces result = new ControlAndCheckingPieces();
-            result.board = board;
-            result.checkingPieces = checkingPieces;
-            return result;
-        }
-        private int decisiveResult(Position pos, List<Move> moves)
-        {
+            //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
                 Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
@@ -818,12 +297,15 @@ namespace Blobfish_11
 
             return -2;
         }
-        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove)
+        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove, bool forceBranching)
         {
-            //TODO: Fixa horisonten.
-            if (depth == 0)
+            if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
+            if(depth <= -8) //Maximalt antal slagväxlingar som får ta plats.
+            {
+                return numericEval(pos);
+            }
             List<Move> moves = allValidMoves(pos);
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
@@ -836,11 +318,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extraDepth(currentMove, pos.board, depth))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth, alpha, beta, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, true));
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, false));
                     }
                     alpha = Math.Max(alpha, value);
                     if (alpha >= beta)
@@ -855,11 +337,11 @@ namespace Blobfish_11
                 {
                     if (extraDepth(currentMove, pos.board, depth))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth, alpha, beta, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, true));
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, false));
                     }
                     beta = Math.Min(beta, value);
                     if (beta <= alpha)
@@ -870,7 +352,7 @@ namespace Blobfish_11
         }
         private bool extraDepth(Move move, char[,] board, int currentDepth)
         {
-            return currentDepth < 3 && move.isCapture(board);
+            return currentDepth < 2 && move.isCapture(board);
         }
     }
 }

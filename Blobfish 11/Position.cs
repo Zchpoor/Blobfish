@@ -10,21 +10,16 @@ namespace Blobfish_11
     {
         //TODO: Gör om till struct?
         //TODO: Ändra allt till Square.
-        private readonly string FEN;
         public bool whiteToMove;
         public int halfMoveClock = 0;
         public int moveCounter = 0;
         public int[] enPassantSquare = new int[2]; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
-        public double material = 0; //TODO: Städa upp
-        public double[] pawnValues = new double[2];
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
-        int[] checkingPieces = { -1, -1, -1, -1 };
 
         public Position(string FEN)
         {
-            this.FEN = FEN;
             int column = 0, row = 0;
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
@@ -155,7 +150,6 @@ namespace Blobfish_11
             int halfMoveClock, int moveCounter, int[,] kingPositions)
         {
             this.board = board;
-            this.FEN = "";
             this.whiteToMove = whiteToMove;
             this.castlingRights = castlingRights;
             this.halfMoveClock = halfMoveClock;
