@@ -16,9 +16,9 @@ namespace Blobfish_11
         {
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
-            for (int i = 0; i < 8; i++)
+            for (sbyte i = 0; i < 8; i++)
             {
-                for (int j = 0; j < 8; j++)
+                for (sbyte j = 0; j < 8; j++)
                 {
                     List<Move> moves = pieceCalculation(pos, new Square(i, j));
                     if (moves != null)
@@ -193,7 +193,7 @@ namespace Blobfish_11
                         int startingRank = pieceIsWhite ? 6 : 1;
                         if (pieceSquare.rank == startingRank)
                         {
-                            currentSquare.rank = pieceSquare.rank + (moveDirection * 2);
+                            currentSquare.rank = (sbyte) (pieceSquare.rank + (moveDirection * 2));
                             pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                             if (pieceOnCurrentSquare == '\0')
                             {
@@ -206,8 +206,8 @@ namespace Blobfish_11
             }
             for (int i = -1; i <= 1; i += 2) //Kommer bli -1 och 1.
             {
-                currentSquare.rank = pieceSquare.rank + moveDirection;
-                currentSquare.line = pieceSquare.line + i;
+                currentSquare.rank = (sbyte) (pieceSquare.rank + moveDirection);
+                currentSquare.line = (sbyte) (pieceSquare.line + i);
                 if (validSquare(currentSquare))
                 {
                     int promotionRank = pieceIsWhite ? 0 : 7;
@@ -301,8 +301,8 @@ namespace Blobfish_11
                     done = true;
                 }
                 counter++;
-                currentSquare.rank = rank + (rankOffset * counter);
-                currentSquare.line = line + (lineOffset * counter);
+                currentSquare.rank = (sbyte) (rank + (rankOffset * counter));
+                currentSquare.line = (sbyte) (line + (lineOffset * counter));
             }
         }
 

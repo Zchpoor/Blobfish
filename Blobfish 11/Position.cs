@@ -11,16 +11,16 @@ namespace Blobfish_11
         //TODO: Gör om till struct?
         //TODO: Ändra allt till Square.
         public bool whiteToMove;
-        public int halfMoveClock = 0;
-        public int moveCounter = 0;
-        public int[] enPassantSquare = new int[2]; //{-1, -1} om en passant ej kan spelas.
+        public sbyte halfMoveClock = 0;
+        public short moveCounter = 0;
+        public sbyte[] enPassantSquare = new sbyte[2]; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
-        public int[,] kingPositions = new int[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
+        public sbyte[,] kingPositions = new sbyte[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
         public Position(string FEN)
         {
-            int column = 0, row = 0;
+            sbyte column = 0, row = 0;
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
             {
@@ -123,7 +123,7 @@ namespace Blobfish_11
             //Till exempel: c6 0 2
             if (EPString[0] == '-')
             {
-                enPassantSquare = new int[] { -1, -1 };
+                enPassantSquare = new sbyte[] { -1, -1 };
             }
             else
             {
@@ -133,21 +133,21 @@ namespace Blobfish_11
                 {
                     throw new Exception("Felaktig FEN."); //TODO: Hantera
                 }
-                enPassantSquare[0] = 7 - EProw;
-                enPassantSquare[1] = EPcolumn; //Eftersom ordingen är omvänd i FEN.
+                enPassantSquare[0] = (sbyte) (7 - EProw);
+                enPassantSquare[1] = (sbyte) EPcolumn; //Eftersom ordingen är omvänd i FEN.
             }
             string lastString = EPString.Substring(EPString.IndexOf(' ') + 1, EPString.Length - EPString.IndexOf(' ') - 1);
             //Till exempel: "1 2".
             string clockString = lastString.Substring(0, lastString.IndexOf(' '));
             //Till exempel: "1".
-            this.halfMoveClock = int.Parse(clockString);
+            this.halfMoveClock = sbyte.Parse(clockString);
             string moveString = lastString.Substring(lastString.IndexOf(' '), lastString.Length - lastString.IndexOf(' '));
-            this.moveCounter = int.Parse(moveString);
+            this.moveCounter = sbyte.Parse(moveString);
             //Till exempel: "2".
 
         }
-        public Position(char[,] board, bool whiteToMove, bool[] castlingRights, int[] enPassantSquare,
-            int halfMoveClock, int moveCounter, int[,] kingPositions)
+        public Position(char[,] board, bool whiteToMove, bool[] castlingRights, sbyte[] enPassantSquare,
+            sbyte halfMoveClock, short moveCounter, sbyte[,] kingPositions)
         {
             this.board = board;
             this.whiteToMove = whiteToMove;
@@ -160,7 +160,7 @@ namespace Blobfish_11
         public Position deepCopy()
         {
            return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
-                new int[] { -1, 1 }, halfMoveClock, moveCounter, (int[,])kingPositions.Clone());
+                new sbyte[] { -1, 1 }, halfMoveClock, moveCounter, (sbyte[,])kingPositions.Clone());
 
         }
     }

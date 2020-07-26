@@ -127,9 +127,9 @@ namespace Blobfish_11
             double[] pieceValues = { 3, 3, 5, 9 };
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
-            for (int row = 0; row < 8; row++)
+            for (sbyte row = 0; row < 8; row++)
             {
-                for (int column = 0; column < 8; column++)
+                for (sbyte column = 0; column < 8; column++)
                 {
                     switch (pos.board[row, column])
                     {
