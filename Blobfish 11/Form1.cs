@@ -184,6 +184,9 @@ namespace Blobfish_11
                 case "omstart":
                     reset();
                     break;
+                case "fen":
+                    fenBox.Text = currentPosition.getFEN();
+                    break;
                 default:
                     try
                     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Blobfish_11
 {
@@ -162,6 +163,74 @@ namespace Blobfish_11
            return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
                 new sbyte[] { -1, 1 }, halfMoveClock, moveCounter, (sbyte[,])kingPositions.Clone());
 
+        }
+        public string getFEN()
+        {
+            string FEN = "";
+            for (int i = 0; i < 8; i++) //Eftersom ordningen är omvänd i FEN.
+            {
+                int emptySquaresCounter = 0;
+                for (int j = 0; j < 8; j++)
+                {
+                    char currentPiece = board[i, j];
+                    if ( currentPiece == '\0')
+                        emptySquaresCounter++;
+                    else
+                    {
+                        if(emptySquaresCounter > 0)
+                        {
+                            FEN += emptySquaresCounter.ToString();
+                            emptySquaresCounter = 0;
+                        }
+                        FEN += currentPiece;
+                    }
+                }
+                if (emptySquaresCounter > 0)
+                {
+                    FEN += emptySquaresCounter.ToString();
+                }
+                if (i < 7)
+                {
+                    FEN += '/';
+                }
+            }
+
+            if (whiteToMove)
+                FEN += " w ";
+            else
+                FEN += " b ";
+
+            if(castlingRights[0] == false && castlingRights[1] == false && castlingRights[2] == false && castlingRights[3] == false)
+            {
+                FEN += "- ";
+            }
+            else
+            {
+                if (castlingRights[0])
+                    FEN += "K";
+                if (castlingRights[1])
+                    FEN += "Q";
+                if (castlingRights[2])
+                    FEN += "k";
+                if (castlingRights[3])
+                    FEN += "q";
+                FEN += " ";
+            }
+
+            if (enPassantSquare[0] == -1 || enPassantSquare[1] == -1)
+            {
+                FEN += "- ";
+            }
+            else
+            {
+                FEN += (char) (enPassantSquare[1] + 'a');
+                FEN += (char) ('8' - enPassantSquare[0]);
+                FEN += " ";
+            }
+
+            FEN += halfMoveClock.ToString() + " " + moveCounter.ToString();
+
+            return FEN;
         }
     }
 }
