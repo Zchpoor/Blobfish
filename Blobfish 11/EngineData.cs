@@ -9,6 +9,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
+        static readonly double[] pieceValues = { 3, 3, 5, 9 };
         private static readonly double[,,] pawn =
         {
             { //Svarta bönder

@@ -125,35 +125,35 @@ namespace Blobfish_11
             }
             foreachKingSquare(pos, pieceSquare, addMoveIfValid);
 
-            int castlingRank = pieceIsWhite ? 7 : 0;
+            sbyte castlingRank = pieceIsWhite ? (sbyte) 7: (sbyte) 0;
             if (pieceSquare.rank == castlingRank && pieceSquare.line == 4 && !isControlledBy(pos, pieceSquare, !pieceIsWhite))
             {
                 //Kungen står på ett fält där rockad skulle kunna vara möjligt.
                 char correctRook = pieceIsWhite ? 'R' : 'r';
-                int castlingRightOffset = pieceIsWhite ? 0 : 2;
+                sbyte castlingRightOffset = pieceIsWhite ? (sbyte) 0: (sbyte) 2;
                 if (pos.board[castlingRank, 0] == correctRook && pos.castlingRights[castlingRightOffset + 1])
                 {
                     //Lång rockad
-                    Square rookTo = new Square(castlingRank, 3);
-                    Square kingTo = new Square(castlingRank, 2);
+                    Square rookTo = new Square(castlingRank, (sbyte) 3);
+                    Square kingTo = new Square(castlingRank, (sbyte) 2);
                     if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
                         pos.board[kingTo.rank, kingTo.line - 1] == '\0' && !isControlledBy(pos, rookTo, !pieceIsWhite) &&
                         !isControlledBy(pos, kingTo, !pieceIsWhite && !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
-                        Square rookFrom = new Square(castlingRank, 0);
+                        Square rookFrom = new Square(castlingRank, (sbyte) 0);
                         possibleMoves.Insert(0, new Castle(pieceSquare, kingTo, rookFrom, rookTo));
                     }
                 }
                 if (pos.board[castlingRank, 7] == correctRook && pos.castlingRights[castlingRightOffset])
                 {
                     //Kort rockad
-                    Square rookTo = new Square(castlingRank, 5);
-                    Square kingTo = new Square(castlingRank, 6);
+                    Square rookTo = new Square(castlingRank, (sbyte) 5);
+                    Square kingTo = new Square(castlingRank, (sbyte) 6);
                     if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
                         !isControlledBy(pos, rookTo, !pieceIsWhite) && !isControlledBy(pos, kingTo, !pieceIsWhite &&
                         !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
-                        Square rookFrom = new Square(castlingRank, 7);
+                        Square rookFrom = new Square(castlingRank, (sbyte) 7);
                         possibleMoves.Insert(0, new Castle(pieceSquare, kingTo, rookFrom, rookTo));
                     }
                 }
@@ -173,7 +173,7 @@ namespace Blobfish_11
                 }
             }
 
-            int moveDirection = pieceIsWhite ? -1 : 1;
+            sbyte moveDirection = pieceIsWhite ? (sbyte) - 1 : (sbyte) 1;
             Square currentSquare = new Square(pieceSquare.rank + moveDirection, pieceSquare.line);
             if (validSquare(currentSquare))
             {
@@ -181,7 +181,7 @@ namespace Blobfish_11
                 if (pieceOnCurrentSquare == '\0')
                 {
 
-                    int promotionRank = pieceIsWhite ? 0 : 7;
+                    sbyte promotionRank = pieceIsWhite ? (sbyte) 0: (sbyte) 7;
                     if (currentSquare.rank == promotionRank)//Promotering.
                     {
                         addPromotions(pieceSquare, currentSquare);
@@ -190,7 +190,7 @@ namespace Blobfish_11
                     {
                         //Vanligt bondedrag, ett steg framåt.
                         possibleMoves.Add(new Move(pieceSquare, currentSquare));
-                        int startingRank = pieceIsWhite ? 6 : 1;
+                        sbyte startingRank = pieceIsWhite ? (sbyte) 6: (sbyte) 1;
                         if (pieceSquare.rank == startingRank)
                         {
                             currentSquare.rank = (sbyte) (pieceSquare.rank + (moveDirection * 2));
@@ -204,13 +204,13 @@ namespace Blobfish_11
                     }
                 }
             }
-            for (int i = -1; i <= 1; i += 2) //Kommer bli -1 och 1.
+            for (sbyte i = -1; i <= 1; i += 2) //Kommer bli -1 och 1.
             {
                 currentSquare.rank = (sbyte) (pieceSquare.rank + moveDirection);
                 currentSquare.line = (sbyte) (pieceSquare.line + i);
                 if (validSquare(currentSquare))
                 {
-                    int promotionRank = pieceIsWhite ? 0 : 7;
+                    sbyte promotionRank = pieceIsWhite ? (sbyte) 0: (sbyte) 7;
                     char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                     if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
                     {
@@ -235,9 +235,9 @@ namespace Blobfish_11
         }
         private void foreachKingSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            for (int i = -1; i <= 1; i++)
+            for (sbyte i = -1; i <= 1; i++)
             {
-                for (int j = -1; j <= 1; j++)
+                for (sbyte j = -1; j <= 1; j++)
                 {
                     if (i == 0 && j == 0) continue;
 
@@ -251,7 +251,7 @@ namespace Blobfish_11
         }
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            void callbackByOffset(int rankOffset, int lineOffset)
+            void callbackByOffset(sbyte rankOffset, sbyte lineOffset)
             {
                 Square currentSquare = new Square(pieceSquare.rank + rankOffset, pieceSquare.line + lineOffset);
                 if (validSquare(currentSquare))
@@ -270,9 +270,9 @@ namespace Blobfish_11
         }
         private void foreachBishopSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            for (int i = -1; i < 2; i += 2) //Kommer att vara -1 eller 1.
+            for (sbyte i = -1; i < 2; i += 2) //Kommer att vara -1 eller 1.
             {
-                for (int j = -1; j < 2; j += 2) //Kommer att vara -1 eller 1.
+                for (sbyte j = -1; j < 2; j += 2) //Kommer att vara -1 eller 1.
                 {
                     foreachLineSquare(pos, pieceSquare, i, j, callback);
                 }
@@ -285,11 +285,11 @@ namespace Blobfish_11
             foreachLineSquare(pos, pieceSquare, 1, 0, callback);
             foreachLineSquare(pos, pieceSquare, -1, 0, callback);
         }
-        private void foreachLineSquare(Position pos, Square pieceSquare, int rankOffset, int lineOffset, functionByPiece callback)
+        private void foreachLineSquare(Position pos, Square pieceSquare, sbyte rankOffset, sbyte lineOffset, functionByPiece callback)
         {
             //Generell funktion som itererar över en linje/diagonal så länge det är giltiga fält.
-            int rank = pieceSquare.rank, line = pieceSquare.line;
-            int counter = 1;
+            sbyte rank = pieceSquare.rank, line = pieceSquare.line;
+            sbyte counter = 1;
             bool done = false;
             Square currentSquare = new Square(rank + (rankOffset * counter), line + (lineOffset * counter));
             while (validSquare(currentSquare) && !done)
@@ -331,7 +331,7 @@ namespace Blobfish_11
                 else return false;
             }
         }
-        private bool validSquare(int rank, int line)
+        private bool validSquare(sbyte rank, sbyte line)
         {
             //TODO: Ta bort vid senare tillfälle.
             return (rank < 8) && (rank >= 0) && (line < 8) && (line >= 0);
@@ -371,8 +371,8 @@ namespace Blobfish_11
             if (isControlled) return true;
 
             //Bönder
-            int riktning = byWhite ? 1 : -1;
-            for (int i = -1; i <= 1; i+=2)
+            sbyte riktning = byWhite ? (sbyte)1 : (sbyte)-1;
+            for (sbyte i = -1; i <= 1; i+=2)
             {
                 Square currentSquare = new Square(relevantSquare.rank + riktning, relevantSquare.line + i);
                 if (validSquare(currentSquare))
