@@ -14,6 +14,10 @@ namespace Blobfish_11
         private delegate void functionByPiece(Square square);
         public List<Move> allValidMoves(Position pos)
         {
+            if (System.Threading.Thread.CurrentThread.Name == "Ke4-f3")
+            {
+                int a = 0;
+            }
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
             for (sbyte i = 0; i < 8; i++)
@@ -28,6 +32,7 @@ namespace Blobfish_11
 
             for (int i = 0; i < allMoves.Count; i++)
             {
+                //Tar bort alla ogiltiga drag
                 Position newPos = allMoves[i].execute(pos);
 
                 if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))

@@ -99,11 +99,11 @@ namespace Blobfish_11
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res == 1000)
+                    if (res > 1000)
                     {
                         MessageBox.Show("Vit vann på schack matt!");
                     }
-                    else if (res == -1000)
+                    else if (res < -1000)
                     {
                         MessageBox.Show("Svart vann på schack matt!");
                     }
@@ -135,11 +135,11 @@ namespace Blobfish_11
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res == 1000)
+                    if (res > 1000)
                     {
                         MessageBox.Show("Vit vann på schack matt!");
                     }
-                    else if (res == -1000)
+                    else if (res < -1000)
                     {
                         MessageBox.Show("Svart vann på schack matt!");
                     }
@@ -325,11 +325,11 @@ namespace Blobfish_11
  *  Byt ut: row -> rank, column -> line. 
  *  Byt ut int[] -> Square.
  *  Fler tester.
- *  Få FEN
  *  Välja pjäs att promotera till.
  *  Vända på brädet.
  *  Se matieral.
  *  Se bästa variant
+ *  Skriv ut antal drag till matt.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -346,5 +346,4 @@ namespace Blobfish_11
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Kungssäkerhet
- *  Få schackar att också förlänga varianterna.
  */

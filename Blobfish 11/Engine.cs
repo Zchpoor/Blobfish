@@ -283,8 +283,8 @@ namespace Blobfish_11
                 bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
-                    if (pos.whiteToMove) return -1000;
-                    else return 1000;
+                    if (pos.whiteToMove) return -2000;
+                    else return 2000;
                 }
                 else return 0; //Patt
             }
@@ -315,7 +315,7 @@ namespace Blobfish_11
                 foreach (Move currentMove in moves)
                 {
                     Position newPos = currentMove.execute(pos);
-                    if (extraDepth(currentMove, pos.board, depth))
+                    if (extraDepth(currentMove, pos, depth) || isCheck(newPos))
                     {
                         value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false, true));
                     }
@@ -327,6 +327,10 @@ namespace Blobfish_11
                     if (alpha >= beta)
                         break; //Pruning
                 }
+                if (value > 1000)
+                    value--;
+                else if (value < -1000)
+                    value++;
                 return value;
             }
             else
@@ -334,7 +338,8 @@ namespace Blobfish_11
                 double value = double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    if (extraDepth(currentMove, pos.board, depth))
+                    Position newPos = currentMove.execute(pos);
+                    if (extraDepth(currentMove, pos, depth) || isCheck(newPos))
                     {
                         value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true, true));
                     }
@@ -346,12 +351,33 @@ namespace Blobfish_11
                     if (beta <= alpha)
                         break; //Pruning
                 }
+                if (value > 1000)
+                    value--;
+                else if (value < -1000)
+                    value++;
                 return value;
             }
         }
-        private bool extraDepth(Move move, char[,] board, int currentDepth)
+        private bool extraDepth(Move move, Position pos, int currentDepth)
         {
-            return currentDepth < 2 && move.isCapture(board);
+            if (currentDepth >= 2)
+                return false;
+            else if (move.isCapture(pos.board))
+                return true;
+            else
+            {
+                Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]) :
+                    new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]);
+                bool isCheck = isControlledBy(pos, relevantKingSquare, pos.whiteToMove);
+                return isCheck;
+            }
+        }
+        private bool isCheck(Position pos)
+        {
+            Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
+                new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+            bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
+            return isCheck;
         }
     }
 }
