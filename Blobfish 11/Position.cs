@@ -17,7 +17,7 @@ namespace Blobfish_11
         public sbyte[] enPassantSquare = new sbyte[2]; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
-        public sbyte[,] kingPositions = new sbyte[2, 2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
+        public Square[] kingPositions = new Square[2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
         public Position(string FEN)
         {
@@ -59,13 +59,11 @@ namespace Blobfish_11
 
                     case 'k':
                         board[row, column] = tkn;
-                        kingPositions[0, 0] = row;
-                        kingPositions[0, 1] = column;
+                        kingPositions[0] = new Square(row, column);
                         column++; break;
                     case 'K':
                         board[row, column] = tkn;
-                        kingPositions[1, 0] = row;
-                        kingPositions[1, 1] = column;
+                        kingPositions[1] = new Square(row, column);
                         column++; break;
 
                     case 'q':
@@ -148,7 +146,7 @@ namespace Blobfish_11
 
         }
         public Position(char[,] board, bool whiteToMove, bool[] castlingRights, sbyte[] enPassantSquare,
-            sbyte halfMoveClock, short moveCounter, sbyte[,] kingPositions)
+            sbyte halfMoveClock, short moveCounter, Square[] kingPositions)
         {
             this.board = board;
             this.whiteToMove = whiteToMove;
@@ -161,7 +159,7 @@ namespace Blobfish_11
         public Position deepCopy()
         {
            return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
-                new sbyte[] { -1, 1 }, halfMoveClock, moveCounter, (sbyte[,])kingPositions.Clone());
+                new sbyte[] { -1, 1 }, halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
 
         }
         public string getFEN()

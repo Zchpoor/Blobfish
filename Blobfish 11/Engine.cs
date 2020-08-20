@@ -119,7 +119,6 @@ namespace Blobfish_11
              */
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
-            double[] kingSaftey = new double[] { 0f, 0f};
             int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
@@ -180,13 +179,11 @@ namespace Blobfish_11
                             break;
 
                         case 'k':
-                            pos.kingPositions[0, 0] = row;
-                            pos.kingPositions[0, 1] = column;
-                            
+                            pos.kingPositions[0] = new Square(row, column);
                             break;
+
                         case 'K':
-                            pos.kingPositions[1, 0] = row;
-                            pos.kingPositions[1, 1] = column;
+                            pos.kingPositions[1] = new Square(row, column);
                             break;
 
                         case 'q':
@@ -203,19 +200,9 @@ namespace Blobfish_11
                 }
             }
 
-            //TODO: fixa denna.
-            for (sbyte i = 0; i < 2; i++)
-            {
-                if (heavyMaterial[i] > 6) //Om det inte är "sluspel"
-                {
-                    kingSaftey[i] += 4* king[0, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
-                }
-                else
-                {
-                    kingSaftey[i] += 4* king[1, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
-                }
-            }
-            double kingSafteyDifference = kingSaftey[1] - kingSaftey[0];
+            //double[] kingSaftey = new double[] { 0f, 0f };
+            double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
+                - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
 
             double bishopPairValue = 0.4f;
             if (bishopColors[0] && bishopColors[1])
@@ -278,8 +265,7 @@ namespace Blobfish_11
             //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
-                Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-                    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+                Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
                 bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
@@ -315,7 +301,7 @@ namespace Blobfish_11
                 foreach (Move currentMove in moves)
                 {
                     Position newPos = currentMove.execute(pos);
-                    if (extraDepth(currentMove, pos, depth) || isCheck(newPos))
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
                         value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false, true));
                     }
@@ -339,7 +325,7 @@ namespace Blobfish_11
                 foreach (Move currentMove in moves)
                 {
                     Position newPos = currentMove.execute(pos);
-                    if (extraDepth(currentMove, pos, depth) || isCheck(newPos))
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
                         value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true, true));
                     }
@@ -358,24 +344,26 @@ namespace Blobfish_11
                 return value;
             }
         }
-        private bool extraDepth(Move move, Position pos, int currentDepth)
+        private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
             if (currentDepth >= 2)
                 return false;
             else if (move.isCapture(pos.board))
                 return true;
+            else if(numberOfAvailableMoves == 1)
+            {
+                return true;
+            }
             else
             {
-                Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]) :
-                    new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]);
+                Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[0] : pos.kingPositions[1];
                 bool isCheck = isControlledBy(pos, relevantKingSquare, pos.whiteToMove);
                 return isCheck;
             }
         }
         private bool isCheck(Position pos)
         {
-            Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-                new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+            Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
             bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
             return isCheck;
         }

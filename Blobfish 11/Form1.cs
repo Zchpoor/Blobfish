@@ -166,6 +166,9 @@ namespace Blobfish_11
                 case "tb":
                     takeback(2);
                     break;
+                case "undo":
+                    takeback(2);
+                    break;
                 case "återta":
                     takeback(2);
                     break;
@@ -330,6 +333,7 @@ namespace Blobfish_11
  *  Se matieral.
  *  Se bästa variant
  *  Skriv ut antal drag till matt.
+ *  Mattbart material
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -340,7 +344,6 @@ namespace Blobfish_11
  *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
  *  Minimera minnesanvändning
- *  Kapa de längsta slagväxlingarna.
  *  Få alfa/beta mellan de olika trådarna.
  *  
  * Förbättringar:

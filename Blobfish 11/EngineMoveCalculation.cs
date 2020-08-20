@@ -14,10 +14,6 @@ namespace Blobfish_11
         private delegate void functionByPiece(Square square);
         public List<Move> allValidMoves(Position pos)
         {
-            if (System.Threading.Thread.CurrentThread.Name == "Ke4-f3")
-            {
-                int a = 0;
-            }
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
             for (sbyte i = 0; i < 8; i++)
@@ -35,12 +31,12 @@ namespace Blobfish_11
                 //Tar bort alla ogiltiga drag
                 Position newPos = allMoves[i].execute(pos);
 
-                if (newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[0, 0], newPos.kingPositions[0, 1]), true))
+                if (newPos.whiteToMove && isControlledBy(newPos, newPos.kingPositions[0], true))
                 {
                     allMoves.RemoveAt(i);
                     i--;
                 }
-                else if (!newPos.whiteToMove && isControlledBy(newPos, new Square(newPos.kingPositions[1, 0], newPos.kingPositions[1, 1]), false))
+                else if (!newPos.whiteToMove && isControlledBy(newPos, newPos.kingPositions[1], false))
                 {
                     allMoves.RemoveAt(i);
                     i--;
@@ -311,18 +307,6 @@ namespace Blobfish_11
             }
         }
 
-        private bool validPosition(Position pos, SquareControl[,] squareControls)
-        {
-            if (pos.whiteToMove && squareControls[pos.kingPositions[0, 0], pos.kingPositions[0, 1]].wControl)
-            {
-                return false;
-            }
-            else if (!pos.whiteToMove && squareControls[pos.kingPositions[1, 0], pos.kingPositions[1, 1]].bControl)
-            {
-                return false;
-            }
-            else return true;
-        }
         private bool accessableFor(bool forWhite, char piece)
         {
             if (forWhite)

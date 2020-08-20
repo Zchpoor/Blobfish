@@ -68,15 +68,15 @@ namespace Blobfish_11
             {
                 newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[3] = false;
-                newPos.kingPositions[0, 0] = this.to[0]; //Sparar om kungens placering.
-                newPos.kingPositions[0, 1] = this.to[1];
+                newPos.kingPositions[0].rank = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[0].line = this.to[1];
             }
             else if (oldPos.board[from[0], from[1]] == 'K')
             {
                 newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights[1] = false;
-                newPos.kingPositions[1, 0] = this.to[0]; //Sparar om kungens placering.
-                newPos.kingPositions[1, 1] = this.to[1];
+                newPos.kingPositions[1].rank = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[1].line = this.to[1];
             }
             else if (oldPos.board[from[0], from[1]] == 'r')
             {
@@ -151,15 +151,15 @@ namespace Blobfish_11
             {
                 newPos.castlingRights[0] = false; 
                 newPos.castlingRights[1] = false;
-                newPos.kingPositions[1, 0] = this.to[0]; //Sparar om kungens placering.
-                newPos.kingPositions[1, 1] = this.to[1];
+                newPos.kingPositions[1].rank = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[1].line = this.to[1];
             }
             else
             {
                 newPos.castlingRights[2] = false;
                 newPos.castlingRights[3] = false;
-                newPos.kingPositions[0, 0] = this.to[0]; //Sparar om kungens placering.
-                newPos.kingPositions[0, 1] = this.to[1];
+                newPos.kingPositions[0].rank = this.to[0]; //Sparar om kungens placering.
+                newPos.kingPositions[0].line = this.to[1];
             }
             if (!oldPos.whiteToMove)
             {
