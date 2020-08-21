@@ -91,7 +91,7 @@ namespace Blobfish_11
             if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
                 Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, 3);
+                EvalResult result = blobFish.eval(pos, 4);
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
                 string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
@@ -114,8 +114,23 @@ namespace Blobfish_11
                 }
                 else if (result.bestMove != null)
                 {
-                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + 
-                        Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
+                    string textEval;
+                    if(eval > 1000)
+                        {
+                        int plysToMate = (int) (2001 - eval);
+                        textEval = "M" +  (plysToMate / 2).ToString();
+                    }
+                    else if(eval < -1000)
+                    {
+                        int plysToMate = (int)(2001 + eval);
+                        textEval = "m-" +  (plysToMate / 2).ToString();
+                    }
+                    else
+                        {
+                        textEval = Math.Round(eval, 2).ToString();
+                        }
+                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) +
+                        Environment.NewLine + "Datorns evaluering: " + textEval;
                     gameMoves.Add(result.bestMove);
                     display(result.bestMove.execute(pos));
                 }
@@ -343,10 +358,10 @@ namespace Blobfish_11
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
- *  Minimera minnesanvändning
  *  Få alfa/beta mellan de olika trådarna.
+ *  Tråd-pool
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
- *  Kungssäkerhet
+ *  Ta öppna linjer med torn.
  */
