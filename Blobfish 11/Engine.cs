@@ -18,12 +18,7 @@ namespace Blobfish_11
             int gameResult = decisiveResult(pos, moves);
             if(gameResult != -2)
             {
-                if (gameResult == 1)
-                    result.evaluation = 1000;
-                else if (gameResult == -1)
-                    result.evaluation = -1000;
-                else
-                    result.evaluation = (double)gameResult;
+                result.evaluation = (double)gameResult;
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
@@ -32,8 +27,20 @@ namespace Blobfish_11
             {
                 List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
-
-                if (moves.Count < 8) 
+                
+                if(moves.Count == 1)
+                {
+                    EvalResult res = eval(moves[0].execute(pos), baseDepth);
+                    if (res.evaluation > 1000) res.evaluation--;
+                    else if (res.evaluation < -1000) res.evaluation++;
+                    result.evaluation = res.evaluation;
+                    result.allMoves = moves;
+                    result.bestMove = moves[0];
+                    return result;
+                    //Forcerande drag beräknas alltid ytterligare ett drag.
+                    //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
+                }
+                if (moves.Count <= 8) 
                     baseDepth++;
 
                 //TODO: Öka längden om antalet pjäser är få.
@@ -44,7 +51,7 @@ namespace Blobfish_11
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte) (baseDepth - 1), !pos.whiteToMove, newDouble);
+                        threadStart(currentMove.execute(pos), (sbyte) (baseDepth - 1), newDouble);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
@@ -95,9 +102,9 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, sbyte depth, bool whiteToMove, SecureDouble ansPlace)
+        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace)
         {
-            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove, false);
+            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, false);
             try
             {
                 ansPlace.mutex.WaitOne();
@@ -282,7 +289,7 @@ namespace Blobfish_11
 
             return -2;
         }
-        private double alphaBeta(Position pos, sbyte depth, double alpha, double beta, bool whiteToMove, bool forceBranching)
+        private double alphaBeta(Position pos, sbyte depth, double alpha, double beta, bool forceBranching)
         {
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
@@ -295,7 +302,7 @@ namespace Blobfish_11
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
 
-            if (whiteToMove)
+            if (pos.whiteToMove)
             {
                 double value = double.NegativeInfinity;
                 foreach (Move currentMove in moves)
@@ -303,11 +310,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false, true));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
                     }
                     alpha = Math.Max(alpha, value);
                     if (alpha >= beta)
@@ -327,11 +334,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true, false));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
                     }
                     beta = Math.Min(beta, value);
                     if (beta <= alpha)
@@ -348,9 +355,11 @@ namespace Blobfish_11
         {
             if (currentDepth >= 2)
                 return false;
-            else if (move.isCapture(pos.board))
+            else if (numberOfAvailableMoves == 1)
+            {
                 return true;
-            else if(numberOfAvailableMoves == 1)
+            }
+            else if (move.isCapture(pos.board))
             {
                 return true;
             }

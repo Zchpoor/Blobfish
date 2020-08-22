@@ -91,7 +91,7 @@ namespace Blobfish_11
             if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
                 Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, 4);
+                EvalResult result = blobFish.eval(pos, 3);
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
                 string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
@@ -147,6 +147,7 @@ namespace Blobfish_11
                 textBox1.Text = temp;
 
                 //TODO: Fakorera ut detta med identisk kod ovan.
+                //TODO: Ibland dubbla textrutor.
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
