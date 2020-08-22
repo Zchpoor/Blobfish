@@ -99,18 +99,7 @@ namespace Blobfish_11
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res > 1000)
-                    {
-                        MessageBox.Show("Vit vann på schack matt!");
-                    }
-                    else if (res < -1000)
-                    {
-                        MessageBox.Show("Svart vann på schack matt!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Partiet slutade remi!");
-                    }
+                    resultPopUp(res);
                 }
                 else if (result.bestMove != null)
                 {
@@ -146,23 +135,11 @@ namespace Blobfish_11
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
 
-                //TODO: Fakorera ut detta med identisk kod ovan.
                 //TODO: Ibland dubbla textrutor.
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res > 1000)
-                    {
-                        MessageBox.Show("Vit vann på schack matt!");
-                    }
-                    else if (res < -1000)
-                    {
-                        MessageBox.Show("Svart vann på schack matt!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Partiet slutade remi!");
-                    }
+                    resultPopUp(res);
                 }
             }
         }
@@ -258,7 +235,15 @@ namespace Blobfish_11
             {
                 for (int i = 0; i < gameMoves.Count; i++)
                 {
-                    scoresheet += gameMoves[i].toString(gamePositions[i].board) + Environment.NewLine;
+                    if(i % 2 == 0)
+                    {
+                        if(i != 0)
+                        {
+                            scoresheet += Environment.NewLine;
+                        }
+                        scoresheet += ((i / 2)+1).ToString() + ".";
+                    }
+                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
                 }
             }
             return scoresheet;
@@ -303,8 +288,11 @@ namespace Blobfish_11
         }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
-            gamePositions.RemoveAt(gamePositions.Count - 1);
-            display(currentPosition);
+            if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
+            {
+                gamePositions.RemoveAt(gamePositions.Count - 1);
+                display(currentPosition);
+            }
         }
         public string getMovesString(List<Move> moves, char[,] board)
         {
@@ -333,6 +321,21 @@ namespace Blobfish_11
             gamePositions.Clear();
             gameMoves.Clear();
             display(new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+        }
+        private void resultPopUp(int result)
+        { 
+            if (result > 1000)
+            {
+                MessageBox.Show("Vit vann på schack matt!");
+            }
+            else if (result < -1000)
+            {
+                MessageBox.Show("Svart vann på schack matt!");
+            }
+            else if(result == 0)
+            {
+                MessageBox.Show("Partiet slutade remi!");
+            }
         }
     }
 }
