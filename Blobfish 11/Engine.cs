@@ -31,9 +31,7 @@ namespace Blobfish_11
                 if(moves.Count == 1)
                 {
                     EvalResult res = eval(moves[0].execute(pos), baseDepth);
-                    if (res.evaluation > 1000) res.evaluation--;
-                    else if (res.evaluation < -1000) res.evaluation++;
-                    result.evaluation = res.evaluation;
+                    result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
                     return result;
@@ -320,10 +318,7 @@ namespace Blobfish_11
                     if (alpha >= beta)
                         break; //Pruning
                 }
-                if (value > 1000)
-                    value--;
-                else if (value < -1000)
-                    value++;
+                value = evaluationStep(value);
                 return value;
             }
             else
@@ -344,10 +339,7 @@ namespace Blobfish_11
                     if (beta <= alpha)
                         break; //Pruning
                 }
-                if (value > 1000)
-                    value--;
-                else if (value < -1000)
-                    value++;
+                value = evaluationStep(value);
                 return value;
             }
         }
@@ -375,6 +367,15 @@ namespace Blobfish_11
             Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
             bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
             return isCheck;
+        }
+        private double evaluationStep(double value)
+        {
+            //Ökar antal drag till matt, ifall evalueringen är forcerad matt.
+            if (value > 1000)
+                return value - 1;
+            else if (value < -1000)
+                return value + 1;
+            else return value;
         }
     }
 }

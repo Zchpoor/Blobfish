@@ -20,6 +20,7 @@ namespace Blobfish_11
         List<Move> gameMoves = new List<Move>();
         Position currentPosition;
         List<Move> currentMoves = new List<Move>();
+        bool flipped = false;
         int[] firstSquare = { -1, -1 };
         public Form1()
         {
@@ -60,7 +61,7 @@ namespace Blobfish_11
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    char piece = pos.board[i, j];
+                    char piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
                     string picName = "null.png";
                     if (piece != '\0')
                     {
@@ -183,6 +184,14 @@ namespace Blobfish_11
                 case "fen":
                     fenBox.Text = currentPosition.getFEN();
                     break;
+                case "flip":
+                    flipped = !flipped;
+                    display(currentPosition);
+                    break;
+                case "vänd":
+                    flipped = !flipped;
+                    display(currentPosition);
+                    break;
                 default:
                     try
                     {
@@ -233,6 +242,7 @@ namespace Blobfish_11
             }
             else
             {
+                int initialMoveNumber = gamePositions[0].moveCounter;
                 for (int i = 0; i < gameMoves.Count; i++)
                 {
                     if(i % 2 == 0)
@@ -241,7 +251,7 @@ namespace Blobfish_11
                         {
                             scoresheet += Environment.NewLine;
                         }
-                        scoresheet += ((i / 2)+1).ToString() + ".";
+                        scoresheet += ((i / 2)+initialMoveNumber).ToString() + ".";
                     }
                     scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
                 }
@@ -254,6 +264,11 @@ namespace Blobfish_11
             int yVal = ((PictureBox)sender).Location.Y; //1-8
             xVal = xVal / (boardPanel.Size.Width / 8);
             yVal = yVal / (boardPanel.Size.Height / 8);
+            if (flipped)
+            {
+                xVal = 7 - xVal;
+                yVal = 7 - yVal;
+            }
             int[] newSquare = { yVal, xVal };
             if (firstSquare[0] == -1)  //-1 indikerar att ingen ruta tidigare markerats.
             {
@@ -351,7 +366,6 @@ namespace Blobfish_11
  *  Vända på brädet.
  *  Se matieral.
  *  Se bästa variant
- *  Skriv ut antal drag till matt.
  *  Mattbart material
  * 
  * Justera matriserna:
