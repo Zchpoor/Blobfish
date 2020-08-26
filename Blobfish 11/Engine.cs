@@ -127,7 +127,6 @@ namespace Blobfish_11
             int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
-            //int column = 0, row = 0;
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
             for (sbyte row = 0; row < 8; row++)
@@ -205,7 +204,6 @@ namespace Blobfish_11
                 }
             }
 
-            //double[] kingSaftey = new double[] { 0f, 0f };
             double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
                 - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
 
@@ -231,7 +229,6 @@ namespace Blobfish_11
         }
         private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
         {
-            //TODO: Använd.
             const double kingValue = 4f;
             if(oppHeavyMaterial > 6)
             {

@@ -50,7 +50,7 @@
             this.fenBox.Size = new System.Drawing.Size(609, 22);
             this.fenBox.TabIndex = 0;
             this.fenBox.Text = "r1bqkb1r/pppp1ppp/5n2/4n3/4P3/2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 1";
-            this.fenBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.fenBox_KeyPress);
+            this.fenBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.fenBox_KeyDown);
             // 
             // label1
             // 
@@ -201,8 +201,10 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
+            this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Blobfish 11";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

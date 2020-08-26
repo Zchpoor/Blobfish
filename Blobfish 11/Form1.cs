@@ -185,12 +185,10 @@ namespace Blobfish_11
                     fenBox.Text = currentPosition.getFEN();
                     break;
                 case "flip":
-                    flipped = !flipped;
-                    display(currentPosition);
+                    flipBoard();
                     break;
                 case "vänd":
-                    flipped = !flipped;
-                    display(currentPosition);
+                    flipBoard();
                     break;
                 default:
                     try
@@ -208,26 +206,6 @@ namespace Blobfish_11
                     }
                     break;
             }
-        }
-        private void takeback(int numberOfMoves)
-        {
-            if (gamePositions.Count > numberOfMoves)
-            {
-                for (int i = 0; i < numberOfMoves; i++)
-                {
-                    gamePositions.RemoveAt(gamePositions.Count - 1);
-                    gameMoves.RemoveAt(gameMoves.Count - 1);
-                }
-                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
-                gamePositions.RemoveAt(gamePositions.Count - 1);
-
-                display(newCurrentPosition);
-            }
-            else
-            {
-                evalBox.Text = "För få drag har spelats!";
-            }
-            //TODO: Ta bort ytterligare ett drag?
         }
         private string scoresheet()
         {
@@ -296,17 +274,20 @@ namespace Blobfish_11
                 moveLabel.Text = "";
             }
         }
-        private void fenBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '\r')
-                button1_Click(null, null);
-        }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
             if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
             {
                 gamePositions.RemoveAt(gamePositions.Count - 1);
                 display(currentPosition);
+            }
+        }
+        private void fenBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                button1_Click(null, null);
             }
         }
         public string getMovesString(List<Move> moves, char[,] board)
@@ -337,6 +318,11 @@ namespace Blobfish_11
             gameMoves.Clear();
             display(new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
         }
+        private void flipBoard()
+        {
+            flipped = !flipped;
+            display(currentPosition);
+        }
         private void resultPopUp(int result)
         { 
             if (result > 1000)
@@ -352,6 +338,50 @@ namespace Blobfish_11
                 MessageBox.Show("Partiet slutade remi!");
             }
         }
+        private void takeback(int numberOfMoves)
+        {
+            if (gamePositions.Count > numberOfMoves)
+            {
+                for (int i = 0; i < numberOfMoves; i++)
+                {
+                    gamePositions.RemoveAt(gamePositions.Count - 1);
+                    gameMoves.RemoveAt(gameMoves.Count - 1);
+                }
+                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
+                gamePositions.RemoveAt(gamePositions.Count - 1);
+                evalBox.Text = "Ett drag har återtagits.";
+                display(newCurrentPosition);
+            }
+            else
+            {
+                evalBox.Text = "För få drag har spelats!";
+            }
+        }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control)
+            {
+                if (e.KeyCode == Keys.F)
+                {
+                    e.SuppressKeyPress = true;
+                    flipBoard();
+                }
+                if (e.KeyCode == Keys.R)
+                {
+                    e.SuppressKeyPress = true;
+                    DialogResult result = MessageBox.Show("Vill du starta ett nytt parti?", "Återställning av partiet", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        reset();
+                    }
+                }
+                if(e.KeyCode == Keys.U)
+                {
+                    e.SuppressKeyPress = true;
+                    takeback(2);
+                }
+            }
+        }
     }
 }
 
@@ -363,14 +393,12 @@ namespace Blobfish_11
  *  Byt ut int[] -> Square.
  *  Fler tester.
  *  Välja pjäs att promotera till.
- *  Vända på brädet.
  *  Se matieral.
  *  Se bästa variant
  *  Mattbart material
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
- *  Minska behov av terräng.
  *  Föredra springare före löpare.
  * 
  * Effektiviseringar:
@@ -378,6 +406,7 @@ namespace Blobfish_11
  *  Effektivisera algoritmer för dragberäkning.
  *  Få alfa/beta mellan de olika trådarna.
  *  Tråd-pool
+ *  Gör om system för att betckna forcerad matt.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
