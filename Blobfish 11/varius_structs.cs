@@ -39,18 +39,69 @@ namespace Blobfish_11
 
         public bool givesCheck;
     }
-    public class SecureDouble
-    {
-        public Mutex mutex;
-        public double value;
-        public SecureDouble(){
-            this.value = double.NaN;
-            this.mutex = new Mutex();
-        }
-    }
     public struct SquareControl
     {
         public bool wControl;
         public bool bControl;
+    }
+    public abstract class DoubleContainer
+    {
+        protected double val;
+        public abstract double getValue();
+        public abstract void setValue(double value);
+    }
+    public class OrdinaryDouble : DoubleContainer
+    {
+        public OrdinaryDouble()
+        {
+            this.val = double.NaN;
+        }
+        public OrdinaryDouble(double value)
+        {
+            this.val = value;
+        }
+        public override double getValue()
+        {
+            return val;
+        }
+        public override void setValue(double value)
+        {
+            this.val = value;
+        }
+    }
+    public class SecureDouble : DoubleContainer
+    {
+        public Mutex mutex;
+        public SecureDouble()
+        {
+            this.val = double.NaN;
+            this.mutex = new Mutex();
+        }
+        public override double getValue()
+        {
+            double ret;
+            try
+            {
+                mutex.WaitOne();
+                ret = val;
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+            return ret;
+        }
+        public override void setValue(double value)
+        {
+            try
+            {
+                mutex.WaitOne();
+                this.val = value;
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
     }
 }

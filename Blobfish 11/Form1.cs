@@ -308,7 +308,7 @@ namespace Blobfish_11
             string text = "";
             for (int i = 0; i < moves.Count; i++)
             {
-                text += moves[i].toString(board) + "    " + Math.Round(evals[i].value, 2).ToString() + Environment.NewLine;
+                text += moves[i].toString(board) + "    " + Math.Round(evals[i].getValue(), 2).ToString() + Environment.NewLine;
             }
             return text;
         }
