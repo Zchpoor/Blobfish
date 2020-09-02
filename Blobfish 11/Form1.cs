@@ -21,7 +21,8 @@ namespace Blobfish_11
         Position currentPosition;
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
-        int[] firstSquare = { -1, -1 };
+        Square firstSquare = new Square(-1, -1);
+        const int minDepth = 4;
         public Form1()
         {
             InitializeComponent();
@@ -92,7 +93,7 @@ namespace Blobfish_11
             if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
                 Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, 3);
+                EvalResult result = blobFish.eval(pos, minDepth);
                 double eval = result.evaluation;
                 currentMoves = result.allMoves;
                 string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
@@ -207,35 +208,6 @@ namespace Blobfish_11
                     break;
             }
         }
-        private string scoresheet()
-        {
-            string scoresheet = "";
-            if(gamePositions.Count != gameMoves.Count+1)
-            {
-                throw new Exception("Fel antal drag/ställningar har spelats!");
-            }
-            else if(gameMoves.Count == 0)
-            {
-                scoresheet = "Inga drag har spelats!";
-            }
-            else
-            {
-                int initialMoveNumber = gamePositions[0].moveCounter;
-                for (int i = 0; i < gameMoves.Count; i++)
-                {
-                    if(i % 2 == 0)
-                    {
-                        if(i != 0)
-                        {
-                            scoresheet += Environment.NewLine;
-                        }
-                        scoresheet += ((i / 2)+initialMoveNumber).ToString() + ".";
-                    }
-                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
-                }
-            }
-            return scoresheet;
-        }
         private void squareClick(object sender, MouseEventArgs e)
         {
             int xVal = ((PictureBox)sender).Location.X; //a-h
@@ -247,20 +219,20 @@ namespace Blobfish_11
                 xVal = 7 - xVal;
                 yVal = 7 - yVal;
             }
-            int[] newSquare = { yVal, xVal };
-            if (firstSquare[0] == -1)  //-1 indikerar att ingen ruta tidigare markerats.
+            Square newSquare = new Square(yVal, xVal);
+            if (firstSquare.rank == -1)  //-1 indikerar att ingen ruta tidigare markerats.
             {
                 firstSquare = newSquare;
                 moveLabel.Text = (char)(xVal + 'a') + (8 - yVal).ToString();
             }
             else
             {
-                moveLabel.Text = (char)(firstSquare[1] + 'a') + (8 - firstSquare[0]).ToString() + "-" +
+                moveLabel.Text = (char)(firstSquare.line + 'a') + (8 - firstSquare.rank).ToString() + "-" +
                     (char)(xVal + 'a') + (8 - yVal).ToString();
                 foreach (Move item in currentMoves)
                 {
-                    if (firstSquare[0] == item.from[0] && firstSquare[1] == item.from[1] &&
-                        newSquare[0] == item.to[0] && newSquare[1] == item.to[1])
+                    if (firstSquare.rank == item.from.rank && firstSquare.line == item.from.line &&
+                        newSquare.rank == item.to.rank && newSquare.line == item.to.line)
                     {
                         Position newPosition = item.execute(currentPosition);
                         this.currentPosition = newPosition;
@@ -269,8 +241,8 @@ namespace Blobfish_11
                         break;
                     }
                 }
-                firstSquare[0] = -1;
-                firstSquare[1] = -1;
+                firstSquare.rank = -1;
+                firstSquare.line = -1;
                 moveLabel.Text = "";
             }
         }
@@ -322,6 +294,35 @@ namespace Blobfish_11
         {
             flipped = !flipped;
             display(currentPosition);
+        }
+        private string scoresheet()
+        {
+            string scoresheet = "";
+            if (gamePositions.Count != gameMoves.Count + 1)
+            {
+                throw new Exception("Fel antal drag/ställningar har spelats!");
+            }
+            else if (gameMoves.Count == 0)
+            {
+                scoresheet = "Inga drag har spelats!";
+            }
+            else
+            {
+                int initialMoveNumber = gamePositions[0].moveCounter;
+                for (int i = 0; i < gameMoves.Count; i++)
+                {
+                    if (i % 2 == 0)
+                    {
+                        if (i != 0)
+                        {
+                            scoresheet += Environment.NewLine;
+                        }
+                        scoresheet += ((i / 2) + initialMoveNumber).ToString() + ".";
+                    }
+                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
+                }
+            }
+            return scoresheet;
         }
         private void resultPopUp(int result)
         { 
@@ -380,6 +381,15 @@ namespace Blobfish_11
                     e.SuppressKeyPress = true;
                     takeback(2);
                 }
+                if (e.KeyCode == Keys.W)
+                {
+                    e.SuppressKeyPress = true;
+                    DialogResult result = MessageBox.Show("Vill du stänga ned programmet?", "Avsluta", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        this.Close();
+                    }
+                }
             }
         }
     }
@@ -389,8 +399,6 @@ namespace Blobfish_11
  * TODO:
  * Bekvämligheter:
  *  +/#
- *  Byt ut: row -> rank, column -> line. 
- *  Byt ut int[] -> Square.
  *  Fler tester.
  *  Välja pjäs att promotera till.
  *  Se matieral.
@@ -404,11 +412,11 @@ namespace Blobfish_11
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
- *  Få alfa/beta mellan de olika trådarna.
- *  Tråd-pool
+ *  Tråd-pool?
  *  Gör om system för att betckna forcerad matt.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
+ *  Dragupprepningar
  */

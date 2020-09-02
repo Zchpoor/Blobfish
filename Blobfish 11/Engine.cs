@@ -10,7 +10,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        public EvalResult eval(Position pos, int baseDepth)
+        public EvalResult eval(Position pos, int minDepth)
         {
             List<Move> moves = allValidMoves(pos);
             EvalResult result = new EvalResult();
@@ -30,7 +30,7 @@ namespace Blobfish_11
 
                 if (moves.Count == 1)
                 {
-                    EvalResult res = eval(moves[0].execute(pos), baseDepth);
+                    EvalResult res = eval(moves[0].execute(pos), minDepth);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
@@ -39,9 +39,9 @@ namespace Blobfish_11
                     //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
                 }
                 if (moves.Count <= 8)
-                    baseDepth++;
+                    minDepth++;
 
-                //TODO: Öka längden om antalet pjäser är få.
+                //TODO: Öka längden om antalet tunga pjäser är få.
 
                 SecureDouble globalAlpha = new SecureDouble();
                 globalAlpha.setValue(double.NegativeInfinity);
@@ -54,7 +54,7 @@ namespace Blobfish_11
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte)(baseDepth - 1), newDouble, globalAlpha, globalBeta);
+                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newDouble, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
@@ -107,17 +107,17 @@ namespace Blobfish_11
             }
             else
             {
-                globalBeta.setValue(Math.Max(globalBeta.getValue(), value));
+                globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
             }
         }
         private double numericEval(Position pos)
         {
             /* 
-             * [row, column]
-             * row==0       -> rad 8.
-             * row==7       -> rad 1.
-             * column==0    -> a-linjen.
-             * column==7    -> h-linjen.
+             * [rank, line]
+             * rank==0       -> rad 8.
+             * rank==7       -> rad 1.
+             * line==0    -> a-linjen.
+             * line==7    -> h-linjen.
              */
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
@@ -126,76 +126,76 @@ namespace Blobfish_11
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
-            for (sbyte row = 0; row < 8; row++)
+            for (sbyte rank = 0; rank < 8; rank++)
             {
-                for (sbyte column = 0; column < 8; column++)
+                for (sbyte line = 0; line < 8; line++)
                 {
-                    switch (pos.board[row, column])
+                    switch (pos.board[rank, line])
                     {
                         case 'p':
                             numberOfPawns[0]++;
-                            pawns[0, column]++;
-                            posFactor[0] += pawn[0, row, column];
+                            pawns[0, line]++;
+                            posFactor[0] += pawn[0, rank, line];
                             break;
 
                         case 'P':
                             numberOfPawns[1]++;
-                            pawns[1, column]++;
-                            posFactor[1] += pawn[1, row, column];
+                            pawns[1, line]++;
+                            posFactor[1] += pawn[1, rank, line];
                             break;
 
                         case 'n':
-                            pieceValue -= pieceValues[0] * knight[row, column];
+                            pieceValue -= pieceValues[0] * knight[rank, line];
                             heavyMaterial[1] += 3;
                             break;
 
                         case 'N':
-                            pieceValue += pieceValues[0] * knight[row, column];
+                            pieceValue += pieceValues[0] * knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
 
                         case 'b':
-                            pieceValue -= pieceValues[1] * bishop[row, column];
+                            pieceValue -= pieceValues[1] * bishop[rank, line];
                             heavyMaterial[1] += 3;
-                            if ((row + column) % 2 == 0)
+                            if ((rank + line) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
                             else
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
 
                         case 'B':
-                            pieceValue += pieceValues[1] * bishop[row, column];
+                            pieceValue += pieceValues[1] * bishop[rank, line];
                             heavyMaterial[0] += 3;
-                            if ((row + column) % 2 == 0)
+                            if ((rank + line) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
                             else
                                 bishopColors[1] = true; //Vit löpare på svart fält
                             break;
 
                         case 'r':
-                            pieceValue -= pieceValues[2] * rook[row, column];
+                            pieceValue -= pieceValues[2] * rook[rank, line];
                             heavyMaterial[1] += 5;
                             break;
                         case 'R':
-                            pieceValue += pieceValues[2] * rook[row, column];
+                            pieceValue += pieceValues[2] * rook[rank, line];
                             heavyMaterial[0] += 5;
                             break;
 
                         case 'k':
-                            pos.kingPositions[0] = new Square(row, column);
+                            pos.kingPositions[0] = new Square(rank, line);
                             break;
 
                         case 'K':
-                            pos.kingPositions[1] = new Square(row, column);
+                            pos.kingPositions[1] = new Square(rank, line);
                             break;
 
                         case 'q':
-                            pieceValue -= pieceValues[3] * queen[row, column];
+                            pieceValue -= pieceValues[3] * queen[rank, line];
                             heavyMaterial[1] += 9;
                             break;
 
                         case 'Q':
-                            pieceValue += pieceValues[3] * queen[row, column];
+                            pieceValue += pieceValues[3] * queen[rank, line];
                             heavyMaterial[0] += 9;
                             break;
                         default:

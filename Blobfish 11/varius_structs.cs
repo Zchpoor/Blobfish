@@ -30,20 +30,6 @@ namespace Blobfish_11
             this.line = (sbyte)line;
         }
     }
-    public struct PieceData
-    {
-        public List<Move> moves;
-
-        //TODO: Byt ut mot bräde av fält?
-        public List<Square> controlledSquares;
-
-        public bool givesCheck;
-    }
-    public struct SquareControl
-    {
-        public bool wControl;
-        public bool bControl;
-    }
     public abstract class DoubleContainer
     {
         protected double val;
