@@ -18,12 +18,7 @@ namespace Blobfish_11
             int gameResult = decisiveResult(pos, moves);
             if(gameResult != -2)
             {
-                if (gameResult == 1)
-                    result.evaluation = 1000;
-                else if (gameResult == -1)
-                    result.evaluation = -1000;
-                else
-                    result.evaluation = (double)gameResult;
+                result.evaluation = (double)gameResult;
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
@@ -32,8 +27,18 @@ namespace Blobfish_11
             {
                 List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
-
-                if (moves.Count < 8) 
+                
+                if(moves.Count == 1)
+                {
+                    EvalResult res = eval(moves[0].execute(pos), baseDepth);
+                    result.evaluation = evaluationStep(res.evaluation);
+                    result.allMoves = moves;
+                    result.bestMove = moves[0];
+                    return result;
+                    //Forcerande drag beräknas alltid ytterligare ett drag.
+                    //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
+                }
+                if (moves.Count <= 8) 
                     baseDepth++;
 
                 //TODO: Öka längden om antalet pjäser är få.
@@ -44,7 +49,7 @@ namespace Blobfish_11
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), baseDepth - 1, !pos.whiteToMove, newDouble);
+                        threadStart(currentMove.execute(pos), (sbyte) (baseDepth - 1), newDouble);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
@@ -95,9 +100,9 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, int depth, bool whiteToMove, SecureDouble ansPlace)
+        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace)
         {
-            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, whiteToMove, false);
+            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, false);
             try
             {
                 ansPlace.mutex.WaitOne();
@@ -119,17 +124,14 @@ namespace Blobfish_11
              */
             int[] numberOfPawns = new int[2];
             double[] posFactor = { 1f, 1f };
-            double[] kingSaftey = new double[] { 0f, 0f};
             int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
-            int[,] pawns = new int[2, 8]; //0=svart, 1=vit.
+            sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
-            //int column = 0, row = 0;
-            double[] pieceValues = { 3, 3, 5, 9 };
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
-            for (int row = 0; row < 8; row++)
+            for (sbyte row = 0; row < 8; row++)
             {
-                for (int column = 0; column < 8; column++)
+                for (sbyte column = 0; column < 8; column++)
                 {
                     switch (pos.board[row, column])
                     {
@@ -181,13 +183,11 @@ namespace Blobfish_11
                             break;
 
                         case 'k':
-                            pos.kingPositions[0, 0] = row;
-                            pos.kingPositions[0, 1] = column;
-                            
+                            pos.kingPositions[0] = new Square(row, column);
                             break;
+
                         case 'K':
-                            pos.kingPositions[1, 0] = row;
-                            pos.kingPositions[1, 1] = column;
+                            pos.kingPositions[1] = new Square(row, column);
                             break;
 
                         case 'q':
@@ -204,19 +204,8 @@ namespace Blobfish_11
                 }
             }
 
-            //TODO: fixa denna.
-            for (int i = 0; i < 2; i++)
-            {
-                if (heavyMaterial[i] > 6) //Om det inte är "sluspel"
-                {
-                    kingSaftey[i] += 4* king[0, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
-                }
-                else
-                {
-                    kingSaftey[i] += 4* king[1, pos.kingPositions[i, 0], pos.kingPositions[i, 1]];
-                }
-            }
-            double kingSafteyDifference = kingSaftey[1] - kingSaftey[0];
+            double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
+                - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
 
             double bishopPairValue = 0.4f;
             if (bishopColors[0] && bishopColors[1])
@@ -228,7 +217,7 @@ namespace Blobfish_11
                 pieceValue -= bishopPairValue;
             }
 
-            for (int i = 0; i < 2; i++)
+            for (sbyte i = 0; i < 2; i++)
             {
                 if (numberOfPawns[i] == 0)
                     posFactor[i] = 0f;
@@ -240,7 +229,6 @@ namespace Blobfish_11
         }
         private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
         {
-            //TODO: Använd.
             const double kingValue = 4f;
             if(oppHeavyMaterial > 6)
             {
@@ -251,16 +239,16 @@ namespace Blobfish_11
                 return kingValue * king[1, kingSquare.rank, kingSquare.line];
             }
         }
-        private double evalPawns(int[] numberOfPawns, double[] posFactor, int[,] pawns)
+        private double evalPawns(int[] numberOfPawns, double[] posFactor, sbyte[,] pawns)
         {
             double[] pawnValues = new double[2];
-            for (int c = 0; c < 2; c++)
+            for (sbyte c = 0; c < 2; c++)
             {
-                int neighbours = 0;
-                int lines = 0;
+                sbyte neighbours = 0;
+                sbyte lines = 0;
                 if (pawns[c, 0] > 0) lines++; //specialfall för a-linjen.
                 if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
-                for (int i = 1; i < 7; i++) //från b till g sista. 
+                for (sbyte i = 1; i < 7; i++) //från b till g sista. 
                 {
                     if (pawns[c, i] > 0) lines++;
                     if (pawns[c, i - 1] > 0) neighbours += pawns[c, 0];
@@ -279,13 +267,12 @@ namespace Blobfish_11
             //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
-                Square relevantKingSquare = pos.whiteToMove ? new Square(pos.kingPositions[1, 0], pos.kingPositions[1, 1]) :
-                    new Square(pos.kingPositions[0, 0], pos.kingPositions[0, 1]);
+                Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
                 bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
-                    if (pos.whiteToMove) return -1000;
-                    else return 1000;
+                    if (pos.whiteToMove) return -2000;
+                    else return 2000;
                 }
                 else return 0; //Patt
             }
@@ -297,12 +284,12 @@ namespace Blobfish_11
 
             return -2;
         }
-        private double alphaBeta(Position pos, int depth, double alpha, double beta, bool whiteToMove, bool forceBranching)
+        private double alphaBeta(Position pos, sbyte depth, double alpha, double beta, bool forceBranching)
         {
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if(depth <= -8) //Maximalt antal slagväxlingar som får ta plats.
+            if(depth <= -8) //Maximalt antal slagväxlingar som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
@@ -310,24 +297,25 @@ namespace Blobfish_11
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
 
-            if (whiteToMove)
+            if (pos.whiteToMove)
             {
                 double value = double.NegativeInfinity;
                 foreach (Move currentMove in moves)
                 {
                     Position newPos = currentMove.execute(pos);
-                    if (extraDepth(currentMove, pos.board, depth))
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, true));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, false, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
                     }
                     alpha = Math.Max(alpha, value);
                     if (alpha >= beta)
                         break; //Pruning
                 }
+                value = evaluationStep(value);
                 return value;
             }
             else
@@ -335,24 +323,56 @@ namespace Blobfish_11
                 double value = double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    if (extraDepth(currentMove, pos.board, depth))
+                    Position newPos = currentMove.execute(pos);
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), depth - 1, alpha, beta, true, false));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
                     }
                     beta = Math.Min(beta, value);
                     if (beta <= alpha)
                         break; //Pruning
                 }
+                value = evaluationStep(value);
                 return value;
             }
         }
-        private bool extraDepth(Move move, char[,] board, int currentDepth)
+        private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
-            return currentDepth < 2 && move.isCapture(board);
+            if (currentDepth >= 2)
+                return false;
+            else if (numberOfAvailableMoves == 1)
+            {
+                return true;
+            }
+            else if (move.isCapture(pos.board))
+            {
+                return true;
+            }
+            else
+            {
+                Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[0] : pos.kingPositions[1];
+                bool isCheck = isControlledBy(pos, relevantKingSquare, pos.whiteToMove);
+                return isCheck;
+            }
+        }
+        private bool isCheck(Position pos)
+        {
+            Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
+            bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
+            return isCheck;
+        }
+        private double evaluationStep(double value)
+        {
+            //Ökar antal drag till matt, ifall evalueringen är forcerad matt.
+            if (value > 1000)
+                return value - 1;
+            else if (value < -1000)
+                return value + 1;
+            else return value;
         }
     }
 }

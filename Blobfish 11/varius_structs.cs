@@ -8,11 +8,6 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public struct ControlAndCheckingPieces
-    {
-        public SquareControl[,] board;
-        public int[] checkingPieces;
-    }
     public struct EvalResult
     {
         public double evaluation;
@@ -22,12 +17,17 @@ namespace Blobfish_11
     }
     public struct Square
     {
-        public int rank;
-        public int line;
-        public Square(int rank, int line)
+        public sbyte rank;
+        public sbyte line;
+        public Square(sbyte rank, sbyte line)
         {
             this.rank = rank;
             this.line = line;
+        }
+        public Square(int rank, int line)
+        {
+            this.rank = (sbyte)rank;
+            this.line = (sbyte)line;
         }
     }
     public struct PieceData
@@ -47,5 +47,10 @@ namespace Blobfish_11
             this.value = double.NaN;
             this.mutex = new Mutex();
         }
+    }
+    public struct SquareControl
+    {
+        public bool wControl;
+        public bool bControl;
     }
 }

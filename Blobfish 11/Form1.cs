@@ -20,6 +20,7 @@ namespace Blobfish_11
         List<Move> gameMoves = new List<Move>();
         Position currentPosition;
         List<Move> currentMoves = new List<Move>();
+        bool flipped = false;
         int[] firstSquare = { -1, -1 };
         public Form1()
         {
@@ -60,7 +61,7 @@ namespace Blobfish_11
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    char piece = pos.board[i, j];
+                    char piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
                     string picName = "null.png";
                     if (piece != '\0')
                     {
@@ -99,23 +100,27 @@ namespace Blobfish_11
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res == 1000)
-                    {
-                        MessageBox.Show("Vit vann på schack matt!");
-                    }
-                    else if (res == -1000)
-                    {
-                        MessageBox.Show("Svart vann på schack matt!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Partiet slutade remi!");
-                    }
+                    resultPopUp(res);
                 }
                 else if (result.bestMove != null)
                 {
-                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) + 
-                        Environment.NewLine + "Evaluering: " + Math.Round(eval, 2);
+                    string textEval;
+                    if(eval > 1000)
+                        {
+                        int plysToMate = (int) (2001 - eval);
+                        textEval = "M" +  (plysToMate / 2).ToString();
+                    }
+                    else if(eval < -1000)
+                    {
+                        int plysToMate = (int)(2001 + eval);
+                        textEval = "m-" +  (plysToMate / 2).ToString();
+                    }
+                    else
+                        {
+                        textEval = Math.Round(eval, 2).ToString();
+                        }
+                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) +
+                        Environment.NewLine + "Datorns evaluering: " + textEval;
                     gameMoves.Add(result.bestMove);
                     display(result.bestMove.execute(pos));
                 }
@@ -131,22 +136,11 @@ namespace Blobfish_11
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
 
-                //TODO: Fakorera ut detta med identisk kod ovan.
+                //TODO: Ibland dubbla textrutor.
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
-                    if (res == 1000)
-                    {
-                        MessageBox.Show("Vit vann på schack matt!");
-                    }
-                    else if (res == -1000)
-                    {
-                        MessageBox.Show("Svart vann på schack matt!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Partiet slutade remi!");
-                    }
+                    resultPopUp(res);
                 }
             }
         }
@@ -164,6 +158,9 @@ namespace Blobfish_11
                     takeback(2);
                     break;
                 case "tb":
+                    takeback(2);
+                    break;
+                case "undo":
                     takeback(2);
                     break;
                 case "återta":
@@ -184,6 +181,15 @@ namespace Blobfish_11
                 case "omstart":
                     reset();
                     break;
+                case "fen":
+                    fenBox.Text = currentPosition.getFEN();
+                    break;
+                case "flip":
+                    flipBoard();
+                    break;
+                case "vänd":
+                    flipBoard();
+                    break;
                 default:
                     try
                     {
@@ -201,26 +207,6 @@ namespace Blobfish_11
                     break;
             }
         }
-        private void takeback(int numberOfMoves)
-        {
-            if (gamePositions.Count > numberOfMoves)
-            {
-                for (int i = 0; i < numberOfMoves; i++)
-                {
-                    gamePositions.RemoveAt(gamePositions.Count - 1);
-                    gameMoves.RemoveAt(gameMoves.Count - 1);
-                }
-                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
-                gamePositions.RemoveAt(gamePositions.Count - 1);
-
-                display(newCurrentPosition);
-            }
-            else
-            {
-                evalBox.Text = "För få drag har spelats!";
-            }
-            //TODO: Ta bort ytterligare ett drag?
-        }
         private string scoresheet()
         {
             string scoresheet = "";
@@ -234,9 +220,18 @@ namespace Blobfish_11
             }
             else
             {
+                int initialMoveNumber = gamePositions[0].moveCounter;
                 for (int i = 0; i < gameMoves.Count; i++)
                 {
-                    scoresheet += gameMoves[i].toString(gamePositions[i].board) + Environment.NewLine;
+                    if(i % 2 == 0)
+                    {
+                        if(i != 0)
+                        {
+                            scoresheet += Environment.NewLine;
+                        }
+                        scoresheet += ((i / 2)+initialMoveNumber).ToString() + ".";
+                    }
+                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
                 }
             }
             return scoresheet;
@@ -247,6 +242,11 @@ namespace Blobfish_11
             int yVal = ((PictureBox)sender).Location.Y; //1-8
             xVal = xVal / (boardPanel.Size.Width / 8);
             yVal = yVal / (boardPanel.Size.Height / 8);
+            if (flipped)
+            {
+                xVal = 7 - xVal;
+                yVal = 7 - yVal;
+            }
             int[] newSquare = { yVal, xVal };
             if (firstSquare[0] == -1)  //-1 indikerar att ingen ruta tidigare markerats.
             {
@@ -274,15 +274,21 @@ namespace Blobfish_11
                 moveLabel.Text = "";
             }
         }
-        private void fenBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '\r')
-                button1_Click(null, null);
-        }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
-            gamePositions.RemoveAt(gamePositions.Count - 1);
-            display(currentPosition);
+            if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
+            {
+                gamePositions.RemoveAt(gamePositions.Count - 1);
+                display(currentPosition);
+            }
+        }
+        private void fenBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                button1_Click(null, null);
+            }
         }
         public string getMovesString(List<Move> moves, char[,] board)
         {
@@ -312,6 +318,70 @@ namespace Blobfish_11
             gameMoves.Clear();
             display(new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
         }
+        private void flipBoard()
+        {
+            flipped = !flipped;
+            display(currentPosition);
+        }
+        private void resultPopUp(int result)
+        { 
+            if (result > 1000)
+            {
+                MessageBox.Show("Vit vann på schack matt!");
+            }
+            else if (result < -1000)
+            {
+                MessageBox.Show("Svart vann på schack matt!");
+            }
+            else if(result == 0)
+            {
+                MessageBox.Show("Partiet slutade remi!");
+            }
+        }
+        private void takeback(int numberOfMoves)
+        {
+            if (gamePositions.Count > numberOfMoves)
+            {
+                for (int i = 0; i < numberOfMoves; i++)
+                {
+                    gamePositions.RemoveAt(gamePositions.Count - 1);
+                    gameMoves.RemoveAt(gameMoves.Count - 1);
+                }
+                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
+                gamePositions.RemoveAt(gamePositions.Count - 1);
+                evalBox.Text = "Ett drag har återtagits.";
+                display(newCurrentPosition);
+            }
+            else
+            {
+                evalBox.Text = "För få drag har spelats!";
+            }
+        }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control)
+            {
+                if (e.KeyCode == Keys.F)
+                {
+                    e.SuppressKeyPress = true;
+                    flipBoard();
+                }
+                if (e.KeyCode == Keys.R)
+                {
+                    e.SuppressKeyPress = true;
+                    DialogResult result = MessageBox.Show("Vill du starta ett nytt parti?", "Återställning av partiet", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        reset();
+                    }
+                }
+                if(e.KeyCode == Keys.U)
+                {
+                    e.SuppressKeyPress = true;
+                    takeback(2);
+                }
+            }
+        }
     }
 }
 
@@ -322,26 +392,23 @@ namespace Blobfish_11
  *  Byt ut: row -> rank, column -> line. 
  *  Byt ut int[] -> Square.
  *  Fler tester.
- *  Få FEN
  *  Välja pjäs att promotera till.
- *  Vända på brädet.
  *  Se matieral.
  *  Se bästa variant
+ *  Mattbart material
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
- *  Minska behov av terräng.
  *  Föredra springare före löpare.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
- *  Minimera minnesanvändning
- *  Kapa de längsta slagväxlingarna.
  *  Få alfa/beta mellan de olika trådarna.
+ *  Tråd-pool
+ *  Gör om system för att betckna forcerad matt.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
- *  Kungssäkerhet
- *  Få schackar att också förlänga varianterna.
+ *  Ta öppna linjer med torn.
  */
