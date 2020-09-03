@@ -22,7 +22,7 @@ namespace Blobfish_11
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
         Square firstSquare = new Square(-1, -1);
-        const int minDepth = 4;
+        const int minDepth = 3;
         public Form1()
         {
             InitializeComponent();
@@ -401,9 +401,10 @@ namespace Blobfish_11
  *  +/#
  *  Fler tester.
  *  Välja pjäs att promotera till.
- *  Se matieral.
+ *  Se material.
  *  Se bästa variant
  *  Mattbart material
+ *  Gör det möjligt att dra pjäserna
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -419,4 +420,6 @@ namespace Blobfish_11
  *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
  *  Dragupprepningar
+ *  Kungssäkerhet
+ *  Gör kraftiga hot forcerande.
  */

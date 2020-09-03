@@ -101,7 +101,7 @@ namespace Blobfish_11
         {
             double value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
-            if (pos.whiteToMove)
+            if (!pos.whiteToMove)
             {
                 globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value));
             }
@@ -289,7 +289,7 @@ namespace Blobfish_11
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -8) //Maximalt antal slagväxlingar som får ta plats i slutet av en variant.
+            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
@@ -316,7 +316,13 @@ namespace Blobfish_11
                     }
                     alpha.setValue(Math.Max(alpha.getValue(), value));
                     if (alpha.getValue() >= beta.getValue())
-                        break; //Pruning
+                    {
+                        if (alphaContainer is SecureDouble)
+                            return double.PositiveInfinity;
+                        else
+                            break; //Pruning
+
+                    }
                 }
                 value = evaluationStep(value);
                 return value;
@@ -337,7 +343,12 @@ namespace Blobfish_11
                     }
                     beta.setValue(Math.Min(beta.getValue(), value));
                     if (beta.getValue() <= alpha.getValue())
-                        break; //Pruning
+                    {
+                        if (betaContainer is SecureDouble)
+                            return double.NegativeInfinity;
+                        else
+                            break; //Pruning
+                    }
                 }
                 value = evaluationStep(value);
                 return value;
