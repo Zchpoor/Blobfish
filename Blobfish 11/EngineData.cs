@@ -9,7 +9,17 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        static readonly double[] pieceValues = { 3, 3, 5, 9 };
+        readonly double[] pieceValues = { 3, 3, 5, 9 };
+        readonly double kingValue = 4f;
+        readonly double bishopPairValue = 0.4f;
+
+        //Partiet anses ha gått in i slutspel omm värder av motståndarens 
+        //tunga pjäser uppgår till mindre än denna variabel.
+        readonly int endgameLimit = 6;
+
+        readonly int sleepTime = 100;
+        readonly int[] moveIncreaseLimits = {20, 8 }; // Talen bör vara i minskande ordning.
+
         private static readonly double[,,] pawn =
         {
             { //Svarta bönder

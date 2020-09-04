@@ -22,6 +22,7 @@ namespace Blobfish_11
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
         Square firstSquare = new Square(-1, -1);
+        Engine blobFish = new Engine();
         const int minDepth = 3;
         public Form1()
         {
@@ -92,57 +93,59 @@ namespace Blobfish_11
             currentPosition = pos;
             if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
             {
-                Engine blobFish = new Engine();
-                EvalResult result = blobFish.eval(pos, minDepth);
-                double eval = result.evaluation;
-                currentMoves = result.allMoves;
-                string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
-                textBox1.Text = movesString;
-                int res = blobFish.decisiveResult(pos, currentMoves);
-                if (res != -2)
-                {
-                    resultPopUp(res);
-                }
-                else if (result.bestMove != null)
-                {
-                    string textEval;
-                    if(eval > 1000)
-                        {
-                        int plysToMate = (int) (2001 - eval);
-                        textEval = "M" +  (plysToMate / 2).ToString();
-                    }
-                    else if(eval < -1000)
-                    {
-                        int plysToMate = (int)(2001 + eval);
-                        textEval = "m-" +  (plysToMate / 2).ToString();
-                    }
-                    else
-                        {
-                        textEval = Math.Round(eval, 2).ToString();
-                        }
-                    evalBox.Text = "Bästa drag: " + result.bestMove.toString(pos.board) +
-                        Environment.NewLine + "Datorns evaluering: " + textEval;
-                    gameMoves.Add(result.bestMove);
-                    display(result.bestMove.execute(pos));
-                }
-                else
-                {
-                    throw new Exception("Odefinierat bästa drag.");
-                }
+                playEngineMove();
             }
             else
             {
-                Engine blobFish = new Engine();
                 currentMoves = blobFish.allValidMoves(pos);
                 string temp = getMovesString(currentMoves, currentPosition.board);
                 textBox1.Text = temp;
 
-                //TODO: Ibland dubbla textrutor.
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
                 {
                     resultPopUp(res);
                 }
+            }
+        }
+        private void playEngineMove()
+        {
+
+            EvalResult result = blobFish.eval(currentPosition, minDepth);
+            double eval = result.evaluation;
+            currentMoves = result.allMoves;
+            string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
+            textBox1.Text = movesString;
+            int res = blobFish.decisiveResult(currentPosition, currentMoves);
+            if (res != -2)
+            {
+                resultPopUp(res);
+            }
+            else if (result.bestMove != null)
+            {
+                string textEval;
+                if (eval > 1000)
+                {
+                    int plysToMate = (int)(2001 - eval);
+                    textEval = "M" + (plysToMate / 2).ToString();
+                }
+                else if (eval < -1000)
+                {
+                    int plysToMate = (int)(2001 + eval);
+                    textEval = "m-" + (plysToMate / 2).ToString();
+                }
+                else
+                {
+                    textEval = Math.Round(eval, 2).ToString();
+                }
+                evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
+                    Environment.NewLine + "Datorns evaluering: " + textEval;
+                gameMoves.Add(result.bestMove);
+                display(result.bestMove.execute(currentPosition));
+            }
+            else
+            {
+                throw new Exception("Odefinierat bästa drag.");
             }
         }
         private void button1_Click(object sender, EventArgs e)
@@ -405,10 +408,14 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Mattbart material
  *  Gör det möjligt att dra pjäserna
+ *  Håll fönstret vid liv när drag beräknas.
+ *  Gör fönstret skalbart.
+ *  Går inte att återta drag om partier angetts via FEN?
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Föredra springare före löpare.
+ *  Mindre behov av kungen i hörnet.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
@@ -422,4 +429,11 @@ namespace Blobfish_11
  *  Dragupprepningar
  *  Kungssäkerhet
  *  Gör kraftiga hot forcerande.
+ *  Öka behov av terräng
+ *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  Gör mer materialistisk.
+ *  
+ *  Kolla upp:
+ *  Sb5: r3kb1r/ppp1pppp/3q1n2/3P1b2/8/P1N1BN2/1P2BPPP/Q4RK1 w kq - 1 12
+ *  Sg4: r1b1k2r/2qpbpp1/p1n1pn2/1pp4p/4P3/1BNPBN2/PPP2PPP/2RQ1R1K b kq - 1 10
  */

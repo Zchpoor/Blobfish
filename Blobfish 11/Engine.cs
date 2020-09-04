@@ -38,8 +38,14 @@ namespace Blobfish_11
                     //Forcerande drag beräknas alltid ytterligare ett drag.
                     //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
                 }
-                if (moves.Count <= 8)
-                    minDepth++;
+
+                // Ökar minimum-djupet om antalet tillgängliga drag är färre än de som anges
+                // i moveIncreaseLimits, vilka återfinns i EngineData.
+                foreach (int item in moveIncreaseLimits)
+                {
+                    if (moves.Count <= item) minDepth++;
+                    else break;
+                }
 
                 //TODO: Öka längden om antalet tunga pjäser är få.
 
@@ -59,7 +65,7 @@ namespace Blobfish_11
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
                     SecureDouble threadResult = allEvals[i];
@@ -69,7 +75,7 @@ namespace Blobfish_11
 #pragma warning restore CS1718 // Comparison made to same variable
                     {
                         //Om resultatet inte hunnit beräknas.
-                        Thread.Sleep(100);
+                        Thread.Sleep(sleepTime);
                         i--;
                     }
                     else
@@ -110,6 +116,80 @@ namespace Blobfish_11
                 globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
             }
         }
+        private double alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
+        {
+            string moveName = ""; //Endast i debug-syfte
+            if (depth <= 0 && !forceBranching)
+                return numericEval(pos);
+
+            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            {
+                return numericEval(pos);
+            }
+            List<Move> moves = allValidMoves(pos);
+            if (moves.Count == 0)
+                return decisiveResult(pos, moves);
+
+            OrdinaryDouble alpha = new OrdinaryDouble(alphaContainer.getValue());
+            OrdinaryDouble beta = new OrdinaryDouble(betaContainer.getValue());
+
+
+            if (pos.whiteToMove)
+            {
+                double value = double.NegativeInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    moveName = currentMove.toString(pos.board);
+                    Position newPos = currentMove.execute(pos);
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
+                    {
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                    }
+                    else
+                    {
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                    }
+                    alpha.setValue(Math.Max(alpha.getValue(), value));
+                    if (alpha.getValue() >= beta.getValue())
+                    {
+                        if (alphaContainer is SecureDouble)
+                            return double.PositiveInfinity;
+                        else
+                            break; //Pruning
+
+                    }
+                }
+                value = evaluationStep(value);
+                return value;
+            }
+            else
+            {
+                double value = double.PositiveInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    moveName = currentMove.toString(pos.board);
+                    Position newPos = currentMove.execute(pos);
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
+                    {
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                    }
+                    else
+                    {
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                    }
+                    beta.setValue(Math.Min(beta.getValue(), value));
+                    if (beta.getValue() <= alpha.getValue())
+                    {
+                        if (betaContainer is SecureDouble)
+                            return double.NegativeInfinity;
+                        else
+                            break; //Pruning
+                    }
+                }
+                value = evaluationStep(value);
+                return value;
+            }
+        }
         private double numericEval(Position pos)
         {
             /* 
@@ -120,7 +200,7 @@ namespace Blobfish_11
              * line==7    -> h-linjen.
              */
             int[] numberOfPawns = new int[2];
-            double[] posFactor = { 1f, 1f };
+            double[] pawnPosFactor = { 1f, 1f };
             int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
@@ -135,13 +215,13 @@ namespace Blobfish_11
                         case 'p':
                             numberOfPawns[0]++;
                             pawns[0, line]++;
-                            posFactor[0] += pawn[0, rank, line];
+                            pawnPosFactor[0] += pawn[0, rank, line];
                             break;
 
                         case 'P':
                             numberOfPawns[1]++;
                             pawns[1, line]++;
-                            posFactor[1] += pawn[1, rank, line];
+                            pawnPosFactor[1] += pawn[1, rank, line];
                             break;
 
                         case 'n':
@@ -207,7 +287,6 @@ namespace Blobfish_11
             double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
                 - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
 
-            double bishopPairValue = 0.4f;
             if (bishopColors[0] && bishopColors[1])
             {
                 pieceValue += bishopPairValue;
@@ -220,17 +299,17 @@ namespace Blobfish_11
             for (sbyte i = 0; i < 2; i++)
             {
                 if (numberOfPawns[i] == 0)
-                    posFactor[i] = 0f;
+                    pawnPosFactor[i] = 0f;
                 else
-                    posFactor[i] /= numberOfPawns[i];
+                    pawnPosFactor[i] /= numberOfPawns[i];
             }
-            double pawnValue = evalPawns(numberOfPawns, posFactor, pawns);
+            double pawnValue = evalPawns(numberOfPawns, pawnPosFactor, pawns);
             return pieceValue + pawnValue + kingSafteyDifference;
         }
         private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
         {
-            const double kingValue = 4f;
-            if (oppHeavyMaterial > 6)
+            //TODO: Förbättra
+            if (oppHeavyMaterial > endgameLimit)
             {
                 return kingValue * king[0, kingSquare.rank, kingSquare.line];
             }
@@ -283,76 +362,6 @@ namespace Blobfish_11
             }
 
             return -2;
-        }
-        private double alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
-        {
-            if (depth <= 0 && !forceBranching)
-                return numericEval(pos);
-
-            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
-            {
-                return numericEval(pos);
-            }
-            List<Move> moves = allValidMoves(pos);
-            if (moves.Count == 0)
-                return decisiveResult(pos, moves);
-
-            OrdinaryDouble alpha = new OrdinaryDouble(alphaContainer.getValue());
-            OrdinaryDouble beta = new OrdinaryDouble(betaContainer.getValue());
-
-            if (pos.whiteToMove)
-            {
-                double value = double.NegativeInfinity;
-                foreach (Move currentMove in moves)
-                {
-                    Position newPos = currentMove.execute(pos);
-                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
-                    {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
-                    }
-                    else
-                    {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
-                    }
-                    alpha.setValue(Math.Max(alpha.getValue(), value));
-                    if (alpha.getValue() >= beta.getValue())
-                    {
-                        if (alphaContainer is SecureDouble)
-                            return double.PositiveInfinity;
-                        else
-                            break; //Pruning
-
-                    }
-                }
-                value = evaluationStep(value);
-                return value;
-            }
-            else
-            {
-                double value = double.PositiveInfinity;
-                foreach (Move currentMove in moves)
-                {
-                    Position newPos = currentMove.execute(pos);
-                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
-                    {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
-                    }
-                    else
-                    {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
-                    }
-                    beta.setValue(Math.Min(beta.getValue(), value));
-                    if (beta.getValue() <= alpha.getValue())
-                    {
-                        if (betaContainer is SecureDouble)
-                            return double.NegativeInfinity;
-                        else
-                            break; //Pruning
-                    }
-                }
-                value = evaluationStep(value);
-                return value;
-            }
         }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
