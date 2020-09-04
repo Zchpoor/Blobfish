@@ -13,13 +13,25 @@ namespace Blobfish_11
         readonly double kingValue = 4f;
         readonly double bishopPairValue = 0.4f;
 
-        //Partiet anses ha gått in i slutspel omm värder av motståndarens 
-        //tunga pjäser uppgår till mindre än denna variabel.
+        //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
+        //tunga pjäser uppgår till mindre än endgameLimit.
         readonly int endgameLimit = 6;
-
         readonly int sleepTime = 100;
-        readonly int[] moveIncreaseLimits = {20, 8 }; // Talen bör vara i minskande ordning.
+        readonly int[] moveIncreaseLimits = {20}; // Talen bör vara i minskande ordning.
 
+        public Engine() {}
+        public Engine(double[] pieceValues, double kingValue, double bishopPairValue, int endgameLimit, int sleepTime, int[] moveIncreaseLimits)
+        {
+            if (pieceValues.Length != 4)
+                throw new Exception("Fel längd på pjäsvärdesvektorn!");
+            this.pieceValues = pieceValues;
+            this.kingValue = kingValue;
+            this.bishopPairValue = bishopPairValue;
+            this.endgameLimit = endgameLimit;
+            this.sleepTime = sleepTime;
+            this.moveIncreaseLimits = moveIncreaseLimits;
+        }
+        
         private static readonly double[,,] pawn =
         {
             { //Svarta bönder

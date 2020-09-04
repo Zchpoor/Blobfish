@@ -91,7 +91,7 @@ namespace Blobfish_11
             //TODO: Flytta ut
             //TODO: Få bort "globala" variabler.
             currentPosition = pos;
-            if ((radioButton2.Checked && pos.whiteToMove) || (radioButton3.Checked && !pos.whiteToMove))
+            if (engineIsToMove())
             {
                 playEngineMove();
             }
@@ -110,19 +110,36 @@ namespace Blobfish_11
         }
         private void playEngineMove()
         {
-
             EvalResult result = blobFish.eval(currentPosition, minDepth);
-            double eval = result.evaluation;
             currentMoves = result.allMoves;
             string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
             textBox1.Text = movesString;
-            int res = blobFish.decisiveResult(currentPosition, currentMoves);
-            if (res != -2)
+            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
+            if (decisiveResult != -2)
             {
-                resultPopUp(res);
+                resultPopUp(decisiveResult);
             }
             else if (result.bestMove != null)
             {
+                printEval(result);
+                gameMoves.Add(result.bestMove);
+                display(result.bestMove.execute(currentPosition));
+            }
+            else
+            {
+                throw new Exception("Odefinierat bästa drag.");
+            }
+        }
+        private void printEval(EvalResult result)
+        {
+            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
+            if (decisiveResult != -2)
+            {
+                resultPopUp(decisiveResult);
+            }
+            else if (result.bestMove != null)
+            {
+                double eval = result.evaluation;
                 string textEval;
                 if (eval > 1000)
                 {
@@ -140,8 +157,6 @@ namespace Blobfish_11
                 }
                 evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
                     Environment.NewLine + "Datorns evaluering: " + textEval;
-                gameMoves.Add(result.bestMove);
-                display(result.bestMove.execute(currentPosition));
             }
             else
             {
@@ -193,6 +208,15 @@ namespace Blobfish_11
                     break;
                 case "vänd":
                     flipBoard();
+                    break;
+                case "eval":
+                    printEval(blobFish.eval(currentPosition, minDepth));
+                    break;
+                case "evaluate":
+                    printEval(blobFish.eval(currentPosition, minDepth));
+                    break;
+                case "bedöm":
+                    printEval(blobFish.eval(currentPosition, minDepth));
                     break;
                 default:
                     try
@@ -253,8 +277,8 @@ namespace Blobfish_11
         {
             if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
             {
-                gamePositions.RemoveAt(gamePositions.Count - 1);
-                display(currentPosition);
+                if (engineIsToMove())
+                    playEngineMove();
             }
         }
         private void fenBox_KeyDown(object sender, KeyEventArgs e)
@@ -394,6 +418,10 @@ namespace Blobfish_11
                     }
                 }
             }
+        }
+        private bool engineIsToMove()
+        {
+            return (radioButton2.Checked && currentPosition.whiteToMove) || (radioButton3.Checked && !currentPosition.whiteToMove);
         }
     }
 }
