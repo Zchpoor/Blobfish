@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Blobfish_11
 {
@@ -23,14 +24,16 @@ namespace Blobfish_11
         bool flipped = false;
         Square firstSquare = new Square(-1, -1);
         Engine blobFish = new Engine();
-        const int minDepth = 3;
+        const int minDepth = 4;
+        int numberOfDots = 1;
+
         public Form1()
         {
             InitializeComponent();
-
             int squareSize = 50;
             boardPanel.AutoSize = true;
             moveLabel.Text = "";
+            ponderingLabel.Text = "Datorn tänker.";
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -81,11 +84,6 @@ namespace Blobfish_11
                 }
             }
 
-            //TEST
-            //GC.Collect();
-            //GC.WaitForPendingFinalizers();
-            //TEST
-
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             //TODO: Flytta ut
@@ -93,13 +91,11 @@ namespace Blobfish_11
             currentPosition = pos;
             if (engineIsToMove())
             {
-                playEngineMove();
+                playBestEngineMove();
             }
             else
             {
                 currentMoves = blobFish.allValidMoves(pos);
-                string temp = getMovesString(currentMoves, currentPosition.board);
-                textBox1.Text = temp;
 
                 int res = blobFish.decisiveResult(pos, currentMoves);
                 if (res != -2)
@@ -108,62 +104,21 @@ namespace Blobfish_11
                 }
             }
         }
-        private void playEngineMove()
+        private void playBestEngineMove()
         {
-            EvalResult result = blobFish.eval(currentPosition, minDepth);
-            currentMoves = result.allMoves;
-            string movesString = getMovesString(currentMoves, result.allEvals, currentPosition.board);
-            textBox1.Text = movesString;
-            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
-            if (decisiveResult != -2)
+            setPonderingMode(true);
+            if (!ponderingWorker.IsBusy)
             {
-                resultPopUp(decisiveResult);
-            }
-            else if (result.bestMove != null)
-            {
-                printEval(result);
-                gameMoves.Add(result.bestMove);
-                display(result.bestMove.execute(currentPosition));
-            }
-            else
-            {
-                throw new Exception("Odefinierat bästa drag.");
+                ponderingWorker.RunWorkerAsync();
             }
         }
-        private void printEval(EvalResult result)
+        private void playMove(Move move)
         {
-            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
-            if (decisiveResult != -2)
-            {
-                resultPopUp(decisiveResult);
-            }
-            else if (result.bestMove != null)
-            {
-                double eval = result.evaluation;
-                string textEval;
-                if (eval > 1000)
-                {
-                    int plysToMate = (int)(2001 - eval);
-                    textEval = "M" + (plysToMate / 2).ToString();
-                }
-                else if (eval < -1000)
-                {
-                    int plysToMate = (int)(2001 + eval);
-                    textEval = "m-" + (plysToMate / 2).ToString();
-                }
-                else
-                {
-                    textEval = Math.Round(eval, 2).ToString();
-                }
-                evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
-                    Environment.NewLine + "Datorns evaluering: " + textEval;
-            }
-            else
-            {
-                throw new Exception("Odefinierat bästa drag.");
-            }
+            Position newPosition = move.execute(currentPosition);
+            this.gameMoves.Add(move);
+            this.display(newPosition);
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void fenButton_Click(object sender, EventArgs e)
         {
             string inputText = fenBox.Text;
             string lowerInput = inputText.ToLower();
@@ -237,6 +192,9 @@ namespace Blobfish_11
         }
         private void squareClick(object sender, MouseEventArgs e)
         {
+            //Om motorn räknar för närvarande, så bör ej andra drag tillåtas spelas.
+            if (ponderingWorker.IsBusy) {return;}
+
             int xVal = ((PictureBox)sender).Location.X; //a-h
             int yVal = ((PictureBox)sender).Location.Y; //1-8
             xVal = xVal / (boardPanel.Size.Width / 8);
@@ -256,17 +214,20 @@ namespace Blobfish_11
             {
                 moveLabel.Text = (char)(firstSquare.line + 'a') + (8 - firstSquare.rank).ToString() + "-" +
                     (char)(xVal + 'a') + (8 - yVal).ToString();
+                bool moveWasPlayed = false;
                 foreach (Move item in currentMoves)
                 {
                     if (firstSquare.rank == item.from.rank && firstSquare.line == item.from.line &&
                         newSquare.rank == item.to.rank && newSquare.line == item.to.line)
                     {
-                        Position newPosition = item.execute(currentPosition);
-                        this.currentPosition = newPosition;
-                        this.gameMoves.Add(item);
-                        this.display(newPosition);
+                        playMove(item);
+                        moveWasPlayed = true;
                         break;
                     }
+                }
+                if (!moveWasPlayed && !(firstSquare.line == newSquare.line && firstSquare.rank == newSquare.rank))
+                {
+                    evalBox.Text = "Felaktigt drag!";
                 }
                 firstSquare.rank = -1;
                 firstSquare.line = -1;
@@ -278,7 +239,7 @@ namespace Blobfish_11
             if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
             {
                 if (engineIsToMove())
-                    playEngineMove();
+                    playBestEngineMove();
             }
         }
         private void fenBox_KeyDown(object sender, KeyEventArgs e)
@@ -286,7 +247,7 @@ namespace Blobfish_11
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                button1_Click(null, null);
+                fenButton_Click(null, null);
             }
         }
         public string getMovesString(List<Move> moves, char[,] board)
@@ -350,6 +311,39 @@ namespace Blobfish_11
                 }
             }
             return scoresheet;
+        }
+        private void printEval(EvalResult result)
+        {
+            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
+            if (decisiveResult != -2)
+            {
+                resultPopUp(decisiveResult);
+            }
+            else if (result.bestMove != null)
+            {
+                double eval = result.evaluation;
+                string textEval;
+                if (eval > 1000)
+                {
+                    int plysToMate = (int)(2001 - eval);
+                    textEval = "M" + (plysToMate / 2).ToString();
+                }
+                else if (eval < -1000)
+                {
+                    int plysToMate = (int)(2001 + eval);
+                    textEval = "m-" + (plysToMate / 2).ToString();
+                }
+                else
+                {
+                    textEval = Math.Round(eval, 2).ToString();
+                }
+                evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
+                    Environment.NewLine + "Datorns evaluering: " + textEval;
+            }
+            else
+            {
+                throw new Exception("Odefinierat bästa drag.");
+            }
         }
         private void resultPopUp(int result)
         { 
@@ -423,6 +417,110 @@ namespace Blobfish_11
         {
             return (radioButton2.Checked && currentPosition.whiteToMove) || (radioButton3.Checked && !currentPosition.whiteToMove);
         }
+
+        private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //TODO: Kolla så ställningen inte förändrats.
+            //TODO: Bli av med denna worker?
+            //Flytta motorn hit?
+            EvalResult resultPlace = new EvalResult();
+            resultPlace.bestMove = null;
+            Thread thread = new Thread(delegate ()
+            {
+                engineStart(minDepth, currentPosition.deepCopy(), resultPlace);
+            });
+            thread.Name = "engineThread";
+            thread.Start();
+            while (thread.IsAlive)
+            {
+                if (ponderingWorker.CancellationPending)
+                {
+                    blobFish.cancelFlag.setValue(1);
+                    e.Cancel = true;
+                    break;
+                }
+                Thread.Sleep(50);
+            }
+            e.Result = resultPlace;
+        }
+        private void ponderingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if(e.Error != null)
+            {
+                MessageBox.Show(e.Error.Message);
+            }
+            else if (e.Cancelled)
+            {
+                blobFish.cancelFlag.setValue(0);
+                //Vidtag lämplig åtgärd
+            }
+            else
+            {
+                try
+                {
+                    EvalResult res = (EvalResult)e.Result;
+                    if (res.bestMove == null)
+                    {
+                        blobFish.cancelFlag.setValue(0);
+                        //takeback(1);
+                        setPonderingMode(false);
+                        //throw new Exception("Inget bästa drag!");
+                    }
+                    else
+                    {
+                        printEval(res);
+                        playMove(res.bestMove);
+                        setPonderingMode(false);
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                    evalBox.Text = "Ett fel inträffade.";
+                    takeback(1);
+                    setPonderingMode(false);
+
+                    //Samlar upp skräp då UI väntar på att användaren skall dra.
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+            }
+        }
+        private void engineStart(int minDepth, Position pos, EvalResult resultPlace)
+        {
+            //TODO: Hitta något bättre sätt att göra detta på.
+            EvalResult res = blobFish.eval(pos, minDepth);
+            resultPlace.bestMove = res.bestMove;
+            resultPlace.allMoves = res.allMoves;
+            resultPlace.allEvals = res.allEvals;
+            resultPlace.evaluation = res.evaluation;
+            return;
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            numberOfDots = (numberOfDots % 3) + 1;
+            ponderingLabel.Text = "Datorn tänker" + string.Join("", Enumerable.Repeat(".", numberOfDots));
+        }
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            ponderingWorker.CancelAsync();
+            takeback(1);
+            evalBox.Text = "Beräkningen avbröts.";
+            setPonderingMode(false);
+        }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ponderingWorker.CancelAsync();
+        }
+        private void setPonderingMode(bool setTo)
+        {
+            ponderingPanel.Visible = setTo;
+            groupBox1.Enabled = !setTo;
+            if (setTo)
+                timer1.Start();
+            else
+                timer1.Stop();
+        }
     }
 }
 
@@ -436,9 +534,9 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Mattbart material
  *  Gör det möjligt att dra pjäserna
- *  Håll fönstret vid liv när drag beräknas.
  *  Gör fönstret skalbart.
  *  Går inte att återta drag om partier angetts via FEN?
+ *  Koordinater
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -461,7 +559,4 @@ namespace Blobfish_11
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  Gör mer materialistisk.
  *  
- *  Kolla upp:
- *  Sb5: r3kb1r/ppp1pppp/3q1n2/3P1b2/8/P1N1BN2/1P2BPPP/Q4RK1 w kq - 1 12
- *  Sg4: r1b1k2r/2qpbpp1/p1n1pn2/1pp4p/4P3/1BNPBN2/PPP2PPP/2RQ1R1K b kq - 1 10
  */

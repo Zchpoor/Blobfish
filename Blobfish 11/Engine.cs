@@ -10,6 +10,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
+        public SecureDouble cancelFlag = new SecureDouble(0);
         public EvalResult eval(Position pos, int minDepth)
         {
             List<Move> moves = allValidMoves(pos);
@@ -53,7 +54,7 @@ namespace Blobfish_11
                 globalAlpha.setValue(double.NegativeInfinity);
                 SecureDouble globalBeta = new SecureDouble();
                 globalBeta.setValue(double.PositiveInfinity);
-
+                List<Thread> threadList = new List<Thread>();
                 foreach (Move currentMove in moves)
                 {
                     SecureDouble newDouble = new SecureDouble();
@@ -64,6 +65,7 @@ namespace Blobfish_11
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
+                    threadList.Add(thread);
                 }
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
@@ -75,6 +77,14 @@ namespace Blobfish_11
 #pragma warning restore CS1718 // Comparison made to same variable
                     {
                         //Om resultatet inte hunnit beräknas.
+                        if(cancelFlag.getValue() != 0)
+                        {
+                            abortAll(threadList);
+                            result.bestMove = null;
+                            result.evaluation = double.NaN;
+                            result.allEvals = null;
+                            return result;
+                        }
                         Thread.Sleep(sleepTime);
                         i--;
                     }
@@ -396,6 +406,14 @@ namespace Blobfish_11
             else if (value < -1000)
                 return value + 1;
             else return value;
+        }
+        private void abortAll(List<Thread> threadList)
+        {
+            foreach (Thread item in threadList)
+            {
+                if (item.IsAlive)
+                    item.Abort();
+            }
         }
     }
 }

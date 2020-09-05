@@ -17,7 +17,7 @@ namespace Blobfish_11
         //tunga pjäser uppgår till mindre än endgameLimit.
         readonly int endgameLimit = 6;
         readonly int sleepTime = 100;
-        readonly int[] moveIncreaseLimits = {20}; // Talen bör vara i minskande ordning.
+        readonly int[] moveIncreaseLimits = {8}; // Talen bör vara i minskande ordning.
 
         public Engine() {}
         public Engine(double[] pieceValues, double kingValue, double bishopPairValue, int endgameLimit, int sleepTime, int[] moveIncreaseLimits)

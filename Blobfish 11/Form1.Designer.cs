@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.fenBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.fenButton = new System.Windows.Forms.Button();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
             this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
@@ -40,7 +40,13 @@
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
+            this.ponderingLabel = new System.Windows.Forms.Label();
+            this.ponderingPanel = new System.Windows.Forms.Panel();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
+            this.ponderingPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
@@ -61,27 +67,15 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Ange FEN:";
             // 
-            // button1
+            // fenButton
             // 
-            this.button1.Location = new System.Drawing.Point(710, 5);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 24);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "OK";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.AcceptsReturn = true;
-            this.textBox1.AcceptsTab = true;
-            this.textBox1.Location = new System.Drawing.Point(794, 0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(258, 560);
-            this.textBox1.TabIndex = 4;
+            this.fenButton.Location = new System.Drawing.Point(710, 5);
+            this.fenButton.Name = "fenButton";
+            this.fenButton.Size = new System.Drawing.Size(75, 24);
+            this.fenButton.TabIndex = 2;
+            this.fenButton.Text = "OK";
+            this.fenButton.UseVisualStyleBackColor = true;
+            this.fenButton.Click += new System.EventHandler(this.fenButton_Click);
             // 
             // boardPanel
             // 
@@ -123,7 +117,7 @@
             // 
             this.evalBox.AcceptsReturn = true;
             this.evalBox.AcceptsTab = true;
-            this.evalBox.Location = new System.Drawing.Point(1058, 0);
+            this.evalBox.Location = new System.Drawing.Point(797, 5);
             this.evalBox.Multiline = true;
             this.evalBox.Name = "evalBox";
             this.evalBox.ReadOnly = true;
@@ -187,26 +181,71 @@
             this.radioButton1.UseVisualStyleBackColor = true;
             this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
             // 
+            // ponderingWorker
+            // 
+            this.ponderingWorker.WorkerSupportsCancellation = true;
+            this.ponderingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ponderingWorker_DoWork);
+            this.ponderingWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ponderingWorker_RunWorkerCompleted);
+            // 
+            // ponderingLabel
+            // 
+            this.ponderingLabel.AutoSize = true;
+            this.ponderingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ponderingLabel.Location = new System.Drawing.Point(3, 9);
+            this.ponderingLabel.Name = "ponderingLabel";
+            this.ponderingLabel.Size = new System.Drawing.Size(120, 25);
+            this.ponderingLabel.TabIndex = 10;
+            this.ponderingLabel.Text = "(default text)";
+            // 
+            // ponderingPanel
+            // 
+            this.ponderingPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.ponderingPanel.Controls.Add(this.cancelButton);
+            this.ponderingPanel.Controls.Add(this.ponderingLabel);
+            this.ponderingPanel.Location = new System.Drawing.Point(553, 198);
+            this.ponderingPanel.Name = "ponderingPanel";
+            this.ponderingPanel.Size = new System.Drawing.Size(200, 100);
+            this.ponderingPanel.TabIndex = 11;
+            this.ponderingPanel.Visible = false;
+            // 
+            // cancelButton
+            // 
+            this.cancelButton.Location = new System.Drawing.Point(6, 54);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(95, 39);
+            this.cancelButton.TabIndex = 11;
+            this.cancelButton.Text = "Avbryt";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 500;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1314, 560);
+            this.ClientSize = new System.Drawing.Size(1060, 560);
+            this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.toMoveLabel);
             this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.fenButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Blobfish 11";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.ponderingPanel.ResumeLayout(false);
+            this.ponderingPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -216,8 +255,7 @@
 
         private System.Windows.Forms.TextBox fenBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button fenButton;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
@@ -226,6 +264,11 @@
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.ComponentModel.BackgroundWorker ponderingWorker;
+        private System.Windows.Forms.Label ponderingLabel;
+        private System.Windows.Forms.Panel ponderingPanel;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

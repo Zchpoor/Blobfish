@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public struct EvalResult
+    public class EvalResult
     {
         public double evaluation;
         public List<Move> allMoves;
@@ -61,6 +61,11 @@ namespace Blobfish_11
         public SecureDouble()
         {
             this.val = double.NaN;
+            this.mutex = new Mutex();
+        }
+        public SecureDouble(double val)
+        {
+            this.val = val;
             this.mutex = new Mutex();
         }
         public override double getValue()
