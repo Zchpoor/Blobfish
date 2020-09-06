@@ -12,12 +12,19 @@ namespace Blobfish_11
         readonly double[] pieceValues = { 3, 3, 5, 9 };
         readonly double kingValue = 4f;
         readonly double bishopPairValue = 0.4f;
+        readonly double[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
-        //tunga pjäser uppgår till mindre än endgameLimit.
-        readonly int endgameLimit = 6;
+        //tunga pjäser uppgår till mindre än eller lika med endgameLimit.
+        readonly int endgameLimit = 8;
+        readonly double kingSafteyDivisor = 200;
         readonly int sleepTime = 100;
-        readonly int[] moveIncreaseLimits = {8}; // Talen bör vara i minskande ordning.
+
+        //För vart och ett av talen som är större än antalet drag i ställningen så
+        //ökas djupet med ett.
+        //Talen bör vara i minskande ordning.
+        //Till exempel: {20, 8, 2}
+        readonly int[] moveIncreaseLimits = {8}; 
 
         public Engine() {}
         public Engine(double[] pieceValues, double kingValue, double bishopPairValue, int endgameLimit, int sleepTime, int[] moveIncreaseLimits)
@@ -125,6 +132,13 @@ namespace Blobfish_11
                 {0.93f,   0.98f,    1f,       1.03f,    1.03f,    1f,       0.98f,    0.93f, },
                 {0.91f,   0.93f,    0.95f,    0.96f,    0.96f,    0.95f,    0.93f,    0.91f, }
             }
+        };
+
+        private static readonly double[,] defence =
+        {
+            {0.25f,  0.8f, 1f,   0.8f, 0.25f,},
+            {0.2f,   1.4f, 1.8f, 1.4f, 0.2f, },
+            {0.1f,   1f,   0f,   1f,   0.1f, }
         };
     }
 }

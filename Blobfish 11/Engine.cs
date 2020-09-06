@@ -200,7 +200,7 @@ namespace Blobfish_11
                 return value;
             }
         }
-        private double numericEval(Position pos)
+        public double numericEval(Position pos)
         {
             /* 
              * [rank, line]
@@ -294,8 +294,8 @@ namespace Blobfish_11
                 }
             }
 
-            double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
-                - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
+            double kingSafteyDifference = kingSaftey(pos, true, heavyMaterial[0])
+                - kingSaftey(pos, false, heavyMaterial[1]);
 
             if (bishopColors[0] && bishopColors[1])
             {
@@ -316,16 +316,59 @@ namespace Blobfish_11
             double pawnValue = evalPawns(numberOfPawns, pawnPosFactor, pawns);
             return pieceValue + pawnValue + kingSafteyDifference;
         }
-        private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
+        private double kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
-            //TODO: Förbättra
+            double defenceAccumulator = 0;
+            sbyte direction = forWhite ? (sbyte) -1 : (sbyte) 1;
+            Square kingSquare = forWhite ? pos.kingPositions[1] : pos.kingPositions[0];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = -2; j < 3; j++)
+                {
+                    Square currentSquare = new Square(kingSquare.rank + (direction * i), kingSquare.line + j);
+                    if (!validSquare(currentSquare)){
+                        continue;
+                    }
+                    char currentPiece = pos.board[currentSquare.rank, currentSquare.line];
+                    double defValue = defenceValueOf(currentPiece);
+                    if(defValue == 0)
+                    {
+                        continue;
+                    }
+                    double defCoeff = defence[2-i, j + 2];
+                    double finDefValue = defValue * defCoeff;
+
+                    //Tag bort denna
+                    double DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
+
+                    defenceAccumulator += finDefValue;
+                }
+            }
+            double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+
+            double kingCoefficient;
             if (oppHeavyMaterial > endgameLimit)
             {
-                return kingValue * king[0, kingSquare.rank, kingSquare.line];
+                kingCoefficient =   king[0, kingSquare.rank, kingSquare.line];
             }
             else
             {
-                return kingValue * king[1, kingSquare.rank, kingSquare.line];
+                kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
+            }
+            kingCoefficient = (Math.Pow(kingCoefficient, 3)); //Fixa detta konstant.
+            return kingCoefficient * safteyValue;
+        }
+        private double defenceValueOf(char piece)
+        {
+            switch (piece.ToString().ToUpper())
+            {
+                case "": return 0; //Kolla om denna fungerar.
+                case "P": return defenceValues[0];
+                case "N": return defenceValues[1];
+                case "B": return defenceValues[2];
+                case "R": return defenceValues[3];
+                case "Q": return defenceValues[4];
+                default: return 0;
             }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, sbyte[,] pawns)
@@ -409,6 +452,7 @@ namespace Blobfish_11
         }
         private void abortAll(List<Thread> threadList)
         {
+            //TODO: Avbryter inte alltid som tänkt?
             foreach (Thread item in threadList)
             {
                 if (item.IsAlive)

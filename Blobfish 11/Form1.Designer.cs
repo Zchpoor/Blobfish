@@ -43,6 +43,7 @@
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
             this.ponderingPanel = new System.Windows.Forms.Panel();
+            this.ponderingTimeLabel = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
@@ -55,7 +56,6 @@
             this.fenBox.Name = "fenBox";
             this.fenBox.Size = new System.Drawing.Size(609, 22);
             this.fenBox.TabIndex = 0;
-            this.fenBox.Text = "r1bqkb1r/pppp1ppp/5n2/4n3/4P3/2N5/PPPP1PPP/R1BQKB1R w KQkq - 0 1";
             this.fenBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.fenBox_KeyDown);
             // 
             // label1
@@ -122,8 +122,9 @@
             this.evalBox.Name = "evalBox";
             this.evalBox.ReadOnly = true;
             this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(258, 560);
+            this.evalBox.Size = new System.Drawing.Size(258, 543);
             this.evalBox.TabIndex = 7;
+            this.evalBox.TabStop = false;
             // 
             // toMoveLabel
             // 
@@ -200,17 +201,28 @@
             // ponderingPanel
             // 
             this.ponderingPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
             this.ponderingPanel.Location = new System.Drawing.Point(553, 198);
             this.ponderingPanel.Name = "ponderingPanel";
-            this.ponderingPanel.Size = new System.Drawing.Size(200, 100);
+            this.ponderingPanel.Size = new System.Drawing.Size(200, 110);
             this.ponderingPanel.TabIndex = 11;
             this.ponderingPanel.Visible = false;
             // 
+            // ponderingTimeLabel
+            // 
+            this.ponderingTimeLabel.AutoSize = true;
+            this.ponderingTimeLabel.Location = new System.Drawing.Point(8, 43);
+            this.ponderingTimeLabel.Name = "ponderingTimeLabel";
+            this.ponderingTimeLabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.ponderingTimeLabel.Size = new System.Drawing.Size(44, 17);
+            this.ponderingTimeLabel.TabIndex = 12;
+            this.ponderingTimeLabel.Text = "00:00";
+            // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(6, 54);
+            this.cancelButton.Location = new System.Drawing.Point(8, 63);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(95, 39);
             this.cancelButton.TabIndex = 11;
@@ -269,6 +281,7 @@
         private System.Windows.Forms.Panel ponderingPanel;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label ponderingTimeLabel;
     }
 }
 
