@@ -49,6 +49,8 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.settingsPanel = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.depthRB4 = new System.Windows.Forms.RadioButton();
+            this.depthRB5 = new System.Windows.Forms.RadioButton();
             this.depthRB3 = new System.Windows.Forms.RadioButton();
             this.depthRB2 = new System.Windows.Forms.RadioButton();
             this.depthRB1 = new System.Windows.Forms.RadioButton();
@@ -58,8 +60,7 @@
             this.playStyleRB2 = new System.Windows.Forms.RadioButton();
             this.playStyleRB1 = new System.Windows.Forms.RadioButton();
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
-            this.depthRB5 = new System.Windows.Forms.RadioButton();
-            this.depthRB4 = new System.Windows.Forms.RadioButton();
+            this.label2 = new System.Windows.Forms.Label();
             this.compColorBox1.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
@@ -270,9 +271,9 @@
             this.settingsPanel.Controls.Add(this.groupBox1);
             this.settingsPanel.Controls.Add(this.playStyleBox);
             this.settingsPanel.Controls.Add(this.compColorBox1);
-            this.settingsPanel.Location = new System.Drawing.Point(553, 181);
+            this.settingsPanel.Location = new System.Drawing.Point(553, 211);
             this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(285, 367);
+            this.settingsPanel.Size = new System.Drawing.Size(285, 337);
             this.settingsPanel.TabIndex = 12;
             // 
             // groupBox1
@@ -289,6 +290,27 @@
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Djup";
+            // 
+            // depthRB4
+            // 
+            this.depthRB4.AutoSize = true;
+            this.depthRB4.Location = new System.Drawing.Point(6, 129);
+            this.depthRB4.Name = "depthRB4";
+            this.depthRB4.Size = new System.Drawing.Size(160, 21);
+            this.depthRB4.TabIndex = 8;
+            this.depthRB4.Text = "5   (Mycket långsam)";
+            this.depthRB4.UseVisualStyleBackColor = true;
+            // 
+            // depthRB5
+            // 
+            this.depthRB5.AutoSize = true;
+            this.depthRB5.Location = new System.Drawing.Point(6, 156);
+            this.depthRB5.Name = "depthRB5";
+            this.depthRB5.Size = new System.Drawing.Size(155, 21);
+            this.depthRB5.TabIndex = 7;
+            this.depthRB5.Text = "6   (Endast slutspel)";
+            this.depthRB5.UseVisualStyleBackColor = true;
+            this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
             // depthRB3
             // 
@@ -392,32 +414,21 @@
             this.playStyleRB0.Text = "Normal";
             this.playStyleRB0.UseVisualStyleBackColor = true;
             // 
-            // depthRB5
+            // label2
             // 
-            this.depthRB5.AutoSize = true;
-            this.depthRB5.Location = new System.Drawing.Point(6, 156);
-            this.depthRB5.Name = "depthRB5";
-            this.depthRB5.Size = new System.Drawing.Size(155, 21);
-            this.depthRB5.TabIndex = 7;
-            this.depthRB5.Text = "6   (Endast slutspel)";
-            this.depthRB5.UseVisualStyleBackColor = true;
-            this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            // 
-            // depthRB4
-            // 
-            this.depthRB4.AutoSize = true;
-            this.depthRB4.Location = new System.Drawing.Point(6, 129);
-            this.depthRB4.Name = "depthRB4";
-            this.depthRB4.Size = new System.Drawing.Size(160, 21);
-            this.depthRB4.TabIndex = 8;
-            this.depthRB4.Text = "5   (Mycket långsam)";
-            this.depthRB4.UseVisualStyleBackColor = true;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(550, 191);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 17);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Inställningar:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1110, 560);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.settingsPanel);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
@@ -479,6 +490,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton depthRB5;
         private System.Windows.Forms.RadioButton depthRB4;
+        private System.Windows.Forms.Label label2;
     }
 }
 

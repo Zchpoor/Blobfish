@@ -487,12 +487,12 @@ namespace Blobfish_11
                     }
                     else
                     {
+                        setPonderingMode(false);
                         printEval(res);
                         if (engineIsToMove())
                         {
                             playMove(res.bestMove);
                         }
-                        setPonderingMode(false);
                     }
                 }
                 catch (Exception exc)
@@ -647,5 +647,8 @@ namespace Blobfish_11
  *  Gör kraftiga hot forcerande.
  *  Öka behov av terräng
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  
+ *  Buggar:
+ *   Verkar ibland vara icke-deterministisk när den spelar bägge färger?
  *  
  */
