@@ -354,6 +354,7 @@ namespace Blobfish_11
             else
             {
                 kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
+                return kingCoefficient * kingValue;
             }
             kingCoefficient = (Math.Pow(kingCoefficient, 4)); //Fixa detta konstant.
             return kingCoefficient * safteyValue;

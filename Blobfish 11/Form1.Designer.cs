@@ -58,6 +58,8 @@
             this.playStyleRB2 = new System.Windows.Forms.RadioButton();
             this.playStyleRB1 = new System.Windows.Forms.RadioButton();
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
+            this.depthRB5 = new System.Windows.Forms.RadioButton();
+            this.depthRB4 = new System.Windows.Forms.RadioButton();
             this.compColorBox1.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
@@ -275,13 +277,15 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.depthRB4);
+            this.groupBox1.Controls.Add(this.depthRB5);
             this.groupBox1.Controls.Add(this.depthRB3);
             this.groupBox1.Controls.Add(this.depthRB2);
             this.groupBox1.Controls.Add(this.depthRB1);
             this.groupBox1.Controls.Add(this.depthRB0);
-            this.groupBox1.Location = new System.Drawing.Point(150, 3);
+            this.groupBox1.Location = new System.Drawing.Point(9, 141);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(130, 132);
+            this.groupBox1.Size = new System.Drawing.Size(271, 188);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Djup";
@@ -291,9 +295,9 @@
             this.depthRB3.AutoSize = true;
             this.depthRB3.Location = new System.Drawing.Point(6, 102);
             this.depthRB3.Name = "depthRB3";
-            this.depthRB3.Size = new System.Drawing.Size(45, 21);
+            this.depthRB3.Size = new System.Drawing.Size(117, 21);
             this.depthRB3.TabIndex = 6;
-            this.depthRB3.Text = "4+";
+            this.depthRB3.Text = "4+ (Långsam)";
             this.depthRB3.UseVisualStyleBackColor = true;
             this.depthRB3.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -303,10 +307,10 @@
             this.depthRB2.Checked = true;
             this.depthRB2.Location = new System.Drawing.Point(6, 75);
             this.depthRB2.Name = "depthRB2";
-            this.depthRB2.Size = new System.Drawing.Size(37, 21);
+            this.depthRB2.Size = new System.Drawing.Size(166, 21);
             this.depthRB2.TabIndex = 5;
             this.depthRB2.TabStop = true;
-            this.depthRB2.Text = "4";
+            this.depthRB2.Text = "4   (Rekommenderas)";
             this.depthRB2.UseVisualStyleBackColor = true;
             this.depthRB2.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -315,9 +319,9 @@
             this.depthRB1.AutoSize = true;
             this.depthRB1.Location = new System.Drawing.Point(6, 48);
             this.depthRB1.Name = "depthRB1";
-            this.depthRB1.Size = new System.Drawing.Size(45, 21);
+            this.depthRB1.Size = new System.Drawing.Size(100, 21);
             this.depthRB1.TabIndex = 4;
-            this.depthRB1.Text = "3+";
+            this.depthRB1.Text = "3+ (Snabb)";
             this.depthRB1.UseVisualStyleBackColor = true;
             this.depthRB1.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -326,9 +330,9 @@
             this.depthRB0.AutoSize = true;
             this.depthRB0.Location = new System.Drawing.Point(6, 21);
             this.depthRB0.Name = "depthRB0";
-            this.depthRB0.Size = new System.Drawing.Size(37, 21);
+            this.depthRB0.Size = new System.Drawing.Size(146, 21);
             this.depthRB0.TabIndex = 3;
-            this.depthRB0.Text = "3";
+            this.depthRB0.Text = "3   (Mycket snabb)";
             this.depthRB0.UseVisualStyleBackColor = true;
             this.depthRB0.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -338,9 +342,9 @@
             this.playStyleBox.Controls.Add(this.playStyleRB2);
             this.playStyleBox.Controls.Add(this.playStyleRB1);
             this.playStyleBox.Controls.Add(this.playStyleRB0);
-            this.playStyleBox.Location = new System.Drawing.Point(3, 141);
+            this.playStyleBox.Location = new System.Drawing.Point(145, 3);
             this.playStyleBox.Name = "playStyleBox";
-            this.playStyleBox.Size = new System.Drawing.Size(277, 115);
+            this.playStyleBox.Size = new System.Drawing.Size(135, 132);
             this.playStyleBox.TabIndex = 10;
             this.playStyleBox.TabStop = false;
             this.playStyleBox.Text = "Spelstil";
@@ -349,7 +353,7 @@
             // 
             this.playStyleRB3.AutoSize = true;
             this.playStyleRB3.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.playStyleRB3.Location = new System.Drawing.Point(150, 21);
+            this.playStyleRB3.Location = new System.Drawing.Point(6, 102);
             this.playStyleRB3.Name = "playStyleRB3";
             this.playStyleRB3.Size = new System.Drawing.Size(93, 21);
             this.playStyleRB3.TabIndex = 6;
@@ -387,6 +391,27 @@
             this.playStyleRB0.TabStop = true;
             this.playStyleRB0.Text = "Normal";
             this.playStyleRB0.UseVisualStyleBackColor = true;
+            // 
+            // depthRB5
+            // 
+            this.depthRB5.AutoSize = true;
+            this.depthRB5.Location = new System.Drawing.Point(6, 156);
+            this.depthRB5.Name = "depthRB5";
+            this.depthRB5.Size = new System.Drawing.Size(155, 21);
+            this.depthRB5.TabIndex = 7;
+            this.depthRB5.Text = "6   (Endast slutspel)";
+            this.depthRB5.UseVisualStyleBackColor = true;
+            this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            // 
+            // depthRB4
+            // 
+            this.depthRB4.AutoSize = true;
+            this.depthRB4.Location = new System.Drawing.Point(6, 129);
+            this.depthRB4.Name = "depthRB4";
+            this.depthRB4.Size = new System.Drawing.Size(160, 21);
+            this.depthRB4.TabIndex = 8;
+            this.depthRB4.Text = "5   (Mycket långsam)";
+            this.depthRB4.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -452,6 +477,8 @@
         private System.Windows.Forms.RadioButton depthRB1;
         private System.Windows.Forms.RadioButton depthRB0;
         private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.RadioButton depthRB5;
+        private System.Windows.Forms.RadioButton depthRB4;
     }
 }
 

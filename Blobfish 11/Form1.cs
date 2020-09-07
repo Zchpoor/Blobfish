@@ -504,8 +504,11 @@ namespace Blobfish_11
 
                 }
                 //Samlar upp skräp då UI väntar på att användaren skall dra.
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                if (!engineIsToMove())
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
             }
         }
         private void engineStart(int minDepth, Position pos, EvalResult resultPlace)
@@ -597,6 +600,10 @@ namespace Blobfish_11
                     minDepth = 4;
                 else if (depthRB3.Checked)
                     minDepth = 4;
+                else if (depthRB4.Checked)
+                    minDepth = 5;
+                else if (depthRB5.Checked)
+                    minDepth = 6;
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
