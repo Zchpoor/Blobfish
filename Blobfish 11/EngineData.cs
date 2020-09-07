@@ -24,11 +24,15 @@ namespace Blobfish_11
         //ökas djupet med ett.
         //Talen bör vara i minskande ordning.
         //Till exempel: {20, 8, 2}
-        readonly int[] moveIncreaseLimits = {8}; 
+        readonly int[] moveIncreaseLimits = {}; 
 
         public Engine() {}
+        public Engine(int[] moveIncreaseLimits)
+        {
+            this.moveIncreaseLimits = moveIncreaseLimits;
+        }
         public Engine(double[] pieceValues, double bishopPairValue, double[] defenceValues,
-            int endgameLimit, double kingSafteyDivisor)
+            int endgameLimit, double kingSafteyDivisor, int[] moveIncreaseLimits)
         {
             if (pieceValues.Length != 4)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
@@ -42,6 +46,7 @@ namespace Blobfish_11
             this.kingSafteyDivisor = kingSafteyDivisor;
             //this.sleepTime = sleepTime;
             //this.moveIncreaseLimits = moveIncreaseLimits;
+            this.moveIncreaseLimits = moveIncreaseLimits;
         }
         
         private static readonly double[,,] pawn =

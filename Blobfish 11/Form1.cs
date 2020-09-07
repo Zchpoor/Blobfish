@@ -25,7 +25,7 @@ namespace Blobfish_11
         bool flipped = false;
         Square firstSquare = new Square(-1, -1);
         Engine blobFish = new Engine();
-        const int minDepth = 4;
+        int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
 
@@ -108,11 +108,11 @@ namespace Blobfish_11
         }
         private void playBestEngineMove()
         {
+            setPonderingMode(true);
             if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
                 evalBox.Text = "";
-                setPonderingMode(true);
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 ponderingWorker.RunWorkerAsync();
@@ -433,7 +433,8 @@ namespace Blobfish_11
         }
         private bool engineIsToMove()
         {
-            return (radioButton2.Checked && currentPosition.whiteToMove) || (radioButton3.Checked && !currentPosition.whiteToMove);
+            return (radioButton4.Checked || radioButton2.Checked && currentPosition.whiteToMove) ||
+                (radioButton3.Checked && !currentPosition.whiteToMove);
         }
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -546,26 +547,32 @@ namespace Blobfish_11
             else
                 timer1.Stop();
         }
-
-        private void playStyleRB_CheckedChanged(object sender, EventArgs e)
-        {
-        }
         private Engine choosePlayingStyle()
         {
             //Byt namn på funktionen?
+            int[] MIL = { };
+            if (depthRB1.Checked || depthRB3.Checked)
+            {
+                MIL = new int[] {8};
+            }
+
             try
             {
-                if (playStyleRB0.Checked)
+                if (playStyleRB0.Checked) //Normal
                 {
-                    return new Engine();
+                    return new Engine(MIL);
                 }
-                else if (playStyleRB1.Checked)
+                else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 8, 150);
+                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 150, MIL);
                 }
-                else if (playStyleRB2.Checked)
+                else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 250);
+                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 250, MIL);
+                }
+                else if (playStyleRB3.Checked) //Positionell
+                {
+                    return new Engine(new double[] { 3, 3.1f, 5, 8.9f }, 0.6f, new double[] { 1, 1.8f, 1.6f, 0.2f, 0.1f }, 8, 200, MIL);
                 }
                 else
                 {
@@ -576,6 +583,22 @@ namespace Blobfish_11
             {
                 MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
                 return new Engine();
+            }
+        }
+        private void depthRB_CheckedChanged(object sender, EventArgs e)
+        {
+            if((sender as RadioButton).Checked)
+            {
+                if (depthRB0.Checked)
+                    minDepth = 3;
+                else if (depthRB1.Checked)
+                    minDepth = 3;
+                else if (depthRB2.Checked)
+                    minDepth = 4;
+                else if (depthRB3.Checked)
+                    minDepth = 4;
+                else
+                    throw new Exception("Fel på djupinställningen!");
             }
         }
     }
@@ -611,6 +634,7 @@ namespace Blobfish_11
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
+ *  Bli av med Le3/Le6
  *  Dragupprepningar
  *  Kungssäkerhet
  *  Gör kraftiga hot forcerande.

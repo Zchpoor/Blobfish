@@ -452,7 +452,6 @@ namespace Blobfish_11
         }
         private void abortAll(List<Thread> threadList)
         {
-            //TODO: Avbryter inte alltid som tänkt?
             foreach (Thread item in threadList)
             {
                 if (item.IsAlive)

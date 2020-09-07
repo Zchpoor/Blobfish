@@ -36,7 +36,8 @@
             this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.compColorBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -47,14 +48,21 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.settingsPanel = new System.Windows.Forms.Panel();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.depthRB3 = new System.Windows.Forms.RadioButton();
+            this.depthRB2 = new System.Windows.Forms.RadioButton();
+            this.depthRB1 = new System.Windows.Forms.RadioButton();
+            this.depthRB0 = new System.Windows.Forms.RadioButton();
+            this.playStyleBox = new System.Windows.Forms.GroupBox();
+            this.playStyleRB3 = new System.Windows.Forms.RadioButton();
             this.playStyleRB2 = new System.Windows.Forms.RadioButton();
             this.playStyleRB1 = new System.Windows.Forms.RadioButton();
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
-            this.groupBox1.SuspendLayout();
+            this.compColorBox1.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.playStyleBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
@@ -124,12 +132,12 @@
             // 
             this.evalBox.AcceptsReturn = true;
             this.evalBox.AcceptsTab = true;
-            this.evalBox.Location = new System.Drawing.Point(797, 5);
+            this.evalBox.Location = new System.Drawing.Point(844, 6);
             this.evalBox.Multiline = true;
             this.evalBox.Name = "evalBox";
             this.evalBox.ReadOnly = true;
             this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(258, 543);
+            this.evalBox.Size = new System.Drawing.Size(254, 543);
             this.evalBox.TabIndex = 7;
             this.evalBox.TabStop = false;
             // 
@@ -142,17 +150,29 @@
             this.toMoveLabel.TabIndex = 8;
             this.toMoveLabel.Text = "(default text)";
             // 
-            // groupBox1
+            // compColorBox1
             // 
-            this.groupBox1.Controls.Add(this.radioButton3);
-            this.groupBox1.Controls.Add(this.radioButton2);
-            this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Location = new System.Drawing.Point(10, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(130, 115);
-            this.groupBox1.TabIndex = 9;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Dator";
+            this.compColorBox1.Controls.Add(this.radioButton4);
+            this.compColorBox1.Controls.Add(this.radioButton3);
+            this.compColorBox1.Controls.Add(this.radioButton2);
+            this.compColorBox1.Controls.Add(this.radioButton1);
+            this.compColorBox1.Location = new System.Drawing.Point(9, 3);
+            this.compColorBox1.Name = "compColorBox1";
+            this.compColorBox1.Size = new System.Drawing.Size(130, 132);
+            this.compColorBox1.TabIndex = 9;
+            this.compColorBox1.TabStop = false;
+            this.compColorBox1.Text = "Färg";
+            // 
+            // radioButton4
+            // 
+            this.radioButton4.AutoSize = true;
+            this.radioButton4.Location = new System.Drawing.Point(6, 102);
+            this.radioButton4.Name = "radioButton4";
+            this.radioButton4.Size = new System.Drawing.Size(70, 21);
+            this.radioButton4.TabIndex = 6;
+            this.radioButton4.Text = "Bägge";
+            this.radioButton4.UseVisualStyleBackColor = true;
+            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
             // 
             // radioButton3
             // 
@@ -245,24 +265,96 @@
             // settingsPanel
             // 
             this.settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.settingsPanel.Controls.Add(this.groupBox2);
             this.settingsPanel.Controls.Add(this.groupBox1);
+            this.settingsPanel.Controls.Add(this.playStyleBox);
+            this.settingsPanel.Controls.Add(this.compColorBox1);
             this.settingsPanel.Location = new System.Drawing.Point(553, 181);
             this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(238, 367);
+            this.settingsPanel.Size = new System.Drawing.Size(285, 367);
             this.settingsPanel.TabIndex = 12;
             // 
-            // groupBox2
+            // groupBox1
             // 
-            this.groupBox2.Controls.Add(this.playStyleRB2);
-            this.groupBox2.Controls.Add(this.playStyleRB1);
-            this.groupBox2.Controls.Add(this.playStyleRB0);
-            this.groupBox2.Location = new System.Drawing.Point(10, 124);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(130, 115);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Spelstil";
+            this.groupBox1.Controls.Add(this.depthRB3);
+            this.groupBox1.Controls.Add(this.depthRB2);
+            this.groupBox1.Controls.Add(this.depthRB1);
+            this.groupBox1.Controls.Add(this.depthRB0);
+            this.groupBox1.Location = new System.Drawing.Point(150, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(130, 132);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Djup";
+            // 
+            // depthRB3
+            // 
+            this.depthRB3.AutoSize = true;
+            this.depthRB3.Location = new System.Drawing.Point(6, 102);
+            this.depthRB3.Name = "depthRB3";
+            this.depthRB3.Size = new System.Drawing.Size(45, 21);
+            this.depthRB3.TabIndex = 6;
+            this.depthRB3.Text = "4+";
+            this.depthRB3.UseVisualStyleBackColor = true;
+            this.depthRB3.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            // 
+            // depthRB2
+            // 
+            this.depthRB2.AutoSize = true;
+            this.depthRB2.Checked = true;
+            this.depthRB2.Location = new System.Drawing.Point(6, 75);
+            this.depthRB2.Name = "depthRB2";
+            this.depthRB2.Size = new System.Drawing.Size(37, 21);
+            this.depthRB2.TabIndex = 5;
+            this.depthRB2.TabStop = true;
+            this.depthRB2.Text = "4";
+            this.depthRB2.UseVisualStyleBackColor = true;
+            this.depthRB2.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            // 
+            // depthRB1
+            // 
+            this.depthRB1.AutoSize = true;
+            this.depthRB1.Location = new System.Drawing.Point(6, 48);
+            this.depthRB1.Name = "depthRB1";
+            this.depthRB1.Size = new System.Drawing.Size(45, 21);
+            this.depthRB1.TabIndex = 4;
+            this.depthRB1.Text = "3+";
+            this.depthRB1.UseVisualStyleBackColor = true;
+            this.depthRB1.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            // 
+            // depthRB0
+            // 
+            this.depthRB0.AutoSize = true;
+            this.depthRB0.Location = new System.Drawing.Point(6, 21);
+            this.depthRB0.Name = "depthRB0";
+            this.depthRB0.Size = new System.Drawing.Size(37, 21);
+            this.depthRB0.TabIndex = 3;
+            this.depthRB0.Text = "3";
+            this.depthRB0.UseVisualStyleBackColor = true;
+            this.depthRB0.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            // 
+            // playStyleBox
+            // 
+            this.playStyleBox.Controls.Add(this.playStyleRB3);
+            this.playStyleBox.Controls.Add(this.playStyleRB2);
+            this.playStyleBox.Controls.Add(this.playStyleRB1);
+            this.playStyleBox.Controls.Add(this.playStyleRB0);
+            this.playStyleBox.Location = new System.Drawing.Point(3, 141);
+            this.playStyleBox.Name = "playStyleBox";
+            this.playStyleBox.Size = new System.Drawing.Size(277, 115);
+            this.playStyleBox.TabIndex = 10;
+            this.playStyleBox.TabStop = false;
+            this.playStyleBox.Text = "Spelstil";
+            // 
+            // playStyleRB3
+            // 
+            this.playStyleRB3.AutoSize = true;
+            this.playStyleRB3.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.playStyleRB3.Location = new System.Drawing.Point(150, 21);
+            this.playStyleRB3.Name = "playStyleRB3";
+            this.playStyleRB3.Size = new System.Drawing.Size(93, 21);
+            this.playStyleRB3.TabIndex = 6;
+            this.playStyleRB3.Text = "Positionell";
+            this.playStyleRB3.UseVisualStyleBackColor = true;
             // 
             // playStyleRB2
             // 
@@ -273,7 +365,6 @@
             this.playStyleRB2.TabIndex = 5;
             this.playStyleRB2.Text = "Materialistisk";
             this.playStyleRB2.UseVisualStyleBackColor = true;
-            this.playStyleRB2.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
             // 
             // playStyleRB1
             // 
@@ -284,7 +375,6 @@
             this.playStyleRB1.TabIndex = 4;
             this.playStyleRB1.Text = "Försiktig";
             this.playStyleRB1.UseVisualStyleBackColor = true;
-            this.playStyleRB1.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
             // 
             // playStyleRB0
             // 
@@ -297,13 +387,12 @@
             this.playStyleRB0.TabStop = true;
             this.playStyleRB0.Text = "Normal";
             this.playStyleRB0.UseVisualStyleBackColor = true;
-            this.playStyleRB0.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1060, 560);
+            this.ClientSize = new System.Drawing.Size(1110, 560);
             this.Controls.Add(this.settingsPanel);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
@@ -318,13 +407,15 @@
             this.Text = "Blobfish 11";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.compColorBox1.ResumeLayout(false);
+            this.compColorBox1.PerformLayout();
             this.ponderingPanel.ResumeLayout(false);
             this.ponderingPanel.PerformLayout();
             this.settingsPanel.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.playStyleBox.ResumeLayout(false);
+            this.playStyleBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -339,7 +430,7 @@
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
         private System.Windows.Forms.Label toMoveLabel;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox compColorBox1;
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
@@ -350,10 +441,17 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label ponderingTimeLabel;
         private System.Windows.Forms.Panel settingsPanel;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox playStyleBox;
         private System.Windows.Forms.RadioButton playStyleRB2;
         private System.Windows.Forms.RadioButton playStyleRB1;
         private System.Windows.Forms.RadioButton playStyleRB0;
+        private System.Windows.Forms.RadioButton playStyleRB3;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton depthRB3;
+        private System.Windows.Forms.RadioButton depthRB2;
+        private System.Windows.Forms.RadioButton depthRB1;
+        private System.Windows.Forms.RadioButton depthRB0;
+        private System.Windows.Forms.RadioButton radioButton4;
     }
 }
 
