@@ -355,7 +355,7 @@ namespace Blobfish_11
             {
                 kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
             }
-            kingCoefficient = (Math.Pow(kingCoefficient, 3)); //Fixa detta konstant.
+            kingCoefficient = (Math.Pow(kingCoefficient, 4)); //Fixa detta konstant.
             return kingCoefficient * safteyValue;
         }
         private double defenceValueOf(char piece)

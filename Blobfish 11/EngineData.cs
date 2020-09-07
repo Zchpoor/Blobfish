@@ -27,16 +27,21 @@ namespace Blobfish_11
         readonly int[] moveIncreaseLimits = {8}; 
 
         public Engine() {}
-        public Engine(double[] pieceValues, double kingValue, double bishopPairValue, int endgameLimit, int sleepTime, int[] moveIncreaseLimits)
+        public Engine(double[] pieceValues, double bishopPairValue, double[] defenceValues,
+            int endgameLimit, double kingSafteyDivisor)
         {
             if (pieceValues.Length != 4)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
             this.pieceValues = pieceValues;
-            this.kingValue = kingValue;
+            //this.kingValue = kingValue;
             this.bishopPairValue = bishopPairValue;
+            if (defenceValues.Length != 5)
+                throw new Exception("Fel längd på försvarsvärdesvektorn!");
+            this.defenceValues = defenceValues;
             this.endgameLimit = endgameLimit;
-            this.sleepTime = sleepTime;
-            this.moveIncreaseLimits = moveIncreaseLimits;
+            this.kingSafteyDivisor = kingSafteyDivisor;
+            //this.sleepTime = sleepTime;
+            //this.moveIncreaseLimits = moveIncreaseLimits;
         }
         
         private static readonly double[,,] pawn =

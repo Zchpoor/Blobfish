@@ -46,8 +46,15 @@
             this.ponderingTimeLabel = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.settingsPanel = new System.Windows.Forms.Panel();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.playStyleRB2 = new System.Windows.Forms.RadioButton();
+            this.playStyleRB1 = new System.Windows.Forms.RadioButton();
+            this.playStyleRB0 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
+            this.settingsPanel.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
@@ -140,7 +147,7 @@
             this.groupBox1.Controls.Add(this.radioButton3);
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Location = new System.Drawing.Point(643, 409);
+            this.groupBox1.Location = new System.Drawing.Point(10, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(130, 115);
             this.groupBox1.TabIndex = 9;
@@ -204,7 +211,7 @@
             this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
-            this.ponderingPanel.Location = new System.Drawing.Point(553, 198);
+            this.ponderingPanel.Location = new System.Drawing.Point(553, 65);
             this.ponderingPanel.Name = "ponderingPanel";
             this.ponderingPanel.Size = new System.Drawing.Size(200, 110);
             this.ponderingPanel.TabIndex = 11;
@@ -235,13 +242,70 @@
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // settingsPanel
+            // 
+            this.settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.settingsPanel.Controls.Add(this.groupBox2);
+            this.settingsPanel.Controls.Add(this.groupBox1);
+            this.settingsPanel.Location = new System.Drawing.Point(553, 181);
+            this.settingsPanel.Name = "settingsPanel";
+            this.settingsPanel.Size = new System.Drawing.Size(238, 367);
+            this.settingsPanel.TabIndex = 12;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.playStyleRB2);
+            this.groupBox2.Controls.Add(this.playStyleRB1);
+            this.groupBox2.Controls.Add(this.playStyleRB0);
+            this.groupBox2.Location = new System.Drawing.Point(10, 124);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(130, 115);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Spelstil";
+            // 
+            // playStyleRB2
+            // 
+            this.playStyleRB2.AutoSize = true;
+            this.playStyleRB2.Location = new System.Drawing.Point(6, 75);
+            this.playStyleRB2.Name = "playStyleRB2";
+            this.playStyleRB2.Size = new System.Drawing.Size(110, 21);
+            this.playStyleRB2.TabIndex = 5;
+            this.playStyleRB2.Text = "Materialistisk";
+            this.playStyleRB2.UseVisualStyleBackColor = true;
+            this.playStyleRB2.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
+            // 
+            // playStyleRB1
+            // 
+            this.playStyleRB1.AutoSize = true;
+            this.playStyleRB1.Location = new System.Drawing.Point(6, 48);
+            this.playStyleRB1.Name = "playStyleRB1";
+            this.playStyleRB1.Size = new System.Drawing.Size(82, 21);
+            this.playStyleRB1.TabIndex = 4;
+            this.playStyleRB1.Text = "Försiktig";
+            this.playStyleRB1.UseVisualStyleBackColor = true;
+            this.playStyleRB1.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
+            // 
+            // playStyleRB0
+            // 
+            this.playStyleRB0.AutoSize = true;
+            this.playStyleRB0.Checked = true;
+            this.playStyleRB0.Location = new System.Drawing.Point(6, 21);
+            this.playStyleRB0.Name = "playStyleRB0";
+            this.playStyleRB0.Size = new System.Drawing.Size(74, 21);
+            this.playStyleRB0.TabIndex = 3;
+            this.playStyleRB0.TabStop = true;
+            this.playStyleRB0.Text = "Normal";
+            this.playStyleRB0.UseVisualStyleBackColor = true;
+            this.playStyleRB0.CheckedChanged += new System.EventHandler(this.playStyleRB_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1060, 560);
+            this.Controls.Add(this.settingsPanel);
             this.Controls.Add(this.ponderingPanel);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.toMoveLabel);
             this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
@@ -258,6 +322,9 @@
             this.groupBox1.PerformLayout();
             this.ponderingPanel.ResumeLayout(false);
             this.ponderingPanel.PerformLayout();
+            this.settingsPanel.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -282,6 +349,11 @@
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label ponderingTimeLabel;
+        private System.Windows.Forms.Panel settingsPanel;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton playStyleRB2;
+        private System.Windows.Forms.RadioButton playStyleRB1;
+        private System.Windows.Forms.RadioButton playStyleRB0;
     }
 }
 

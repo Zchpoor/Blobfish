@@ -110,6 +110,7 @@ namespace Blobfish_11
         {
             if (!ponderingWorker.IsBusy)
             {
+                blobFish = choosePlayingStyle();
                 evalBox.Text = "";
                 setPonderingMode(true);
                 ponderingTime = new TimeSpan(0);
@@ -170,16 +171,16 @@ namespace Blobfish_11
                     flipBoard();
                     break;
                 case "eval":
-                    printEval(blobFish.eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
                     break;
                 case "evaluate":
-                    printEval(blobFish.eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
                     break;
                 case "bedöm":
-                    printEval(blobFish.eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
                     break;
                 case "num":
-                    double res = blobFish.numericEval(currentPosition);
+                    double res = choosePlayingStyle().numericEval(currentPosition);
                     evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + res.ToString();
                     break;
                 default:
@@ -417,12 +418,12 @@ namespace Blobfish_11
                             reset();
                         }
                     }
-                    if (e.KeyCode == Keys.U && e.Modifiers == Keys.Shift)
+                    if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Shift)
                     {
                         e.SuppressKeyPress = true;
                         takeback(1);
                     }
-                    if (e.KeyCode == Keys.U)
+                    if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
                         takeback(2);
@@ -537,13 +538,45 @@ namespace Blobfish_11
         private void setPonderingMode(bool setTo)
         {
             ponderingPanel.Visible = setTo;
-            groupBox1.Enabled = !setTo;
+            settingsPanel.Enabled = !setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
             if (setTo)
                 timer1.Start();
             else
                 timer1.Stop();
+        }
+
+        private void playStyleRB_CheckedChanged(object sender, EventArgs e)
+        {
+        }
+        private Engine choosePlayingStyle()
+        {
+            //Byt namn på funktionen?
+            try
+            {
+                if (playStyleRB0.Checked)
+                {
+                    return new Engine();
+                }
+                else if (playStyleRB1.Checked)
+                {
+                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 8, 150);
+                }
+                else if (playStyleRB2.Checked)
+                {
+                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 250);
+                }
+                else
+                {
+                    return new Engine();
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
+                return new Engine();
+            }
         }
     }
 }
@@ -566,7 +599,6 @@ namespace Blobfish_11
  *  Gör torn assymmetriska?
  *  Fixa ny matris för kung.
  *  Föredra springare före löpare.
- *  Mindre behov av kungen i hörnet.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
