@@ -149,7 +149,9 @@ namespace Blobfish_11
                 double value = double.NegativeInfinity;
                 foreach (Move currentMove in moves)
                 {
+                    //Endast i debug-syfte
                     moveName = currentMove.toString(pos.board);
+
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
@@ -177,7 +179,9 @@ namespace Blobfish_11
                 double value = double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
+                    //Endast i debug-syfte
                     moveName = currentMove.toString(pos.board);
+
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
@@ -356,7 +360,6 @@ namespace Blobfish_11
                 kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
                 return kingCoefficient * kingValue;
             }
-            kingCoefficient = (Math.Pow(kingCoefficient, 4)); //Fixa detta konstant.
             return kingCoefficient * safteyValue;
         }
         private double defenceValueOf(char piece)

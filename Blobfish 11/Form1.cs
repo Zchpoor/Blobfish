@@ -628,7 +628,6 @@ namespace Blobfish_11
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Fixa ny matris för kung.
- *  Föredra springare före löpare.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
@@ -650,5 +649,6 @@ namespace Blobfish_11
  *  
  *  Buggar:
  *   Verkar ibland vara icke-deterministisk när den spelar bägge färger?
+ *   Avbryter ibland samtidigt som lås släpps.
  *  
  */
