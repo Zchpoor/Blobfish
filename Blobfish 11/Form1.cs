@@ -330,7 +330,9 @@ namespace Blobfish_11
             }
             else if (result.bestMove != null)
             {
-                double eval = result.evaluation;
+                col ans = result.evaluation;
+                string name = ans.name;
+                double eval = ans.eval;
                 string textEval;
                 if (eval > 1000)
                 {
@@ -347,7 +349,7 @@ namespace Blobfish_11
                     textEval = Math.Round(eval, 2).ToString();
                 }
                 evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
-                    Environment.NewLine + "Datorns evaluering: " + textEval;
+                    Environment.NewLine + name + Environment.NewLine + "Datorns evaluering: " + textEval;
             }
             else
             {

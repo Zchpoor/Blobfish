@@ -19,20 +19,20 @@ namespace Blobfish_11
             int gameResult = decisiveResult(pos, moves);
             if (gameResult != -2)
             {
-                result.evaluation = (double)gameResult;
+                result.evaluation.eval = (double)gameResult;
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
             }
             else
             {
-                List<SecureDouble> allEvals = new List<SecureDouble>();
-                double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+                List<col> allEvals = new List<col>();
+                col bestValue = pos.whiteToMove ? new col(double.NegativeInfinity) : new col(double.PositiveInfinity);
 
                 if (moves.Count == 1)
                 {
                     EvalResult res = eval(moves[0].execute(pos), minDepth);
-                    result.evaluation = evaluationStep(res.evaluation);
+                    result.evaluation.eval = evaluationStep(res.evaluation.eval);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
                     return result;
@@ -57,7 +57,7 @@ namespace Blobfish_11
                 List<Thread> threadList = new List<Thread>();
                 foreach (Move currentMove in moves)
                 {
-                    SecureDouble newDouble = new SecureDouble();
+                    col newDouble = new col(double.NaN);
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
@@ -70,10 +70,9 @@ namespace Blobfish_11
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
-                    SecureDouble threadResult = allEvals[i];
-                    double value = threadResult.getValue();
+                    col threadResult = allEvals[i];
 #pragma warning disable CS1718 // Comparison made to same variable
-                    if (value != value) //Kollar om talet är odefinierat.
+                    if (threadResult.eval != threadResult.eval) //Kollar om talet är odefinierat.
 #pragma warning restore CS1718 // Comparison made to same variable
                     {
                         //Om resultatet inte hunnit beräknas.
@@ -81,7 +80,7 @@ namespace Blobfish_11
                         {
                             abortAll(threadList);
                             result.bestMove = null;
-                            result.evaluation = double.NaN;
+                            result.evaluation.eval = double.NaN;
                             result.allEvals = null;
                             return result;
                         }
@@ -92,15 +91,21 @@ namespace Blobfish_11
                     { //Om resultatet är klart.
                         if (pos.whiteToMove)
                         {
-                            bestValue = Math.Max(bestValue, value);
+                            if(bestValue.eval < threadResult.eval)
+                            {
+                                bestValue = threadResult;
+                            }
                         }
                         else
                         {
-                            bestValue = Math.Min(bestValue, value);
+                            if (bestValue.eval > threadResult.eval)
+                            {
+                                bestValue = threadResult;
+                            }
                         }
 
                         //TODO: Gör finare
-                        if (bestValue == value)
+                        if (bestValue.eval == threadResult.eval)
                         {
                             result.bestMove = moves[i];
                         }
@@ -111,34 +116,35 @@ namespace Blobfish_11
             }
 
             result.allMoves = moves;
+            //result.evaluation.name = result.bestMove.toString(pos.board) + " " + result.evaluation.name;
             return result;
         }
-        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace, SecureDouble globalAlpha, SecureDouble globalBeta)
+        public void threadStart(Position pos, sbyte depth, col ansPlace, SecureDouble globalAlpha, SecureDouble globalBeta)
         {
-            double value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
-            ansPlace.setValue(value);
+            col value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
+            ansPlace.eval = (value.eval);
+            ansPlace.name = value.name;
             if (!pos.whiteToMove)
             {
-                globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value));
+                globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value.eval));
             }
             else
             {
-                globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
+                globalBeta.setValue(Math.Min(globalBeta.getValue(), value.eval));
             }
         }
-        private double alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
+        private col alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
         {
-            string moveName = ""; //Endast i debug-syfte
             if (depth <= 0 && !forceBranching)
-                return numericEval(pos);
+                return new col(numericEval(pos));
 
             if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
-                return numericEval(pos);
+                return new col(numericEval(pos));
             }
             List<Move> moves = allValidMoves(pos);
             if (moves.Count == 0)
-                return decisiveResult(pos, moves);
+                return new col(decisiveResult(pos, moves));
 
             OrdinaryDouble alpha = new OrdinaryDouble(alphaContainer.getValue());
             OrdinaryDouble beta = new OrdinaryDouble(betaContainer.getValue());
@@ -146,61 +152,75 @@ namespace Blobfish_11
 
             if (pos.whiteToMove)
             {
-                double value = double.NegativeInfinity;
+                col value = new col(double.NegativeInfinity);
                 foreach (Move currentMove in moves)
                 {
-                    //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
-
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                        col ret = alphaBeta(newPos, (sbyte)(depth - 1), alpha, beta, true);
+                        if(ret.eval >= value.eval)
+                        {
+                            value = ret;
+                            value.name = currentMove.toString(pos.board) + " " + value.name;
+                        }
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                        col ret = alphaBeta(newPos, (sbyte)(depth - 1), alpha, beta, false);
+                        if (ret.eval >= value.eval)
+                        {
+                            value = ret;
+                            value.name = currentMove.toString(pos.board) + " " + value.name;
+                        }
                     }
-                    alpha.setValue(Math.Max(alpha.getValue(), value));
+                    alpha.setValue(Math.Max(alpha.getValue(), value.eval));
                     if (alpha.getValue() >= beta.getValue())
                     {
                         if (alphaContainer is SecureDouble)
-                            return double.PositiveInfinity;
+                            return new col(double.PositiveInfinity);
                         else
                             break; //Pruning
 
                     }
                 }
-                value = evaluationStep(value);
+                value.eval = evaluationStep(value.eval);
                 return value;
             }
             else
             {
-                double value = double.PositiveInfinity;
+                col value = new col(double.PositiveInfinity);
                 foreach (Move currentMove in moves)
                 {
-                    //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
-
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                        col ret = alphaBeta(newPos, (sbyte)(depth - 1), alpha, beta, true);
+                        if (ret.eval < value.eval)
+                        {
+                            value = ret;
+                            value.name = currentMove.toString(pos.board) + " " + value.name;
+                        }
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                        col ret = alphaBeta(newPos, (sbyte)(depth - 1), alpha, beta, false);
+                        if (ret.eval < value.eval)
+                        {
+                            value = ret;
+                            value.name = currentMove.toString(pos.board) + " " + value.name;
+                        }
                     }
-                    beta.setValue(Math.Min(beta.getValue(), value));
+                    beta.setValue(Math.Min(beta.getValue(), value.eval));
                     if (beta.getValue() <= alpha.getValue())
                     {
                         if (betaContainer is SecureDouble)
-                            return double.NegativeInfinity;
+                            return new col(double.NegativeInfinity);
                         else
                             break; //Pruning
                     }
                 }
-                value = evaluationStep(value);
+                value.eval = evaluationStep(value.eval);
                 return value;
             }
         }
@@ -342,13 +362,10 @@ namespace Blobfish_11
                     double defCoeff = defence[2-i, j + 2];
                     double finDefValue = defValue * defCoeff;
 
-                    //Tag bort denna
-                    double DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
-
                     defenceAccumulator += finDefValue;
                 }
             }
-            double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+            double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
 
             double kingCoefficient;
             if (oppHeavyMaterial > endgameLimit)

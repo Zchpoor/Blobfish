@@ -10,9 +10,9 @@ namespace Blobfish_11
 {
     public class EvalResult
     {
-        public double evaluation;
+        public col evaluation;
         public List<Move> allMoves;
-        public List<SecureDouble> allEvals;
+        public List<col> allEvals;
         public Move bestMove;
     }
     public struct Square
@@ -93,6 +93,16 @@ namespace Blobfish_11
             {
                 mutex.ReleaseMutex();
             }
+        }
+    }
+    public class col
+    {
+        public string name;
+        public double eval;
+        public col(double eval)
+        {
+            this.eval = eval;
+            this.name = "";
         }
     }
 }
