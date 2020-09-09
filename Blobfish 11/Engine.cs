@@ -149,6 +149,9 @@ namespace Blobfish_11
                 double value = double.NegativeInfinity;
                 foreach (Move currentMove in moves)
                 {
+                    if (betaContainer is SecureDouble && betaContainer.getValue() < beta.getValue())
+                        beta.setValue(betaContainer.getValue());
+
                     //Endast i debug-syfte
                     moveName = currentMove.toString(pos.board);
 
@@ -179,6 +182,8 @@ namespace Blobfish_11
                 double value = double.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
+                    if (alphaContainer is SecureDouble && alphaContainer.getValue() > alpha.getValue())
+                        alpha.setValue(alphaContainer.getValue());
                     //Endast i debug-syfte
                     moveName = currentMove.toString(pos.board);
 

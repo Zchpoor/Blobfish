@@ -163,6 +163,7 @@ namespace Blobfish_11
                     break;
                 case "fen":
                     fenBox.Text = currentPosition.getFEN();
+                    fenBox.SelectAll();
                     break;
                 case "flip":
                     flipBoard();
@@ -531,7 +532,8 @@ namespace Blobfish_11
         private void cancelButton_Click(object sender, EventArgs e)
         {
             ponderingWorker.CancelAsync();
-            takeback(1);
+            if(!radioButton4.Checked)
+                takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             setPonderingMode(false);
         }
@@ -541,7 +543,7 @@ namespace Blobfish_11
         }
         private void setPonderingMode(bool setTo)
         {
-            ponderingPanel.Visible = setTo;
+            ponderingPanel.Visible = true;
             settingsPanel.Enabled = !setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
@@ -567,7 +569,7 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 150, MIL);
+                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 175, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
@@ -634,7 +636,6 @@ namespace Blobfish_11
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
  *  Gör om system för att betckna forcerad matt.
- *  Jämför med global alfa/beta oftare.
  *  Beräkna nästa lager av drag tidigare.
  *  
  * Förbättringar:
