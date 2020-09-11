@@ -147,9 +147,10 @@
             // toMoveLabel
             // 
             this.toMoveLabel.AutoSize = true;
+            this.toMoveLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.toMoveLabel.Location = new System.Drawing.Point(550, 31);
             this.toMoveLabel.Name = "toMoveLabel";
-            this.toMoveLabel.Size = new System.Drawing.Size(87, 17);
+            this.toMoveLabel.Size = new System.Drawing.Size(103, 20);
             this.toMoveLabel.TabIndex = 8;
             this.toMoveLabel.Text = "(default text)";
             // 

@@ -94,7 +94,7 @@ namespace Blobfish_11
 
             currentPosition = pos;
 
-            currentMoves = blobFish.allValidMoves(pos);
+            currentMoves = blobFish.allValidMoves(pos, false);
 
             int res = blobFish.decisiveResult(pos, currentMoves);
             if (res != -2)
@@ -133,6 +133,18 @@ namespace Blobfish_11
             {
                 case "test":
                     evalBox.Text = Tests.runTests();
+                    break;
+                case "moves":
+                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    break;
+                case "drag":
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    break;
+                case "sorted":
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                    break;
+                case "sorterade":
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
                     break;
                 case "takeback":
                     takeback(2);
@@ -183,6 +195,27 @@ namespace Blobfish_11
                 case "num":
                     double res = choosePlayingStyle().numericEval(currentPosition);
                     evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + res.ToString();
+                    break;
+                case "time":
+                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
+                    break;
+                case "tid":
+                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
+                    break;
+                case "spec":
+                    //Endast för att se vilke tid som går åt för numericEval respektive allValidMoves.
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        blobFish.numericEval(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"));
+                    }
+                    for (int i = 0; i < 10000; i++) //Verkar vara ca 10-20ggr långsammare
+                    {
+                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), false);
+                    }
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), true);
+                    }
                     break;
                 default:
                     try
@@ -266,19 +299,6 @@ namespace Blobfish_11
             foreach (Move item in moves)
             {
                 text += item.toString(board) + Environment.NewLine;
-            }
-            return text;
-        }
-        public string getMovesString(List<Move> moves, List<SecureDouble> evals, char[,] board)
-        {
-            if (moves == null || evals == null) return "";
-            if (moves.Count != evals.Count)
-                throw new Exception("Olika antal evalueringar och drag!");
-
-            string text = "";
-            for (int i = 0; i < moves.Count; i++)
-            {
-                text += moves[i].toString(board) + "    " + Math.Round(evals[i].getValue(), 2).ToString() + Environment.NewLine;
             }
             return text;
         }
@@ -543,7 +563,7 @@ namespace Blobfish_11
         }
         private void setPonderingMode(bool setTo)
         {
-            ponderingPanel.Visible = true;
+            ponderingPanel.Visible = setTo;
             settingsPanel.Enabled = !setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
@@ -569,15 +589,15 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 175, MIL);
+                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 250, MIL);
+                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
                 }
                 else if (playStyleRB3.Checked) //Positionell
                 {
-                    return new Engine(new double[] { 3, 3.1f, 5, 8.9f }, 0.6f, new double[] { 1, 1.8f, 1.6f, 0.2f, 0.1f }, 8, 200, MIL);
+                    return new Engine(new double[] { 3, 3.1f, 5, 8.9f }, 0.6f, new double[] { 1, 1.8f, 1.6f, 0.2f, 0.1f }, 8, 1, MIL);
                 }
                 else
                 {
@@ -626,10 +646,10 @@ namespace Blobfish_11
  *  Gör fönstret skalbart.
  *  Koordinater
  *  Double -> Float (Volatile)
+ *  Gå framåt/bakåt i partiet.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
- *  Fixa ny matris för kung.
  * 
  * Effektiviseringar:
  *  Sortera efter uppskattad kvalitet på draget.
@@ -643,7 +663,6 @@ namespace Blobfish_11
  *  Ta öppna linjer med torn.
  *  Bli av med Le3/Le6
  *  Dragupprepningar
- *  Kungssäkerhet
  *  Gör kraftiga hot forcerande.
  *  Öka behov av terräng
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
@@ -651,5 +670,4 @@ namespace Blobfish_11
  *  Buggar:
  *   Verkar ibland vara icke-deterministisk när den spelar bägge färger?
  *   Avbryter ibland samtidigt som lås släpps.
- *  
  */

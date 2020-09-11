@@ -13,7 +13,7 @@ namespace Blobfish_11
         public SecureDouble cancelFlag = new SecureDouble(0);
         public EvalResult eval(Position pos, int minDepth)
         {
-            List<Move> moves = allValidMoves(pos);
+            List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
             int gameResult = decisiveResult(pos, moves);
@@ -83,6 +83,7 @@ namespace Blobfish_11
                             result.bestMove = null;
                             result.evaluation = double.NaN;
                             result.allEvals = null;
+                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
                             return result;
                         }
                         Thread.Sleep(sleepTime);
@@ -136,7 +137,7 @@ namespace Blobfish_11
             {
                 return numericEval(pos);
             }
-            List<Move> moves = allValidMoves(pos);
+            List<Move> moves = allValidMoves(pos, true);
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
 

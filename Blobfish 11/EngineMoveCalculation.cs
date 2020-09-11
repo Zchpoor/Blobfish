@@ -12,7 +12,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
-        public List<Move> allValidMoves(Position pos)
+        public List<Move> allValidMoves(Position pos, bool sorted)
         {
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
@@ -43,6 +43,7 @@ namespace Blobfish_11
                 }
 
             }
+            if(sorted) return sortByEstQuality(allMoves, pos);
             return allMoves;
         }
         private List<Move> pieceCalculation(Position pos, Square pieceSquare)
@@ -306,19 +307,6 @@ namespace Blobfish_11
             }
         }
 
-        private bool accessableFor(bool forWhite, char piece)
-        {
-            if (forWhite)
-            {
-                if (piece == '\0' || piece > 'Z') return true;
-                else return false;
-            }
-            else
-            {
-                if (piece < 'Z') return true;
-                else return false;
-            }
-        }
         private bool validSquare(Square square)
         {
             return (square.rank < 8) && (square.rank >= 0) && (square.line < 8) && (square.line >= 0);
@@ -368,7 +356,86 @@ namespace Blobfish_11
                 }
             }
             return false;
+        }
+        private List<Move> sortByEstQuality(List<Move> moves, Position pos)
+        {
+            //Högre placering i arrayen indikerar högre prioritet.
+            const int priorities = 7;
+            List<Move>[] listArray = new List<Move>[priorities];
+            for (int i = 0; i < 7; i++)
+            {
+                listArray[i] = new List<Move>();
+            }
 
+            void addWithPriority(Move move, int priority)
+            {
+                listArray[priority].Add(move);
+            }
+            foreach (Move currentMove in moves)
+            {
+                char toChar = pos.board[currentMove.to.rank, currentMove.to.line];
+                if(toChar != '\0') //Slag
+                {
+                    char fromChar = pos.board[currentMove.from.rank, currentMove.from.line];
+                    int valueDiff = valueOf(toChar) - valueOf(fromChar);
+                    if (valueDiff <= 0)
+                        addWithPriority(currentMove, 0);
+                    else if (valueDiff <= 2)
+                        addWithPriority(currentMove, 2);
+                    else if (valueDiff <= 4)
+                        addWithPriority(currentMove, 3);
+                    else if (valueDiff <= 6)
+                        addWithPriority(currentMove, 4);
+                    else
+                        addWithPriority(currentMove, 5);
+                    continue;
+                }
+                else //Ej slag
+                {
+                    if(currentMove is Castle)
+                    {
+                        addWithPriority(currentMove, 1);
+                    }
+                    else if(currentMove is Promotion && (currentMove as Promotion).promoteTo == 'Q')
+                    {
+                        addWithPriority(currentMove, 4);
+                    }
+                    else
+                    {
+                        //TODO: Ytterligare uppdelning här.
+                        addWithPriority(currentMove, 0);
+                    }
+                }
+            }
+            List<Move> sortedList = new List<Move>();
+            for (int i = priorities-1; i >= 0; i--)
+            {
+                sortedList.AddRange(listArray[i]);
+            }
+            if (sortedList.Count != moves.Count)
+                throw new Exception("Fel i dragsorteringsfunktionen.");
+            return sortedList;
+        }
+        private int valueOf(char tkn)
+        {
+            switch (tkn.ToString().ToUpper())
+            {
+                case "Q": return 9;
+                case "R": return 5;
+                case "B": return 3;
+                case "N": return 3;
+                case "P": return 1;
+                default: return 0;
+            }
         }
     }
 }
+/* Kategorisering:
+ *   6. Avgörande drag (0 drag i nästa)
+ *   5. +8
+ *   4. +6, promotering till dam
+ *   3. +4
+ *   2. +2
+ *   1. Rockad, (bonde till 7:de raden?), (flytta centrumbonde?), (promotering till springare?)
+ *   0. Övrigt
+ */

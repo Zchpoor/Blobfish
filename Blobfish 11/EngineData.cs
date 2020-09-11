@@ -32,7 +32,7 @@ namespace Blobfish_11
             this.moveIncreaseLimits = moveIncreaseLimits;
         }
         public Engine(double[] pieceValues, double bishopPairValue, double[] defenceValues,
-            int endgameLimit, double kingSafteyDivisor, int[] moveIncreaseLimits)
+            int endgameLimit, double kingSafteyCoefficient, int[] moveIncreaseLimits)
         {
             if (pieceValues.Length != 4)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
@@ -43,7 +43,7 @@ namespace Blobfish_11
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
             this.defenceValues = defenceValues;
             this.endgameLimit = endgameLimit;
-            this.kingSafteyDivisor = kingSafteyDivisor;
+            this.kingSafteyDivisor = 200* kingSafteyCoefficient;
             //this.sleepTime = sleepTime;
             //this.moveIncreaseLimits = moveIncreaseLimits;
             this.moveIncreaseLimits = moveIncreaseLimits;

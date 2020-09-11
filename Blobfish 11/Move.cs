@@ -203,7 +203,7 @@ namespace Blobfish_11
     }
     public class Promotion : Move
     {
-        char promoteTo;
+        public char promoteTo;
         public Promotion(Square fromSquare, Square toSquare, char promoteTo) :
             base(fromSquare, toSquare)
         {
