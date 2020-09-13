@@ -23,11 +23,13 @@ namespace Blobfish_11
         readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
-        Square firstSquare = new Square(-1, -1);
         Engine blobFish = new Engine();
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
+        private Square dragFromSquare = new Square(-1, -1);
+        private Image toOldImage = null;
+        private Image fromImage = null;
 
         public Form1()
         {
@@ -52,7 +54,13 @@ namespace Blobfish_11
                     picBox.Margin = new Padding(0);
                     picBox.Padding = new Padding(0);
                     picBox.Image = Image.FromFile("null.png");
-                    picBox.MouseClick += new MouseEventHandler(squareClick);
+
+                    picBox.AllowDrop = true;
+                    picBox.MouseDown += new MouseEventHandler(squareMouseDown);
+                    picBox.DragEnter += new DragEventHandler(squareDragEnter);
+                    picBox.DragDrop += new DragEventHandler(squareDragDrop);
+                    picBox.DragLeave += new EventHandler(squareDragLeave);
+                    picBox.GiveFeedback += new GiveFeedbackEventHandler(squareGiveFeedBack);
                     if ((i + j) % 2 == 0)
                         picBox.BackColor = Color.WhiteSmoke;
                     else
@@ -233,13 +241,10 @@ namespace Blobfish_11
                     break;
             }
         }
-        private void squareClick(object sender, MouseEventArgs e)
+        private Square picBoxSquare(PictureBox picBox)
         {
-            //Om motorn räknar för närvarande, så bör ej andra drag tillåtas spelas.
-            if (ponderingWorker.IsBusy) {return;}
-
-            int xVal = ((PictureBox)sender).Location.X; //a-h
-            int yVal = ((PictureBox)sender).Location.Y; //1-8
+            int xVal = picBox.Location.X; //a-h
+            int yVal = picBox.Location.Y; //1-8
             xVal = xVal / (boardPanel.Size.Width / 8);
             yVal = yVal / (boardPanel.Size.Height / 8);
             if (flipped)
@@ -247,35 +252,7 @@ namespace Blobfish_11
                 xVal = 7 - xVal;
                 yVal = 7 - yVal;
             }
-            Square newSquare = new Square(yVal, xVal);
-            if (firstSquare.rank == -1)  //-1 indikerar att ingen ruta tidigare markerats.
-            {
-                firstSquare = newSquare;
-                moveLabel.Text = (char)(xVal + 'a') + (8 - yVal).ToString();
-            }
-            else
-            {
-                moveLabel.Text = (char)(firstSquare.line + 'a') + (8 - firstSquare.rank).ToString() + "-" +
-                    (char)(xVal + 'a') + (8 - yVal).ToString();
-                bool moveWasPlayed = false;
-                foreach (Move item in currentMoves)
-                {
-                    if (firstSquare.rank == item.from.rank && firstSquare.line == item.from.line &&
-                        newSquare.rank == item.to.rank && newSquare.line == item.to.line)
-                    {
-                        playMove(item);
-                        moveWasPlayed = true;
-                        break;
-                    }
-                }
-                if (!moveWasPlayed && !(firstSquare.line == newSquare.line && firstSquare.rank == newSquare.rank))
-                {
-                    evalBox.Text = "Felaktigt drag!";
-                }
-                firstSquare.rank = -1;
-                firstSquare.line = -1;
-                moveLabel.Text = "";
-            }
+            return new Square(yVal, xVal);
         }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
@@ -636,6 +613,76 @@ namespace Blobfish_11
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
+        }
+
+        private void squareMouseDown(object sender, MouseEventArgs e)
+        {
+            if (ponderingWorker.IsBusy) return;
+
+            PictureBox from = sender as PictureBox;
+            dragFromSquare = picBoxSquare(from);
+            fromImage = from.Image;
+            from.Image = Image.FromFile("null.png");
+            from.DoDragDrop(fromImage, DragDropEffects.Copy);
+        }
+        private void squareDragEnter(object sender, DragEventArgs e)
+        {
+            PictureBox to = sender as PictureBox;
+            e.Effect = DragDropEffects.Copy;
+
+            toOldImage = to.Image;
+            Image cpy = (Image)fromImage.Clone();
+            using (Graphics g = Graphics.FromImage(cpy))
+            {
+                using (SolidBrush br =
+                new SolidBrush(Color.FromArgb(100, 255, 255, 255)))
+                {
+                    g.FillRectangle(br, 0, 0, cpy.Width, cpy.Height);
+                }
+            }
+            to.Image = cpy;
+        }
+        private void squareDragDrop(object sender, DragEventArgs e)
+        {
+            bool moveWasPlayed = false;
+            Square newSquare = picBoxSquare(sender as PictureBox);
+            foreach (Move item in currentMoves)
+            {
+                if (dragFromSquare.rank == item.from.rank && dragFromSquare.line == item.from.line &&
+                    newSquare.rank == item.to.rank && newSquare.line == item.to.line)
+                {
+                    playMove(item);
+                    moveWasPlayed = true;
+                    (sender as PictureBox).Image = fromImage;
+                    break;
+                }
+            }
+            if (!moveWasPlayed)
+            {
+                if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
+                    evalBox.Text = "Felaktigt drag!";
+                (sender as PictureBox).Image = toOldImage;
+                Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;
+            }
+            dragFromSquare = new Square(-1, -1);
+            moveLabel.Text = "";
+        }
+        private void squareDragLeave(object sender, EventArgs e)
+        {
+            (sender as PictureBox).Image = toOldImage;
+        }
+        private void squareGiveFeedBack(object sender, GiveFeedbackEventArgs e)
+        {
+            //Byt ut till annan pekare?
+            if (e.Effect == DragDropEffects.Copy)
+            {
+                e.UseDefaultCursors = false;
+                
+                Cursor.Current = Cursors.Hand;
+            }
+            else
+                e.UseDefaultCursors = true;
+
         }
     }
 }
