@@ -439,15 +439,22 @@ namespace Blobfish_11
                             reset();
                         }
                     }
-                    if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Shift)
-                    {
-                        e.SuppressKeyPress = true;
-                        takeback(1);
-                    }
                     if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
                         takeback(2);
+                    }
+                }
+            }
+            if(e.Modifiers == (Keys.Control | Keys.Shift))
+            {
+                if (!ponderingWorker.IsBusy)
+                {
+                    //Kortkommandon som endast tillåts om motorn inte är igång.
+                    if (e.KeyCode == Keys.Z)
+                    {
+                        e.SuppressKeyPress = true;
+                        takeback(1);
                     }
                 }
             }
@@ -597,7 +604,7 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 1.2f, 0.2f, 0.1f }, 8, 0.75f, MIL);
+                    return new Engine(new double[] { 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 0.8f, 0.1f, 0.05f }, 8, 1f, MIL);
                 }
                 else
                 {
