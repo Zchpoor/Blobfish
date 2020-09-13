@@ -378,9 +378,9 @@
             this.playStyleRB3.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
             this.playStyleRB3.Location = new System.Drawing.Point(6, 102);
             this.playStyleRB3.Name = "playStyleRB3";
-            this.playStyleRB3.Size = new System.Drawing.Size(93, 21);
+            this.playStyleRB3.Size = new System.Drawing.Size(113, 21);
             this.playStyleRB3.TabIndex = 6;
-            this.playStyleRB3.Text = "Positionell";
+            this.playStyleRB3.Text = "Experimentell";
             this.playStyleRB3.UseVisualStyleBackColor = true;
             // 
             // playStyleRB2

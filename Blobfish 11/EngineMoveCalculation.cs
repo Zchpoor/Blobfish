@@ -12,6 +12,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
+
         public List<Move> allValidMoves(Position pos, bool sorted)
         {
             //Public för att kunna användas av testerna.
@@ -360,54 +361,22 @@ namespace Blobfish_11
         private List<Move> sortByEstQuality(List<Move> moves, Position pos)
         {
             //Högre placering i arrayen indikerar högre prioritet.
-            const int priorities = 7;
+            const int priorities = 6;
+
             List<Move>[] listArray = new List<Move>[priorities];
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < priorities; i++)
             {
+                //Initierar vektorn.
                 listArray[i] = new List<Move>();
             }
 
-            void addWithPriority(Move move, int priority)
-            {
-                listArray[priority].Add(move);
-            }
             foreach (Move currentMove in moves)
             {
-                char toChar = pos.board[currentMove.to.rank, currentMove.to.line];
-                if(toChar != '\0') //Slag
-                {
-                    char fromChar = pos.board[currentMove.from.rank, currentMove.from.line];
-                    int valueDiff = valueOf(toChar) - valueOf(fromChar);
-                    if (valueDiff <= 0)
-                        addWithPriority(currentMove, 0);
-                    else if (valueDiff <= 2)
-                        addWithPriority(currentMove, 2);
-                    else if (valueDiff <= 4)
-                        addWithPriority(currentMove, 3);
-                    else if (valueDiff <= 6)
-                        addWithPriority(currentMove, 4);
-                    else
-                        addWithPriority(currentMove, 5);
-                    continue;
-                }
-                else //Ej slag
-                {
-                    if(currentMove is Castle)
-                    {
-                        addWithPriority(currentMove, 1);
-                    }
-                    else if(currentMove is Promotion && (currentMove as Promotion).promoteTo == 'Q')
-                    {
-                        addWithPriority(currentMove, 4);
-                    }
-                    else
-                    {
-                        //TODO: Ytterligare uppdelning här.
-                        addWithPriority(currentMove, 0);
-                    }
-                }
+                listArray[priorityOf(currentMove, pos)].Add(currentMove);
             }
+
             List<Move> sortedList = new List<Move>();
+            //Dragen läggs till i "omvänd ordning".
             for (int i = priorities-1; i >= 0; i--)
             {
                 sortedList.AddRange(listArray[i]);
@@ -415,6 +384,51 @@ namespace Blobfish_11
             if (sortedList.Count != moves.Count)
                 throw new Exception("Fel i dragsorteringsfunktionen.");
             return sortedList;
+        }
+        private int priorityOf(Move move, Position pos)
+        {
+            char toChar = pos.board[move.to.rank, move.to.line];
+            char fromChar = pos.board[move.from.rank, move.from.line];
+            if (toChar != '\0') //Slag
+            {
+                int valueOfCapturedPiece = valueOf(toChar);
+                int valueDiff = valueOfCapturedPiece - valueOf(fromChar);
+                
+                if (valueDiff <= 0)
+                    return 0;
+                else if (valueDiff <= 2)
+                    return 2;
+                else if (valueDiff <= 4)
+                    return 3;
+                else if (valueDiff <= 6)
+                    return 4;
+                else
+                    return 5;
+            }
+            else //Ej slag
+            {
+                if (move is Castle)
+                {
+                    return 1;
+                }
+                else if (move is Promotion && (move as Promotion).promoteTo == 'Q')
+                {
+                    return 4;
+                }
+                else
+                {
+                    int secondLastRow = pos.whiteToMove ? 1 : 6;
+                    if ((fromChar == 'p' || fromChar == 'P') && move.to.rank == secondLastRow)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        //TODO: Ytterligare uppdelning här.
+                        return 0;
+                    }
+                }
+            }
         }
         private int valueOf(char tkn)
         {
@@ -431,11 +445,10 @@ namespace Blobfish_11
     }
 }
 /* Kategorisering:
- *   6. Avgörande drag (0 drag i nästa)
  *   5. +8
  *   4. +6, promotering till dam
  *   3. +4
  *   2. +2
- *   1. Rockad, (bonde till 7:de raden?), (flytta centrumbonde?), (promotering till springare?)
+ *   1. Rockad, bonde till 7:de raden
  *   0. Övrigt
  */

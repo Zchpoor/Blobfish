@@ -112,7 +112,7 @@ namespace Blobfish_11
             if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
-                evalBox.Text = "";
+                //evalBox.Text = "";
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 ponderingWorker.RunWorkerAsync();
@@ -208,11 +208,11 @@ namespace Blobfish_11
                     {
                         blobFish.numericEval(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"));
                     }
-                    for (int i = 0; i < 10000; i++) //Verkar vara ca 10-20ggr långsammare
+                    for (int i = 0; i < 10000; i++) //Verkar vara ca 10-20ggr långsammare än numericEval.
                     {
                         blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), false);
                     }
-                    for (int i = 0; i < 10000; i++)
+                    for (int i = 0; i < 10000; i++) //Extra tid för att sortera dragen verkar vara försumbar
                     {
                         blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), true);
                     }
@@ -293,7 +293,7 @@ namespace Blobfish_11
                 fenButton_Click(null, null);
             }
         }
-        public string getMovesString(List<Move> moves, char[,] board)
+        private string getMovesString(List<Move> moves, char[,] board)
         {
             string text = "";
             foreach (Move item in moves)
@@ -589,15 +589,15 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.4f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
+                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
                     return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
                 }
-                else if (playStyleRB3.Checked) //Positionell
+                else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] { 3, 3.1f, 5, 8.9f }, 0.6f, new double[] { 1, 1.8f, 1.6f, 0.2f, 0.1f }, 8, 1, MIL);
+                    return new Engine(new double[] { 3, 3, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 1.2f, 0.2f, 0.1f }, 8, 0.75f, MIL);
                 }
                 else
                 {
@@ -650,9 +650,9 @@ namespace Blobfish_11
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
+ *  Minska behov av att ställa ut damen.
  * 
  * Effektiviseringar:
- *  Sortera efter uppskattad kvalitet på draget.
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
  *  Gör om system för att betckna forcerad matt.
@@ -664,10 +664,6 @@ namespace Blobfish_11
  *  Bli av med Le3/Le6
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
- *  Öka behov av terräng
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
- *  Buggar:
- *   Verkar ibland vara icke-deterministisk när den spelar bägge färger?
- *   Avbryter ibland samtidigt som lås släpps.
  */

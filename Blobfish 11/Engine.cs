@@ -221,7 +221,11 @@ namespace Blobfish_11
              */
             int[] numberOfPawns = new int[2];
             double[] pawnPosFactor = { 1f, 1f };
-            int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
+
+            //Grov uppskattning av moståndarens tunga pjäser.
+            //0 = svart, 1 = vit.
+            int[] heavyMaterial = new int[] { 0, 0 };
+
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
@@ -246,17 +250,17 @@ namespace Blobfish_11
 
                         case 'n':
                             pieceValue -= pieceValues[0] * knight[rank, line];
-                            heavyMaterial[1] += 3;
+                            heavyMaterial[0] += 3;
                             break;
 
                         case 'N':
                             pieceValue += pieceValues[0] * knight[rank, line];
-                            heavyMaterial[0] += 3;
+                            heavyMaterial[1] += 3;
                             break;
 
                         case 'b':
                             pieceValue -= pieceValues[1] * bishop[rank, line];
-                            heavyMaterial[1] += 3;
+                            heavyMaterial[0] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
                             else
@@ -265,7 +269,7 @@ namespace Blobfish_11
 
                         case 'B':
                             pieceValue += pieceValues[1] * bishop[rank, line];
-                            heavyMaterial[0] += 3;
+                            heavyMaterial[1] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
                             else
@@ -274,11 +278,11 @@ namespace Blobfish_11
 
                         case 'r':
                             pieceValue -= pieceValues[2] * rook[rank, line];
-                            heavyMaterial[1] += 5;
+                            heavyMaterial[0] += 5;
                             break;
                         case 'R':
                             pieceValue += pieceValues[2] * rook[rank, line];
-                            heavyMaterial[0] += 5;
+                            heavyMaterial[1] += 5;
                             break;
 
                         case 'k':
@@ -291,12 +295,12 @@ namespace Blobfish_11
 
                         case 'q':
                             pieceValue -= pieceValues[3] * queen[rank, line];
-                            heavyMaterial[1] += 9;
+                            heavyMaterial[0] += 9;
                             break;
 
                         case 'Q':
                             pieceValue += pieceValues[3] * queen[rank, line];
-                            heavyMaterial[0] += 9;
+                            heavyMaterial[1] += 9;
                             break;
                         default:
                             break;
