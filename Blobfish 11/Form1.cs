@@ -241,19 +241,6 @@ namespace Blobfish_11
                     break;
             }
         }
-        private Square picBoxSquare(PictureBox picBox)
-        {
-            int xVal = picBox.Location.X; //a-h
-            int yVal = picBox.Location.Y; //1-8
-            xVal = xVal / (boardPanel.Size.Width / 8);
-            yVal = yVal / (boardPanel.Size.Height / 8);
-            if (flipped)
-            {
-                xVal = 7 - xVal;
-                yVal = 7 - yVal;
-            }
-            return new Square(yVal, xVal);
-        }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
             if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
@@ -651,9 +638,9 @@ namespace Blobfish_11
                 if (dragFromSquare.rank == item.from.rank && dragFromSquare.line == item.from.line &&
                     newSquare.rank == item.to.rank && newSquare.line == item.to.line)
                 {
+                    (sender as PictureBox).Image = fromImage;
                     playMove(item);
                     moveWasPlayed = true;
-                    (sender as PictureBox).Image = fromImage;
                     break;
                 }
             }
@@ -662,7 +649,10 @@ namespace Blobfish_11
                 if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
                     evalBox.Text = "Felaktigt drag!";
                 (sender as PictureBox).Image = toOldImage;
-                Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;
+                if(!flipped)
+                    Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;
+                else
+                    Falt[7-dragFromSquare.rank, 7-dragFromSquare.line].Image = fromImage;
             }
             dragFromSquare = new Square(-1, -1);
             moveLabel.Text = "";
@@ -684,6 +674,19 @@ namespace Blobfish_11
                 e.UseDefaultCursors = true;
 
         }
+        private Square picBoxSquare(PictureBox picBox)
+        {
+            int xVal = picBox.Location.X; //a-h
+            int yVal = picBox.Location.Y; //1-8
+            xVal = xVal / (boardPanel.Size.Width / 8);
+            yVal = yVal / (boardPanel.Size.Height / 8);
+            if (flipped)
+            {
+                xVal = 7 - xVal;
+                yVal = 7 - yVal;
+            }
+            return new Square(yVal, xVal);
+        }
     }
 }
 
@@ -696,11 +699,11 @@ namespace Blobfish_11
  *  Se material.
  *  Se bästa variant
  *  Mattbart material
- *  Gör det möjligt att dra pjäserna
  *  Gör fönstret skalbart.
  *  Koordinater
  *  Double -> Float (Volatile)
  *  Gå framåt/bakåt i partiet.
+ *  Dra nu!
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -719,5 +722,7 @@ namespace Blobfish_11
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  
+ *  Buggar:
  *  
  */
