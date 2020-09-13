@@ -249,17 +249,17 @@ namespace Blobfish_11
                             break;
 
                         case 'n':
-                            pieceValue -= pieceValues[0] * knight[rank, line];
+                            pieceValue -= pieceValues[1] * knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
 
                         case 'N':
-                            pieceValue += pieceValues[0] * knight[rank, line];
+                            pieceValue += pieceValues[1] * knight[rank, line];
                             heavyMaterial[1] += 3;
                             break;
 
                         case 'b':
-                            pieceValue -= pieceValues[1] * bishop[rank, line];
+                            pieceValue -= pieceValues[2] * bishop[rank, line];
                             heavyMaterial[0] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
@@ -268,7 +268,7 @@ namespace Blobfish_11
                             break;
 
                         case 'B':
-                            pieceValue += pieceValues[1] * bishop[rank, line];
+                            pieceValue += pieceValues[2] * bishop[rank, line];
                             heavyMaterial[1] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
@@ -277,11 +277,11 @@ namespace Blobfish_11
                             break;
 
                         case 'r':
-                            pieceValue -= pieceValues[2] * rook[rank, line];
+                            pieceValue -= pieceValues[3] * rook[rank, line];
                             heavyMaterial[0] += 5;
                             break;
                         case 'R':
-                            pieceValue += pieceValues[2] * rook[rank, line];
+                            pieceValue += pieceValues[3] * rook[rank, line];
                             heavyMaterial[1] += 5;
                             break;
 
@@ -294,12 +294,12 @@ namespace Blobfish_11
                             break;
 
                         case 'q':
-                            pieceValue -= pieceValues[3] * queen[rank, line];
+                            pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;
                             break;
 
                         case 'Q':
-                            pieceValue += pieceValues[3] * queen[rank, line];
+                            pieceValue += pieceValues[4] * queen[rank, line];
                             heavyMaterial[1] += 9;
                             break;
                         default:
@@ -327,7 +327,7 @@ namespace Blobfish_11
                 else
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
-            double pawnValue = evalPawns(numberOfPawns, pawnPosFactor, pawns);
+            double pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
             return pieceValue + pawnValue + kingSafteyDifference;
         }
         private double kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)

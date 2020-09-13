@@ -596,15 +596,15 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] { 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
+                    return new Engine(new double[] {1, 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] { 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
+                    return new Engine(new double[] {1.2f, 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] { 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 0.8f, 0.1f, 0.05f }, 8, 1f, MIL);
+                    return new Engine(new double[] {1, 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 0.8f, 0.1f, 0.05f }, 8, 1f, MIL);
                 }
                 else
                 {

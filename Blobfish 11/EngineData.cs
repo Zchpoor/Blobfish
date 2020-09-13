@@ -9,7 +9,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        readonly double[] pieceValues = { 3, 3, 5, 9 };
+        readonly double[] pieceValues = {1, 3, 3, 5, 9 };
         readonly double kingValue = 4f;
         readonly double bishopPairValue = 0.4f;
         readonly double[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
@@ -34,7 +34,7 @@ namespace Blobfish_11
         public Engine(double[] pieceValues, double bishopPairValue, double[] defenceValues,
             int endgameLimit, double kingSafteyCoefficient, int[] moveIncreaseLimits)
         {
-            if (pieceValues.Length != 4)
+            if (pieceValues.Length != 5)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
             this.pieceValues = pieceValues;
             //this.kingValue = kingValue;
@@ -107,14 +107,14 @@ namespace Blobfish_11
         };
         private static readonly double[,] queen =
         {
-            {0.97f,    0.98f,    0.99f,    1f,       1f,       0.99f,    0.98f,    0.97f},
-            {0.98f,    0.99f,    1f,       1.01f,    1.01f,    1f,       0.99f,    0.98f},
-            {0.99f,    1f,       1.01f,    1.02f,    1.02f,    1.01f,    1f,       0.99f},
-            {1f,       1.01f,    1.02f,    1.03f,    1.03f,    1.02f,    1.01f,    1f   },
-            {1f,       1.01f,    1.02f,    1.03f,    1.03f,    1.02f,    1.01f,    1f   },
-            {0.99f,    1f,       1.01f,    1.02f,    1.02f,    1.01f,    1f,       0.99f},
-            {0.98f,    0.99f,    1f,       1.01f,    1.01f,    1f,       0.99f,    0.98f},
-            {0.97f,    0.98f,    0.99f,    1f,       1f,       0.99f,    0.98f,    0.97f}
+            {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f},
+            {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
+            {0.997f, 1.000f, 1.003f, 1.007f, 1.007f, 1.003f, 1.000f, 0.997f},
+            {1.000f, 1.003f, 1.007f, 1.010f, 1.010f, 1.007f, 1.003f, 1.000f},
+            {1.000f, 1.003f, 1.007f, 1.010f, 1.010f, 1.007f, 1.003f, 1.000f},
+            {0.997f, 1.000f, 1.003f, 1.007f, 1.007f, 1.003f, 1.000f, 0.997f},
+            {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
+            {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f}
         };
         private static readonly double[,,] king =
         {
