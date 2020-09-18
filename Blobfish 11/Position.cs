@@ -14,76 +14,76 @@ namespace Blobfish_11
         public bool whiteToMove;
         public sbyte halfMoveClock = 0;
         public short moveCounter = 0;
-        public sbyte[] enPassantSquare = new sbyte[2]; //{-1, -1} om en passant ej kan spelas.
+        public Square enPassantSquare = new Square(); //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights = new bool[4]; //KQkq
         public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public Square[] kingPositions = new Square[2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
         public Position(string FEN)
         {
-            sbyte column = 0, row = 0;
+            sbyte line = 0, rank = 0;
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
             {
                 switch (tkn)
                 {
                     case 'p':
-                        board[row, column] = tkn;
-                        column++;
+                        board[rank, line] = tkn;
+                        line++;
                         break;
                     case 'P':
-                        board[row, column] = tkn;
-                        column++;
+                        board[rank, line] = tkn;
+                        line++;
                         break;
 
                     case 'n':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
                     case 'N':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
 
                     case 'b':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
                     case 'B':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
 
                     case 'r':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
                     case 'R':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
 
                     case 'k':
-                        board[row, column] = tkn;
-                        kingPositions[0] = new Square(row, column);
-                        column++; break;
+                        board[rank, line] = tkn;
+                        kingPositions[0] = new Square(rank, line);
+                        line++; break;
                     case 'K':
-                        board[row, column] = tkn;
-                        kingPositions[1] = new Square(row, column);
-                        column++; break;
+                        board[rank, line] = tkn;
+                        kingPositions[1] = new Square(rank, line);
+                        line++; break;
 
                     case 'q':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
                     case 'Q':
-                        board[row, column] = tkn;
-                        column++; break;
+                        board[rank, line] = tkn;
+                        line++; break;
 
-                    case '/': column = 0; row++; break;
-                    case '1': column += 1; break;
-                    case '2': column += 2; break;
-                    case '3': column += 3; break;
-                    case '4': column += 4; break;
-                    case '5': column += 5; break;
-                    case '6': column += 6; break;
-                    case '7': column += 7; break;
+                    case '/': line = 0; rank++; break;
+                    case '1': line += 1; break;
+                    case '2': line += 2; break;
+                    case '3': line += 3; break;
+                    case '4': line += 4; break;
+                    case '5': line += 5; break;
+                    case '6': line += 6; break;
+                    case '7': line += 7; break;
                     case '8': break;
                     default:
-                        column++;
+                        line++;
                         break;
                 }
             }
@@ -122,18 +122,18 @@ namespace Blobfish_11
             //Till exempel: c6 0 2
             if (EPString[0] == '-')
             {
-                enPassantSquare = new sbyte[] { -1, -1 };
+                enPassantSquare = new Square(-1, -1);
             }
             else
             {
-                int EPcolumn = EPString[0] - 'a';
-                int EProw = EPString[1] - '1';
-                if (EPcolumn < 0 || EPcolumn > 7 || EProw < 0 || EProw > 7)
+                int EPline = EPString[0] - 'a';
+                int EPrank = EPString[1] - '1';
+                if (EPline < 0 || EPline > 7 || EPrank < 0 || EPrank > 7)
                 {
                     throw new Exception("Felaktig FEN."); //TODO: Hantera
                 }
-                enPassantSquare[0] = (sbyte) (7 - EProw);
-                enPassantSquare[1] = (sbyte) EPcolumn; //Eftersom ordingen är omvänd i FEN.
+                enPassantSquare.rank = (sbyte) (7 - EPrank);
+                enPassantSquare.line = (sbyte) EPline; //Eftersom ordingen är omvänd i FEN.
             }
             string lastString = EPString.Substring(EPString.IndexOf(' ') + 1, EPString.Length - EPString.IndexOf(' ') - 1);
             //Till exempel: "1 2".
@@ -145,7 +145,7 @@ namespace Blobfish_11
             //Till exempel: "2".
 
         }
-        public Position(char[,] board, bool whiteToMove, bool[] castlingRights, sbyte[] enPassantSquare,
+        public Position(char[,] board, bool whiteToMove, bool[] castlingRights, Square enPassantSquare,
             sbyte halfMoveClock, short moveCounter, Square[] kingPositions)
         {
             this.board = board;
@@ -159,7 +159,7 @@ namespace Blobfish_11
         public Position deepCopy()
         {
            return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
-                new sbyte[] { -1, 1 }, halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
+                new Square(-1, -1), halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
 
         }
         public string getFEN()
@@ -215,14 +215,14 @@ namespace Blobfish_11
                 FEN += " ";
             }
 
-            if (enPassantSquare[0] == -1 || enPassantSquare[1] == -1)
+            if (enPassantSquare.rank == -1 || enPassantSquare.line == -1)
             {
                 FEN += "- ";
             }
             else
             {
-                FEN += (char) (enPassantSquare[1] + 'a');
-                FEN += (char) ('8' - enPassantSquare[0]);
+                FEN += (char) (enPassantSquare.line + 'a');
+                FEN += (char) ('8' - enPassantSquare.rank);
                 FEN += " ";
             }
 

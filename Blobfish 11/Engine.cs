@@ -10,13 +10,14 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        public EvalResult eval(Position pos, int baseDepth)
+        public SecureDouble cancelFlag = new SecureDouble(0);
+        public EvalResult eval(Position pos, int minDepth)
         {
-            List<Move> moves =  allValidMoves(pos);
+            List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
             int gameResult = decisiveResult(pos, moves);
-            if(gameResult != -2)
+            if (gameResult != -2)
             {
                 result.evaluation = (double)gameResult;
                 result.allMoves = new List<Move>();
@@ -27,10 +28,10 @@ namespace Blobfish_11
             {
                 List<SecureDouble> allEvals = new List<SecureDouble>();
                 double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
-                
-                if(moves.Count == 1)
+
+                if (moves.Count == 1)
                 {
-                    EvalResult res = eval(moves[0].execute(pos), baseDepth);
+                    EvalResult res = eval(moves[0].execute(pos), minDepth);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
@@ -38,59 +39,72 @@ namespace Blobfish_11
                     //Forcerande drag beräknas alltid ytterligare ett drag.
                     //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
                 }
-                if (moves.Count <= 8) 
-                    baseDepth++;
 
-                //TODO: Öka längden om antalet pjäser är få.
+                // Ökar minimum-djupet om antalet tillgängliga drag är färre än de som anges
+                // i moveIncreaseLimits, vilka återfinns i EngineData.
+                foreach (int item in moveIncreaseLimits)
+                {
+                    if (moves.Count <= item) minDepth++;
+                    else break;
+                }
 
+                //TODO: Öka längden om antalet tunga pjäser är få.
+
+                SecureDouble globalAlpha = new SecureDouble();
+                globalAlpha.setValue(double.NegativeInfinity);
+                SecureDouble globalBeta = new SecureDouble();
+                globalBeta.setValue(double.PositiveInfinity);
+                List<Thread> threadList = new List<Thread>();
                 foreach (Move currentMove in moves)
                 {
                     SecureDouble newDouble = new SecureDouble();
                     allEvals.Add(newDouble);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte) (baseDepth - 1), newDouble);
+                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newDouble, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
+                    threadList.Add(thread);
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
                     SecureDouble threadResult = allEvals[i];
-                    try
-                    {
-                        threadResult.mutex.WaitOne();
-                        double value = threadResult.value;
+                    double value = threadResult.getValue();
 #pragma warning disable CS1718 // Comparison made to same variable
-                        if (value != value) //Kollar om talet är odefinierat.
+                    if (value != value) //Kollar om talet är odefinierat.
 #pragma warning restore CS1718 // Comparison made to same variable
+                    {
+                        //Om resultatet inte hunnit beräknas.
+                        if(cancelFlag.getValue() != 0)
                         {
-                            //Om resultatet inte hunnit beräknas.
-                            Thread.Sleep(100);
-                            i--;
+                            abortAll(threadList);
+                            result.bestMove = null;
+                            result.evaluation = double.NaN;
+                            result.allEvals = null;
+                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
+                            return result;
+                        }
+                        Thread.Sleep(sleepTime);
+                        i--;
+                    }
+                    else
+                    { //Om resultatet är klart.
+                        if (pos.whiteToMove)
+                        {
+                            bestValue = Math.Max(bestValue, value);
                         }
                         else
-                        { //Om resultatet är klart.
-                            if (pos.whiteToMove)
-                            {
-                                bestValue = Math.Max(bestValue, value);
-                            }
-                            else
-                            {
-                                bestValue = Math.Min(bestValue, value);
-                            }
-                            
-                            //TODO: Gör finare
-                            if(bestValue == value)
-                            {
-                                result.bestMove = moves[i];
-                            }
+                        {
+                            bestValue = Math.Min(bestValue, value);
                         }
-                    }
-                    finally
-                    {
-                        threadResult.mutex.ReleaseMutex();
+
+                        //TODO: Gör finare
+                        if (bestValue == value)
+                        {
+                            result.bestMove = moves[i];
+                        }
                     }
                 }
                 result.evaluation = bestValue;
@@ -100,103 +114,193 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace)
+        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace, SecureDouble globalAlpha, SecureDouble globalBeta)
         {
-            double value = alphaBeta(pos, depth, double.NegativeInfinity, double.PositiveInfinity, false);
-            try
+            double value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
+            ansPlace.setValue(value);
+            if (!pos.whiteToMove)
             {
-                ansPlace.mutex.WaitOne();
-                ansPlace.value = value;
+                globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value));
             }
-            finally
+            else
             {
-                ansPlace.mutex.ReleaseMutex();
+                globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
             }
         }
-        private double numericEval(Position pos)
+        private double alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
+        {
+            string moveName = ""; //Endast i debug-syfte
+            if (depth <= 0 && !forceBranching)
+                return numericEval(pos);
+
+            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            {
+                return numericEval(pos);
+            }
+            List<Move> moves = allValidMoves(pos, true);
+            if (moves.Count == 0)
+                return decisiveResult(pos, moves);
+
+            OrdinaryDouble alpha = new OrdinaryDouble(alphaContainer.getValue());
+            OrdinaryDouble beta = new OrdinaryDouble(betaContainer.getValue());
+
+
+            if (pos.whiteToMove)
+            {
+                double value = double.NegativeInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    if (betaContainer is SecureDouble && betaContainer.getValue() < beta.getValue())
+                        beta.setValue(betaContainer.getValue());
+
+                    //Endast i debug-syfte
+                    moveName = currentMove.toString(pos.board);
+
+                    Position newPos = currentMove.execute(pos);
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
+                    {
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                    }
+                    else
+                    {
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                    }
+                    alpha.setValue(Math.Max(alpha.getValue(), value));
+                    if (alpha.getValue() >= beta.getValue())
+                    {
+                        if (alphaContainer is SecureDouble)
+                            return double.PositiveInfinity;
+                        else
+                            break; //Pruning
+
+                    }
+                }
+                value = evaluationStep(value);
+                return value;
+            }
+            else
+            {
+                double value = double.PositiveInfinity;
+                foreach (Move currentMove in moves)
+                {
+                    if (alphaContainer is SecureDouble && alphaContainer.getValue() > alpha.getValue())
+                        alpha.setValue(alphaContainer.getValue());
+                    //Endast i debug-syfte
+                    moveName = currentMove.toString(pos.board);
+
+                    Position newPos = currentMove.execute(pos);
+                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
+                    {
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                    }
+                    else
+                    {
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                    }
+                    beta.setValue(Math.Min(beta.getValue(), value));
+                    if (beta.getValue() <= alpha.getValue())
+                    {
+                        if (betaContainer is SecureDouble)
+                            return double.NegativeInfinity;
+                        else
+                            break; //Pruning
+                    }
+                }
+                value = evaluationStep(value);
+                return value;
+            }
+        }
+        public double numericEval(Position pos)
         {
             /* 
-             * [row, column]
-             * row==0       -> rad 8.
-             * row==7       -> rad 1.
-             * column==0    -> a-linjen.
-             * column==7    -> h-linjen.
+             * [rank, line]
+             * rank==0       -> rad 8.
+             * rank==7       -> rad 1.
+             * line==0    -> a-linjen.
+             * line==7    -> h-linjen.
              */
             int[] numberOfPawns = new int[2];
-            double[] posFactor = { 1f, 1f };
-            int[] heavyMaterial = new int[] { 0, 0 }; //Grov uppskattning av moståndarens tunga pjäser.
+            double[] pawnPosFactor = { 1f, 1f };
+
+            //Grov uppskattning av moståndarens tunga pjäser.
+            //0 = svart, 1 = vit.
+            int[] heavyMaterial = new int[] { 0, 0 };
+
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             double pieceValue = 0;
-            for (sbyte row = 0; row < 8; row++)
+            for (sbyte rank = 0; rank < 8; rank++)
             {
-                for (sbyte column = 0; column < 8; column++)
+                for (sbyte line = 0; line < 8; line++)
                 {
-                    switch (pos.board[row, column])
+                    switch (pos.board[rank, line])
                     {
                         case 'p':
                             numberOfPawns[0]++;
-                            pawns[0, column]++;
-                            posFactor[0] += pawn[0, row, column];
+                            pawns[0, line]++;
+                            pawnPosFactor[0] += pawn[0, rank, line];
                             break;
 
                         case 'P':
                             numberOfPawns[1]++;
-                            pawns[1, column]++;
-                            posFactor[1] += pawn[1, row, column];
+                            pawns[1, line]++;
+                            pawnPosFactor[1] += pawn[1, rank, line];
                             break;
 
                         case 'n':
-                            pieceValue -= pieceValues[0] * knight[row, column];
-                            heavyMaterial[1] += 3;
-                            break;
-                        case 'N':
-                            pieceValue += pieceValues[0] * knight[row, column];
+                            pieceValue -= pieceValues[1] * knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
 
-                        case 'b':
-                            pieceValue -= pieceValues[1] * bishop[row, column];
+                        case 'N':
+                            pieceValue += pieceValues[1] * knight[rank, line];
                             heavyMaterial[1] += 3;
-                            if ((row + column) % 2 == 0)
+                            break;
+
+                        case 'b':
+                            pieceValue -= pieceValues[2] * bishop[rank, line];
+                            heavyMaterial[0] += 3;
+                            if ((rank + line) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
                             else
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
+
                         case 'B':
-                            pieceValue += pieceValues[1] * bishop[row, column];
-                            heavyMaterial[0] += 3;
-                            if ((row + column) % 2 == 0)
+                            pieceValue += pieceValues[2] * bishop[rank, line];
+                            heavyMaterial[1] += 3;
+                            if ((rank + line) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
                             else
                                 bishopColors[1] = true; //Vit löpare på svart fält
                             break;
 
                         case 'r':
-                            pieceValue -= pieceValues[2] * rook[row, column];
-                            heavyMaterial[1] += 5;
+                            pieceValue -= pieceValues[3] * rook[rank, line];
+                            heavyMaterial[0] += 5;
                             break;
                         case 'R':
-                            pieceValue += pieceValues[2] * rook[row, column];
-                            heavyMaterial[0] += 5;
+                            pieceValue += pieceValues[3] * rook[rank, line];
+                            heavyMaterial[1] += 5;
                             break;
 
                         case 'k':
-                            pos.kingPositions[0] = new Square(row, column);
+                            pos.kingPositions[0] = new Square(rank, line);
                             break;
 
                         case 'K':
-                            pos.kingPositions[1] = new Square(row, column);
+                            pos.kingPositions[1] = new Square(rank, line);
                             break;
 
                         case 'q':
-                            pieceValue -= pieceValues[3] * queen[row, column];
-                            heavyMaterial[1] += 9;
-                            break;
-                        case 'Q':
-                            pieceValue += pieceValues[3] * queen[row, column];
+                            pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;
+                            break;
+
+                        case 'Q':
+                            pieceValue += pieceValues[4] * queen[rank, line];
+                            heavyMaterial[1] += 9;
                             break;
                         default:
                             break;
@@ -204,10 +308,9 @@ namespace Blobfish_11
                 }
             }
 
-            double kingSafteyDifference = kingSaftey(pos.kingPositions[1], heavyMaterial[0])
-                - kingSaftey(pos.kingPositions[0], heavyMaterial[1]);
+            double kingSafteyDifference = kingSaftey(pos, true, heavyMaterial[0])
+                - kingSaftey(pos, false, heavyMaterial[1]);
 
-            double bishopPairValue = 0.4f;
             if (bishopColors[0] && bishopColors[1])
             {
                 pieceValue += bishopPairValue;
@@ -220,23 +323,66 @@ namespace Blobfish_11
             for (sbyte i = 0; i < 2; i++)
             {
                 if (numberOfPawns[i] == 0)
-                    posFactor[i] = 0f;
+                    pawnPosFactor[i] = 0f;
                 else
-                    posFactor[i] /= numberOfPawns[i];
+                    pawnPosFactor[i] /= numberOfPawns[i];
             }
-            double pawnValue = evalPawns(numberOfPawns, posFactor, pawns);
+            double pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
             return pieceValue + pawnValue + kingSafteyDifference;
         }
-        private double kingSaftey(Square kingSquare, int oppHeavyMaterial)
+        private double kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
-            const double kingValue = 4f;
-            if(oppHeavyMaterial > 6)
+            double defenceAccumulator = 0;
+            sbyte direction = forWhite ? (sbyte) -1 : (sbyte) 1;
+            Square kingSquare = forWhite ? pos.kingPositions[1] : pos.kingPositions[0];
+            for (int i = 0; i < 3; i++)
             {
-                return kingValue * king[0, kingSquare.rank, kingSquare.line];
+                for (int j = -2; j < 3; j++)
+                {
+                    Square currentSquare = new Square(kingSquare.rank + (direction * i), kingSquare.line + j);
+                    if (!validSquare(currentSquare)){
+                        continue;
+                    }
+                    char currentPiece = pos.board[currentSquare.rank, currentSquare.line];
+                    double defValue = defenceValueOf(currentPiece);
+                    if(defValue == 0)
+                    {
+                        continue;
+                    }
+                    double defCoeff = defence[2-i, j + 2];
+                    double finDefValue = defValue * defCoeff;
+
+                    //Tag bort denna
+                    double DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
+
+                    defenceAccumulator += finDefValue;
+                }
+            }
+            double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+
+            double kingCoefficient;
+            if (oppHeavyMaterial > endgameLimit)
+            {
+                kingCoefficient =   king[0, kingSquare.rank, kingSquare.line];
             }
             else
             {
-                return kingValue * king[1, kingSquare.rank, kingSquare.line];
+                kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
+                return kingCoefficient * kingValue;
+            }
+            return kingCoefficient * safteyValue;
+        }
+        private double defenceValueOf(char piece)
+        {
+            switch (piece.ToString().ToUpper())
+            {
+                case "": return 0; //Kolla om denna fungerar.
+                case "P": return defenceValues[0];
+                case "N": return defenceValues[1];
+                case "B": return defenceValues[2];
+                case "R": return defenceValues[3];
+                case "Q": return defenceValues[4];
+                default: return 0;
             }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, sbyte[,] pawns)
@@ -284,62 +430,6 @@ namespace Blobfish_11
 
             return -2;
         }
-        private double alphaBeta(Position pos, sbyte depth, double alpha, double beta, bool forceBranching)
-        {
-            if (depth <= 0 && !forceBranching)
-                return numericEval(pos);
-
-            if(depth <= -8) //Maximalt antal slagväxlingar som får ta plats i slutet av en variant.
-            {
-                return numericEval(pos);
-            }
-            List<Move> moves = allValidMoves(pos);
-            if (moves.Count == 0)
-                return decisiveResult(pos, moves);
-
-            if (pos.whiteToMove)
-            {
-                double value = double.NegativeInfinity;
-                foreach (Move currentMove in moves)
-                {
-                    Position newPos = currentMove.execute(pos);
-                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
-                    {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
-                    }
-                    else
-                    {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
-                    }
-                    alpha = Math.Max(alpha, value);
-                    if (alpha >= beta)
-                        break; //Pruning
-                }
-                value = evaluationStep(value);
-                return value;
-            }
-            else
-            {
-                double value = double.PositiveInfinity;
-                foreach (Move currentMove in moves)
-                {
-                    Position newPos = currentMove.execute(pos);
-                    if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
-                    {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, true));
-                    }
-                    else
-                    {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte) (depth - 1), alpha, beta, false));
-                    }
-                    beta = Math.Min(beta, value);
-                    if (beta <= alpha)
-                        break; //Pruning
-                }
-                value = evaluationStep(value);
-                return value;
-            }
-        }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
             if (currentDepth >= 2)
@@ -373,6 +463,14 @@ namespace Blobfish_11
             else if (value < -1000)
                 return value + 1;
             else return value;
+        }
+        private void abortAll(List<Thread> threadList)
+        {
+            foreach (Thread item in threadList)
+            {
+                if (item.IsAlive)
+                    item.Abort();
+            }
         }
     }
 }

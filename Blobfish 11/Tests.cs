@@ -11,11 +11,11 @@ namespace Blobfish_11
         //TODO: Lägg till fler tester.
         static public string runTests()
         {
-            return testNumberOfMoves();
+            return testNumberOfMoves() + Environment.NewLine + testForcedMates();
         }
         static private string testNumberOfMoves()
         {
-            string detailedResult = "Antal drag:" + Environment.NewLine;
+            string detailedResult = "Antal drag-tester:" + Environment.NewLine;
             int testCounter = 1;
             bool testFailed = false;
             Engine blobfish = new Engine();
@@ -23,7 +23,7 @@ namespace Blobfish_11
             bool makeTest(string FEN, int moves)
             {
                 Position pos = new Position(FEN);
-                List<Move> allMoves = blobfish.allValidMoves(pos);
+                List<Move> allMoves = blobfish.allValidMoves(pos, false);
                 bool success = allMoves.Count == moves;
                 if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
                 else
@@ -72,8 +72,42 @@ namespace Blobfish_11
                 return detailedResult;
             else
                 return "Antal drag-tester: Felfritt!";
-
         }
+        static private string testForcedMates()
+        {
+            string testName = "Forcerad matt-tester";
+            string detailedResult = testName + ": " + Environment.NewLine;
+            int testCounter = 1;
+            bool testFailed = false;
+            Engine blobfish = new Engine();
 
+            bool makeTest(string FEN, int movesToMate)
+            {
+                Position pos = new Position(FEN);
+                EvalResult result = blobfish.eval(pos, movesToMate + 1);
+                int plysToMate = (movesToMate * 2) -1;
+                bool success = result.evaluation == (pos.whiteToMove ? (2001 - plysToMate) : (-2001 + plysToMate));
+                if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
+                else
+                {
+                    detailedResult += "  Test " + testCounter.ToString() + ": Misslyckades" + Environment.NewLine;
+                    testFailed = true;
+                }
+                testCounter++;
+                return success;
+            }
+            
+            makeTest("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4", 1); //Skolmatt
+            makeTest("r1b1k2r/ppppqppp/2n5/4n3/1PP2B2/5N2/1P1NPPPP/R2QKB1R b KQkq - 0 8", 1); //Budapestmatten
+            makeTest("8/5P1k/5K2/8/8/8/8/8 w - - 0 1", 2); //Underpromotering
+            makeTest("8/6k1/R7/1R6/8/8/8/4K3 w - - 0 1", 2); //Trappstegsmatt
+            makeTest("r7/ppp2kpp/2nb4/5K2/2PP1P1q/2N5/PP1Q2PP/R4BNR b - - 0 16", 2); //Portugisiskt
+            makeTest("r4rk1/pp3Npp/1b6/8/2Q5/P6P/1q3PP1/R4RK1 w - - 0 1", 3); //Kvävmatt
+
+            if (testFailed)
+                return detailedResult;
+            else
+                return testName + ": Felfritt!";
+        }
     }
 }

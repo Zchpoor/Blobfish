@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public struct EvalResult
+    public class EvalResult
     {
         public double evaluation;
         public List<Move> allMoves;
@@ -30,27 +30,69 @@ namespace Blobfish_11
             this.line = (sbyte)line;
         }
     }
-    public struct PieceData
+    public abstract class DoubleContainer
     {
-        public List<Move> moves;
-
-        //TODO: Byt ut mot bräde av fält?
-        public List<Square> controlledSquares;
-
-        public bool givesCheck;
+        protected double val;
+        public abstract double getValue();
+        public abstract void setValue(double value);
     }
-    public class SecureDouble
+    public class OrdinaryDouble : DoubleContainer
     {
-        public Mutex mutex;
-        public double value;
-        public SecureDouble(){
-            this.value = double.NaN;
-            this.mutex = new Mutex();
+        public OrdinaryDouble()
+        {
+            this.val = double.NaN;
+        }
+        public OrdinaryDouble(double value)
+        {
+            this.val = value;
+        }
+        public override double getValue()
+        {
+            return val;
+        }
+        public override void setValue(double value)
+        {
+            this.val = value;
         }
     }
-    public struct SquareControl
+    public class SecureDouble : DoubleContainer
     {
-        public bool wControl;
-        public bool bControl;
+        public Mutex mutex;
+        public SecureDouble()
+        {
+            this.val = double.NaN;
+            this.mutex = new Mutex();
+        }
+        public SecureDouble(double val)
+        {
+            this.val = val;
+            this.mutex = new Mutex();
+        }
+        public override double getValue()
+        {
+            double ret;
+            try
+            {
+                mutex.WaitOne();
+                ret = val;
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+            return ret;
+        }
+        public override void setValue(double value)
+        {
+            try
+            {
+                mutex.WaitOne();
+                this.val = value;
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
     }
 }
