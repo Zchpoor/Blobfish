@@ -43,7 +43,7 @@ namespace Blobfish_11
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
             this.defenceValues = defenceValues;
             this.endgameLimit = endgameLimit;
-            this.kingSafteyDivisor = 200* kingSafteyCoefficient;
+            this.kingSafteyDivisor = 200 / kingSafteyCoefficient;
             //this.sleepTime = sleepTime;
             //this.moveIncreaseLimits = moveIncreaseLimits;
             this.moveIncreaseLimits = moveIncreaseLimits;

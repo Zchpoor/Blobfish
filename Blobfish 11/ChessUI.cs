@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace Blobfish_11
 {
-    public partial class Form1 : Form
+    public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
         List<Position> gamePositions = new List<Position>();
@@ -27,11 +27,8 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
-        private Square dragFromSquare = new Square(-1, -1);
-        private Image toOldImage = null;
-        private Image fromImage = null;
 
-        public Form1()
+        public ChessUI()
         {
             InitializeComponent();
             int squareSize = 50;
@@ -98,7 +95,7 @@ namespace Blobfish_11
                     }
 
                     Falt[i, j].Image = Image.FromFile(picName);
-                    Cursor cursor = moveablePiece(piece) ? Cursors.Hand : Cursors.Default;
+                    Cursor cursor = moveablePiece(piece) ? dragCursor : Cursors.Default;
                     Falt[i, j].Cursor = cursor;
                 }
             }
@@ -375,7 +372,7 @@ namespace Blobfish_11
                 evalBox.Text = "För få drag har spelats!";
             }
         }
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void ChessUI_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Modifiers == Keys.Control)
             {
@@ -515,11 +512,11 @@ namespace Blobfish_11
             resultPlace.evaluation = res.evaluation;
             return;
         }
-        private void timer1_Tick(object sender, EventArgs e)
+        private void ponderingTimer_Tick(object sender, EventArgs e)
         {
             numberOfDots = (numberOfDots % 3) + 1;
             ponderingLabel.Text = "Datorn tänker" + string.Join("", Enumerable.Repeat(".", numberOfDots));
-            ponderingTime = ponderingTime.Add(new TimeSpan(0, 0, 0, 0, timer1.Interval));
+            ponderingTime = ponderingTime.Add(new TimeSpan(0, 0, 0, 0, ponderingTimer.Interval));
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
         }
         private void cancelButton_Click(object sender, EventArgs e)
@@ -530,7 +527,7 @@ namespace Blobfish_11
             evalBox.Text = "Beräkningen avbröts.";
             setPonderingMode(false);
         }
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void ChessUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             ponderingWorker.CancelAsync();
         }
@@ -541,9 +538,9 @@ namespace Blobfish_11
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
             if (setTo)
-                timer1.Start();
+                ponderingTimer.Start();
             else
-                timer1.Stop();
+                ponderingTimer.Stop();
             for (int rank = 0; rank < 7; rank++)
             {
                 for (int line = 0; line < 7; line++)
@@ -555,7 +552,7 @@ namespace Blobfish_11
                     else
                     {
                         char pieceOnSquare = currentPosition.board[rank, line];
-                        Cursor cursor = moveablePiece(pieceOnSquare) ? Cursors.Hand : Cursors.Default;
+                        Cursor cursor = moveablePiece(pieceOnSquare) ? dragCursor : Cursors.Default;
                         if (flipped)
                         {
                             Falt[7 - rank, 7 - line].Cursor = cursor;
@@ -586,11 +583,11 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] {1, 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
+                    return new Engine(new double[] {1, 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] {1.2f, 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
+                    return new Engine(new double[] {1.2f, 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, MIL);
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
@@ -626,114 +623,6 @@ namespace Blobfish_11
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
-        }
-
-        private bool moveablePiece(char piece)
-        {
-            if (piece == '\0')
-            {
-                return false;
-            }
-            else if(currentPosition.whiteToMove && piece < 'a')
-            {
-                return true;
-            }
-            else if(!currentPosition.whiteToMove && piece >= 'a')
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        private void squareMouseDown(object sender, MouseEventArgs e)
-        {
-            if (ponderingWorker.IsBusy) return;
-            
-            PictureBox from = sender as PictureBox;
-            dragFromSquare = picBoxSquare(from);
-            char piece = currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
-            if (!moveablePiece(piece))
-                return;
-
-            fromImage = from.Image;
-            from.Image = Image.FromFile("null.png");
-            from.DoDragDrop(fromImage, DragDropEffects.Copy);
-        }
-        private void squareDragEnter(object sender, DragEventArgs e)
-        {
-            PictureBox to = sender as PictureBox;
-            e.Effect = DragDropEffects.Copy;
-
-            toOldImage = to.Image;
-            Image cpy = (Image)fromImage.Clone();
-            using (Graphics g = Graphics.FromImage(cpy))
-            {
-                using (SolidBrush br =
-                new SolidBrush(Color.FromArgb(100, 255, 255, 255)))
-                {
-                    g.FillRectangle(br, 0, 0, cpy.Width, cpy.Height);
-                }
-            }
-            to.Image = cpy;
-        }
-        private void squareDragDrop(object sender, DragEventArgs e)
-        {
-            bool moveWasPlayed = false;
-            Square newSquare = picBoxSquare(sender as PictureBox);
-            foreach (Move item in currentMoves)
-            {
-                if (dragFromSquare.rank == item.from.rank && dragFromSquare.line == item.from.line &&
-                    newSquare.rank == item.to.rank && newSquare.line == item.to.line)
-                {
-                    (sender as PictureBox).Image = fromImage;
-                    playMove(item);
-                    moveWasPlayed = true;
-                    break;
-                }
-            }
-            if (!moveWasPlayed)
-            {
-                if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
-                    evalBox.Text = "Felaktigt drag!";
-                (sender as PictureBox).Image = toOldImage;
-                if(!flipped)
-                    Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;
-                else
-                    Falt[7-dragFromSquare.rank, 7-dragFromSquare.line].Image = fromImage;
-            }
-            dragFromSquare = new Square(-1, -1);
-            moveLabel.Text = "";
-        }
-        private void squareDragLeave(object sender, EventArgs e)
-        {
-            (sender as PictureBox).Image = toOldImage;
-        }
-        private void squareGiveFeedBack(object sender, GiveFeedbackEventArgs e)
-        {
-            //Byt ut till annan pekare?
-            if (e.Effect == DragDropEffects.Copy)
-            {
-                e.UseDefaultCursors = false;
-                Cursor.Current = Cursors.Hand;
-            }
-            else
-                e.UseDefaultCursors = true;
-
-        }
-        private Square picBoxSquare(PictureBox picBox)
-        {
-            int xVal = picBox.Location.X; //a-h
-            int yVal = picBox.Location.Y; //1-8
-            xVal = xVal / (boardPanel.Size.Width / 8);
-            yVal = yVal / (boardPanel.Size.Height / 8);
-            if (flipped)
-            {
-                xVal = 7 - xVal;
-                yVal = 7 - yVal;
-            }
-            return new Square(yVal, xVal);
         }
     }
 }

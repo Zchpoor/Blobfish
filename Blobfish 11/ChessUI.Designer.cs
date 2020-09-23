@@ -1,6 +1,6 @@
 ﻿namespace Blobfish_11
 {
-    partial class Form1
+    partial class ChessUI
     {
         /// <summary>
         /// Required designer variable.
@@ -46,7 +46,7 @@
             this.ponderingPanel = new System.Windows.Forms.Panel();
             this.ponderingTimeLabel = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.ponderingTimer = new System.Windows.Forms.Timer(this.components);
             this.settingsPanel = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.depthRB4 = new System.Windows.Forms.RadioButton();
@@ -263,8 +263,8 @@
             // 
             // timer1
             // 
-            this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.ponderingTimer.Interval = 500;
+            this.ponderingTimer.Tick += new System.EventHandler(this.ponderingTimer_Tick);
             // 
             // settingsPanel
             // 
@@ -424,7 +424,7 @@
             this.label2.TabIndex = 13;
             this.label2.Text = "Inställningar:";
             // 
-            // Form1
+            // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -440,10 +440,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
             this.KeyPreview = true;
-            this.Name = "Form1";
+            this.Name = "ChessUI";
             this.Text = "Blobfish 11";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChessUI_FormClosing);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChessUI_KeyDown);
             this.compColorBox1.ResumeLayout(false);
             this.compColorBox1.PerformLayout();
             this.ponderingPanel.ResumeLayout(false);
@@ -475,7 +475,7 @@
         private System.Windows.Forms.Label ponderingLabel;
         private System.Windows.Forms.Panel ponderingPanel;
         private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer ponderingTimer;
         private System.Windows.Forms.Label ponderingTimeLabel;
         private System.Windows.Forms.Panel settingsPanel;
         private System.Windows.Forms.GroupBox playStyleBox;
