@@ -342,9 +342,9 @@
             this.depthRB1.AutoSize = true;
             this.depthRB1.Location = new System.Drawing.Point(6, 48);
             this.depthRB1.Name = "depthRB1";
-            this.depthRB1.Size = new System.Drawing.Size(100, 21);
+            this.depthRB1.Size = new System.Drawing.Size(96, 21);
             this.depthRB1.TabIndex = 4;
-            this.depthRB1.Text = "3+ (Snabb)";
+            this.depthRB1.Text = "3  (Snabb)";
             this.depthRB1.UseVisualStyleBackColor = true;
             this.depthRB1.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -355,7 +355,7 @@
             this.depthRB0.Name = "depthRB0";
             this.depthRB0.Size = new System.Drawing.Size(146, 21);
             this.depthRB0.TabIndex = 3;
-            this.depthRB0.Text = "3   (Mycket snabb)";
+            this.depthRB0.Text = "2   (Mycket snabb)";
             this.depthRB0.UseVisualStyleBackColor = true;
             this.depthRB0.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 

@@ -76,6 +76,9 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
+            currentPosition = pos;
+            currentMoves = blobFish.allValidMoves(pos, false);
+
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -95,14 +98,13 @@ namespace Blobfish_11
                     }
 
                     Falt[i, j].Image = Image.FromFile(picName);
+                    Cursor cursor = moveablePiece(piece) ? Cursors.Hand : Cursors.Default;
+                    Falt[i, j].Cursor = cursor;
                 }
             }
 
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
-            currentPosition = pos;
-
-            currentMoves = blobFish.allValidMoves(pos, false);
 
             int res = blobFish.decisiveResult(pos, currentMoves);
             if (res != -2)
@@ -116,7 +118,6 @@ namespace Blobfish_11
         }
         private void playBestEngineMove()
         {
-            setPonderingMode(true);
             if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
@@ -125,6 +126,7 @@ namespace Blobfish_11
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 ponderingWorker.RunWorkerAsync();
             }
+            setPonderingMode(true);
         }
         private void playMove(Move move)
         {
@@ -523,7 +525,7 @@ namespace Blobfish_11
         private void cancelButton_Click(object sender, EventArgs e)
         {
             ponderingWorker.CancelAsync();
-            if(!radioButton4.Checked)
+            if (!radioButton4.Checked)
                 takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             setPonderingMode(false);
@@ -542,12 +544,36 @@ namespace Blobfish_11
                 timer1.Start();
             else
                 timer1.Stop();
+            for (int rank = 0; rank < 7; rank++)
+            {
+                for (int line = 0; line < 7; line++)
+                {
+                    if (setTo)
+                    {
+                        Falt[rank, line].Cursor = Cursors.Default;
+                    }
+                    else
+                    {
+                        char pieceOnSquare = currentPosition.board[rank, line];
+                        Cursor cursor = moveablePiece(pieceOnSquare) ? Cursors.Hand : Cursors.Default;
+                        if (flipped)
+                        {
+                            Falt[7 - rank, 7 - line].Cursor = cursor;
+                        }
+                        else
+                        {
+                            Falt[rank, line].Cursor = cursor;
+                        }
+                    }
+
+                }
+            }
         }
         private Engine choosePlayingStyle()
         {
             //Byt namn på funktionen?
             int[] MIL = { };
-            if (depthRB1.Checked || depthRB3.Checked)
+            if (depthRB3.Checked)
             {
                 MIL = new int[] {8};
             }
@@ -586,7 +612,7 @@ namespace Blobfish_11
             if((sender as RadioButton).Checked)
             {
                 if (depthRB0.Checked)
-                    minDepth = 3;
+                    minDepth = 2;
                 else if (depthRB1.Checked)
                     minDepth = 3;
                 else if (depthRB2.Checked)
@@ -602,12 +628,35 @@ namespace Blobfish_11
             }
         }
 
+        private bool moveablePiece(char piece)
+        {
+            if (piece == '\0')
+            {
+                return false;
+            }
+            else if(currentPosition.whiteToMove && piece < 'a')
+            {
+                return true;
+            }
+            else if(!currentPosition.whiteToMove && piece >= 'a')
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
             if (ponderingWorker.IsBusy) return;
-
+            
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);
+            char piece = currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
+            if (!moveablePiece(piece))
+                return;
+
             fromImage = from.Image;
             from.Image = Image.FromFile("null.png");
             from.DoDragDrop(fromImage, DragDropEffects.Copy);
@@ -667,7 +716,6 @@ namespace Blobfish_11
             if (e.Effect == DragDropEffects.Copy)
             {
                 e.UseDefaultCursors = false;
-                
                 Cursor.Current = Cursors.Hand;
             }
             else
