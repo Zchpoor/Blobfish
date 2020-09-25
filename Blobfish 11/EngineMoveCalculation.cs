@@ -391,8 +391,8 @@ namespace Blobfish_11
             char fromChar = pos.board[move.from.rank, move.from.line];
             if (toChar != '\0') //Slag
             {
-                int valueOfCapturedPiece = valueOf(toChar);
-                int valueDiff = valueOfCapturedPiece - valueOf(fromChar);
+                int valueOfCapturedPiece = heavyValueOf(toChar);
+                int valueDiff = valueOfCapturedPiece - heavyValueOf(fromChar);
                 
                 if (valueDiff <= 0)
                     return 0;
@@ -430,7 +430,7 @@ namespace Blobfish_11
                 }
             }
         }
-        private int valueOf(char tkn)
+        private int heavyValueOf(char tkn)
         {
             switch (tkn.ToString().ToUpper())
             {

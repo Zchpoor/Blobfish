@@ -10,7 +10,6 @@ namespace Blobfish_11
     public class Position
     {
         //TODO: Gör om till struct?
-        //TODO: Ändra allt till Square.
         public bool whiteToMove;
         public sbyte halfMoveClock = 0;
         public short moveCounter = 0;

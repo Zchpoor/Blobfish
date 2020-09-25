@@ -27,6 +27,7 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
+        Dictionary<char, Image> piecesPictures = new System.Collections.Generic.Dictionary<char, Image>();
 
         public ChessUI()
         {
@@ -36,6 +37,30 @@ namespace Blobfish_11
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
+            #region fetchImages
+            try
+            {
+                piecesPictures.Add('\0', Image.FromFile("null.png"));
+                piecesPictures.Add('p', Image.FromFile("Bp.png"));
+                piecesPictures.Add('P', Image.FromFile("WP.png"));
+                piecesPictures.Add('n', Image.FromFile("Bn.png"));
+                piecesPictures.Add('N', Image.FromFile("WN.png"));
+                piecesPictures.Add('b', Image.FromFile("Bb.png"));
+                piecesPictures.Add('B', Image.FromFile("WB.png"));
+                piecesPictures.Add('r', Image.FromFile("Br.png"));
+                piecesPictures.Add('R', Image.FromFile("WR.png"));
+                piecesPictures.Add('q', Image.FromFile("Bq.png"));
+                piecesPictures.Add('Q', Image.FromFile("WQ.png"));
+                piecesPictures.Add('k', Image.FromFile("Bk.png"));
+                piecesPictures.Add('K', Image.FromFile("WK.png"));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Ett fel inträffade vid inladdning av bilder. Programmet kommer att avslutas. " +
+                    Environment.NewLine + "Felmeddelande: " + Environment.NewLine + e.Message);
+                this.Close();
+            }
+            #endregion
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -81,20 +106,7 @@ namespace Blobfish_11
                 for (int j = 0; j < 8; j++)
                 {
                     char piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
-                    string picName = "null.png";
-                    if (piece != '\0')
-                    {
-                        if (piece > 'Z')
-                        {
-                            picName = "B" + piece + ".png";
-                        }
-                        else
-                        {
-                            picName = "W" + piece + ".png";
-                        }
-                    }
-
-                    Falt[i, j].Image = Image.FromFile(picName);
+                    Falt[i, j].Image = piecesPictures[piece];
                     Cursor cursor = moveablePiece(piece) ? dragCursor : Cursors.Default;
                     Falt[i, j].Cursor = cursor;
                 }
@@ -661,5 +673,5 @@ namespace Blobfish_11
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
  *  Buggar:
- *  
+ *  Bli av med toUpper?
  */
