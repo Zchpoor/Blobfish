@@ -31,7 +31,7 @@ namespace Blobfish_11
 
                 if (moves.Count == 1)
                 {
-                    EvalResult res = eval(moves[0].execute(pos), minDepth);
+                    EvalResult res = eval(moves[0].execute(pos), minDepth-1);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
@@ -357,6 +357,11 @@ namespace Blobfish_11
 
                     defenceAccumulator += finDefValue;
                 }
+            }
+            if(defenceAccumulator > safteySoftCap)
+            {
+                //Halverar nyttan av kungsförsvar efter en viss gräns.
+                defenceAccumulator -= (defenceAccumulator - safteySoftCap) / 2;
             }
             double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
 

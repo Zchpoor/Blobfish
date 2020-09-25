@@ -13,6 +13,7 @@ namespace Blobfish_11
         readonly double kingValue = 4f;
         readonly double bishopPairValue = 0.4f;
         readonly double[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
+        double safteySoftCap = 6f;
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
         //tunga pjäser uppgår till mindre än eller lika med endgameLimit.

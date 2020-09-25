@@ -201,7 +201,7 @@ namespace Blobfish_11
                     break;
                 case "num":
                     double res = choosePlayingStyle().numericEval(currentPosition);
-                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + res.ToString();
+                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res,2).ToString();
                     break;
                 case "time":
                     evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
@@ -591,7 +591,7 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] {1, 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 0.8f, 0.1f, 0.05f }, 8, 1f, MIL);
+                    return new Engine(new double[] {1, 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 0.85f, MIL);
                 }
                 else
                 {
