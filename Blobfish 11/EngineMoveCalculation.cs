@@ -237,9 +237,12 @@ namespace Blobfish_11
         }
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
+            Square currentSquare = new Square();
             void callbackByOffset(sbyte rankOffset, sbyte lineOffset)
             {
-                Square currentSquare = new Square(pieceSquare.rank + rankOffset, pieceSquare.line + lineOffset);
+                currentSquare.rank = (sbyte) (pieceSquare.rank + rankOffset);
+                currentSquare.line = (sbyte) (pieceSquare.line + lineOffset);
+
                 if (validSquare(currentSquare))
                 {
                     callback(currentSquare);
@@ -257,32 +260,28 @@ namespace Blobfish_11
         private void foreachLineSquare(Position pos, Square pieceSquare, sbyte rankOffset, sbyte lineOffset, functionByPiece callback)
         {
             //Generell funktion som itererar över en linje/diagonal så länge det är giltiga fält.
-            sbyte rank = pieceSquare.rank, line = pieceSquare.line;
-            sbyte counter = 1;
             bool done = false;
-            Square currentSquare = new Square(rank + (rankOffset * counter), line + (lineOffset * counter));
-            while (validSquare(currentSquare) && !done)
+            pieceSquare.rank += rankOffset;
+            pieceSquare.line += lineOffset;
+
+            while (validSquare(pieceSquare) && !done)
             {
-                callback(currentSquare);
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                callback(pieceSquare);
+                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
                 if (pieceOnCurrentSquare != '\0') //Ett fält där en pjäs står.
                 {
                     done = true;
                 }
-                counter++;
-                currentSquare.rank = (sbyte)(rank + (rankOffset * counter));
-                currentSquare.line = (sbyte)(line + (lineOffset * counter));
+                pieceSquare.rank += rankOffset;
+                pieceSquare.line += lineOffset;
             }
         }
         private void foreachBishopSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
-            for (sbyte i = -1; i < 2; i += 2) //Kommer att vara -1 eller 1.
-            {
-                for (sbyte j = -1; j < 2; j += 2) //Kommer att vara -1 eller 1.
-                {
-                    foreachLineSquare(pos, pieceSquare, i, j, callback);
-                }
-            }
+            foreachLineSquare(pos, pieceSquare, -1, -1, callback);
+            foreachLineSquare(pos, pieceSquare, -1, 1, callback);
+            foreachLineSquare(pos, pieceSquare, 1, -1, callback);
+            foreachLineSquare(pos, pieceSquare, 1, 1, callback);
         }
         private void foreachRookSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
@@ -293,13 +292,15 @@ namespace Blobfish_11
         }
         private void foreachKingSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
+            Square currentSquare = new Square();
             for (sbyte i = -1; i <= 1; i++)
             {
                 for (sbyte j = -1; j <= 1; j++)
                 {
                     if (i == 0 && j == 0) continue;
 
-                    Square currentSquare = new Square(pieceSquare.rank + i, pieceSquare.line + j);
+                    currentSquare.rank = (sbyte)(pieceSquare.rank + i);
+                    currentSquare.line = (sbyte)(pieceSquare.line + j);
                     if (validSquare(currentSquare))
                     {
                         callback(currentSquare);

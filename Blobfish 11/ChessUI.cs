@@ -693,8 +693,8 @@ namespace Blobfish_11
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
  *  Buggar:
- *  Förbättra Clone()
  *  Förbättra validSquare()
  *  Krash om annat än pjäser dras.
  *  Negativa dragantal
+ *  Fel vid bildinladdning i "release"-läge
  */
