@@ -379,15 +379,19 @@ namespace Blobfish_11
         }
         private double defenceValueOf(char piece)
         {
-            switch (piece.ToString().ToUpper())
+            if (piece == '\0') return 0;
+            if (piece > 'a') 
+                piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            switch (piece)
             {
-                case "": return 0; //Kolla om denna fungerar.
-                case "P": return defenceValues[0];
-                case "N": return defenceValues[1];
-                case "B": return defenceValues[2];
-                case "R": return defenceValues[3];
-                case "Q": return defenceValues[4];
-                default: return 0;
+                case 'P': return defenceValues[0];
+                case 'N': return defenceValues[1];
+                case 'B': return defenceValues[2];
+                case 'R': return defenceValues[3];
+                case 'Q': return defenceValues[4];
+                case 'K': return 0;
+                default: 
+                    throw new Exception("Okänt tecken!");
             }
         }
         private double evalPawns(int[] numberOfPawns, double[] posFactor, sbyte[,] pawns)

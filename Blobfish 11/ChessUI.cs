@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Blobfish_11
 {
@@ -27,7 +28,7 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
-        Dictionary<char, Image> piecesPictures = new System.Collections.Generic.Dictionary<char, Image>();
+        Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
         public ChessUI()
         {
@@ -75,7 +76,7 @@ namespace Blobfish_11
                     picBox.SizeMode = PictureBoxSizeMode.Zoom;
                     picBox.Margin = new Padding(0);
                     picBox.Padding = new Padding(0);
-                    picBox.Image = Image.FromFile("null.png");
+                    picBox.Image = piecesPictures['\0'];
 
                     picBox.AllowDrop = true;
                     picBox.MouseDown += new MouseEventHandler(squareMouseDown);
@@ -223,18 +224,34 @@ namespace Blobfish_11
                     break;
                 case "spec":
                     //Endast för att se vilke tid som går åt för numericEval respektive allValidMoves.
+                    Stopwatch sw = new Stopwatch();
+                    long t0, t1, t2;
+                    sw.Start();
                     for (int i = 0; i < 10000; i++)
                     {
                         blobFish.numericEval(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"));
                     }
-                    for (int i = 0; i < 10000; i++) //Verkar vara ca 10-20ggr långsammare än numericEval.
+                    sw.Stop();
+                    t0 = sw.ElapsedMilliseconds;
+                    sw.Restart();
+                    for (int i = 0; i < 10000; i++)
                     {
                         blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), false);
                     }
-                    for (int i = 0; i < 10000; i++) //Extra tid för att sortera dragen verkar vara försumbar
+                    sw.Stop();
+                    t1 = sw.ElapsedMilliseconds;
+                    sw.Restart();
+                    for (int i = 0; i < 10000; i++)
                     {
                         blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), true);
                     }
+                    sw.Stop();
+                    t2 = sw.ElapsedMilliseconds;
+                    evalBox.Text = "Tider för 10000 iterationer: "
+                        + "\r\n  Evaluering av ställning: " + t0.ToString()
+                        + "\r\n  Alla drag (osorterade): " + t1.ToString()
+                        + "\r\n  Alla drag (sorterade): " + t2.ToString()
+                        + "\r\n  Extra tid för att sortera: " + Math.Round((((double)t2 / (double)t1)-1) * 100, 2) + "%";
                     break;
                 default:
                     try
@@ -653,6 +670,7 @@ namespace Blobfish_11
  *  Double -> Float (Volatile)
  *  Gå framåt/bakåt i partiet.
  *  Dra nu!
+ *  Tidtagarur i spec-kommandot.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -674,4 +692,6 @@ namespace Blobfish_11
  *  
  *  Buggar:
  *  Bli av med toUpper?
+ *  Krash om annat än pjäser dras.
+ *  Negativa dragantal
  */

@@ -318,27 +318,30 @@ namespace Blobfish_11
         }
         private bool isControlledBy(Position pos, Square relevantSquare, bool byWhite)
         {
-            string piecesToLookFor = byWhite ? "BQ" : "bq";
+            //Tab (\t) används om inget annat tecken skall användas.
+
+            char[] piecesToLookFor = byWhite ? new char[2] { 'B', 'Q' } : new char[2] { 'b', 'q' };
             bool isControlled = false;
             void CheckIfPieceToLookFor(Square currentSquare)
             {
                 char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                if (piecesToLookFor.Contains(pieceOnCurrentSquare))
+                if (piecesToLookFor[0] == pieceOnCurrentSquare || piecesToLookFor[1] == pieceOnCurrentSquare)
                     isControlled = true;
             }
 
             foreachBishopSquare(pos, relevantSquare, CheckIfPieceToLookFor);
             if (isControlled) return true;
 
-            piecesToLookFor = byWhite ? "RQ" : "rq";
+            piecesToLookFor[0] = byWhite ? 'R' : 'r';
             foreachRookSquare(pos, relevantSquare, CheckIfPieceToLookFor);
             if (isControlled) return true;
 
-            piecesToLookFor = byWhite ? "K" : "k";
+            piecesToLookFor[0] = byWhite ? 'K' : 'k';
+            piecesToLookFor[1] = byWhite ? '\t' : '\t'; //Kommer aldrig återfinnas.
             foreachKingSquare(pos, relevantSquare, CheckIfPieceToLookFor);
             if (isControlled) return true;
 
-            piecesToLookFor = byWhite ? "N" : "n";
+            piecesToLookFor[0] = byWhite ? 'N' : 'n';
             foreachKnightSquare(pos, relevantSquare, CheckIfPieceToLookFor);
             if (isControlled) return true;
 
