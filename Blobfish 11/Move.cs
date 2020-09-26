@@ -101,7 +101,8 @@ namespace Blobfish_11
             }
 
             //Beräkna en passant-fält
-            if(oldPos.board[from.rank, from.line].ToString().ToUpper() == "P") //Om den förflyttade pjäsen är en bonde
+            if(oldPos.board[from.rank, from.line] == 'P'
+                || oldPos.board[from.rank, from.line] == 'p') //Om den förflyttade pjäsen är en bonde
             {
                if(Math.Abs(from.rank - to.rank) == 2) //Om förflyttningen är två steg.
                 {

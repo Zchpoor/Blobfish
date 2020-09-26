@@ -9,16 +9,16 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        readonly double[] pieceValues = {1, 3, 3, 5, 9 };
-        readonly double kingValue = 4f;
-        readonly double bishopPairValue = 0.4f;
-        readonly double[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
-        double safteySoftCap = 6f;
+        readonly float[] pieceValues = {1, 3, 3, 5, 9 };
+        readonly float kingValue = 4f;
+        readonly float bishopPairValue = 0.4f;
+        readonly float[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
+        readonly float safteySoftCap = 6f;
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
         //tunga pjäser uppgår till mindre än eller lika med endgameLimit.
         readonly int endgameLimit = 8;
-        readonly double kingSafteyDivisor = 200;
+        readonly float kingSafteyDivisor = 200f;
         readonly int sleepTime = 100;
 
         //För vart och ett av talen som är större än antalet drag i ställningen så
@@ -32,8 +32,8 @@ namespace Blobfish_11
         {
             this.moveIncreaseLimits = moveIncreaseLimits;
         }
-        public Engine(double[] pieceValues, double bishopPairValue, double[] defenceValues,
-            int endgameLimit, double kingSafteyCoefficient, int[] moveIncreaseLimits)
+        public Engine(float[] pieceValues, float bishopPairValue, float[] defenceValues,
+            int endgameLimit, float kingSafteyCoefficient, int[] moveIncreaseLimits)
         {
             if (pieceValues.Length != 5)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
@@ -44,13 +44,11 @@ namespace Blobfish_11
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
             this.defenceValues = defenceValues;
             this.endgameLimit = endgameLimit;
-            this.kingSafteyDivisor = 200 / kingSafteyCoefficient;
-            //this.sleepTime = sleepTime;
-            //this.moveIncreaseLimits = moveIncreaseLimits;
+            this.kingSafteyDivisor = 200f / kingSafteyCoefficient;
             this.moveIncreaseLimits = moveIncreaseLimits;
         }
         
-        private static readonly double[,,] pawn =
+        private static readonly float[,,] pawn =
         {
             { //Svarta bönder
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }, //8
@@ -73,7 +71,7 @@ namespace Blobfish_11
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }  //1
             }
         };
-        private static readonly double[,] knight =
+        private static readonly float[,] knight =
         {
             {0.89f,    0.95f,    0.97f,    0.98f,    0.98f,    0.97f,    0.95f,    0.89f },
             {0.95f,    0.98f,    1f,       1.02f,    1.02f,    1f,       0.98f,    0.95f },
@@ -84,7 +82,7 @@ namespace Blobfish_11
             {0.95f,    0.98f,    1f,       1.02f,    1.02f,    1f,       0.98f,    0.95f },
             {0.89f,    0.95f,    0.97f,    0.98f,    0.98f,    0.97f,     0.95f,    0.89f }
         };                               
-        private static readonly double[,] bishop =
+        private static readonly float[,] bishop =
         {
             {1f,    0.97f, 0.94f, 0.92f, 0.92f, 0.94f, 0.97f, 1f    },
             {0.97f, 1.02f, 0.98f, 0.96f, 0.96f, 0.98f, 1.02f, 0.97f },
@@ -95,7 +93,7 @@ namespace Blobfish_11
             {0.97f, 1.02f, 0.98f, 0.96f, 0.96f, 0.98f, 1.02f, 0.97f },
             {1f,    0.97f, 0.94f, 0.92f, 0.92f, 0.94f, 0.97f, 1f    }
         };
-        private static readonly double[,] rook =
+        private static readonly float[,] rook =
         {
             {1f,      1.03f,    1.07f,    1.1f,     1.1f,     1.07f,    1.03f,    1f,    },
             {1.03f,   1f,       0.96f,    1.02f,    1.02f,    0.96f,    1f,       1.03f, },
@@ -106,7 +104,7 @@ namespace Blobfish_11
             {1.03f,   1f,       0.96f,    1.02f,    1.02f,    0.96f,    1f,       1.03f, },
             {1f,      1.03f,    1.07f,    1.1f,     1.1f,     1.07f,    1.03f,    1f,    }
         };
-        private static readonly double[,] queen =
+        private static readonly float[,] queen =
         {
             {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f},
             {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
@@ -117,7 +115,7 @@ namespace Blobfish_11
             {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
             {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f}
         };
-        private static readonly double[,,] king =
+        private static readonly float[,,] king =
         {
            { //Ej slutspel
                 {2f,   1.9f,  1.4f,  1f,    1f,    1.4f,  1.9f,  2f   },
@@ -145,7 +143,7 @@ namespace Blobfish_11
             }
         };
 
-        private static readonly double[,] defence =
+        private static readonly float[,] defence =
         {
             {0.25f,  0.8f, 1f,   0.8f, 0.25f,},
             {0.2f,   1.4f, 1.8f, 1.4f, 0.2f, },

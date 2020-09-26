@@ -155,16 +155,20 @@ namespace Blobfish_11
                     evalBox.Text = Tests.runTests();
                     break;
                 case "moves":
-                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
                     break;
                 case "drag":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
                     break;
                 case "sorted":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
                     break;
                 case "sorterade":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
                     break;
                 case "takeback":
                     takeback(2);
@@ -213,7 +217,7 @@ namespace Blobfish_11
                     printEval(choosePlayingStyle().eval(currentPosition, minDepth));
                     break;
                 case "num":
-                    double res = choosePlayingStyle().numericEval(currentPosition);
+                    float res = choosePlayingStyle().numericEval(currentPosition);
                     evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res,2).ToString();
                     break;
                 case "time":
@@ -223,35 +227,35 @@ namespace Blobfish_11
                     evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
                     break;
                 case "spec":
-                    //Endast för att se vilke tid som går åt för numericEval respektive allValidMoves.
+                    string posToEvaluate = "r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13";
                     Stopwatch sw = new Stopwatch();
                     long t0, t1, t2;
                     sw.Start();
                     for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.numericEval(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"));
+                        blobFish.numericEval(new Position(posToEvaluate));
                     }
                     sw.Stop();
                     t0 = sw.ElapsedMilliseconds;
                     sw.Restart();
                     for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), false);
+                        blobFish.allValidMoves(new Position(posToEvaluate), false);
                     }
                     sw.Stop();
                     t1 = sw.ElapsedMilliseconds;
                     sw.Restart();
                     for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), true);
+                        blobFish.allValidMoves(new Position(posToEvaluate), true);
                     }
                     sw.Stop();
                     t2 = sw.ElapsedMilliseconds;
-                    evalBox.Text = "Tider för 10000 iterationer: "
+                    evalBox.Text = "Tider för 10000 iterationer (ms): "
                         + "\r\n  Evaluering av ställning: " + t0.ToString()
                         + "\r\n  Alla drag (osorterade): " + t1.ToString()
                         + "\r\n  Alla drag (sorterade): " + t2.ToString()
-                        + "\r\n  Extra tid för att sortera: " + Math.Round((((double)t2 / (double)t1)-1) * 100, 2) + "%";
+                        + "\r\n  Extra tid för att sortera: " + Math.Round((((float)t2 / (float)t1)-1) * 100, 1) + "%";
                     break;
                 default:
                     try
@@ -343,7 +347,7 @@ namespace Blobfish_11
             }
             else if (result.bestMove != null)
             {
-                double eval = result.evaluation;
+                float eval = result.evaluation;
                 string textEval;
                 if (eval > 1000)
                 {
@@ -612,15 +616,15 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] {1, 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.6f, new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] {1.2f, 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, MIL);
+                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f, new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, MIL);
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] {1, 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 0.85f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3.1f, 5f, 9f }, 0.4f, new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 0.85f, MIL);
                 }
                 else
                 {
@@ -667,7 +671,6 @@ namespace Blobfish_11
  *  Mattbart material
  *  Gör fönstret skalbart.
  *  Koordinater
- *  Double -> Float (Volatile)
  *  Gå framåt/bakåt i partiet.
  *  Dra nu!
  *  Tidtagarur i spec-kommandot.
@@ -679,19 +682,19 @@ namespace Blobfish_11
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
- *  Gör om system för att betckna forcerad matt.
+ *  Gör om system för att beteckna forcerad matt.
  *  Beräkna nästa lager av drag tidigare.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
- *  Bli av med Le3/Le6
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
  *  Buggar:
- *  Bli av med toUpper?
+ *  Förbättra Clone()
+ *  Förbättra validSquare()
  *  Krash om annat än pjäser dras.
  *  Negativa dragantal
  */

@@ -394,8 +394,8 @@ namespace Blobfish_11
             char fromChar = pos.board[move.from.rank, move.from.line];
             if (toChar != '\0') //Slag
             {
-                int valueOfCapturedPiece = heavyValueOf(toChar);
-                int valueDiff = valueOfCapturedPiece - heavyValueOf(fromChar);
+                int valueOfCapturedPiece = roughValueOf(toChar);
+                int valueDiff = valueOfCapturedPiece - roughValueOf(fromChar);
                 
                 if (valueDiff <= 0)
                     return 0;
@@ -433,15 +433,18 @@ namespace Blobfish_11
                 }
             }
         }
-        private int heavyValueOf(char tkn)
+        private int roughValueOf(char piece)
         {
-            switch (tkn.ToString().ToUpper())
+            if (piece == '\0') return 0;
+            if (piece > 'a')
+                piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            switch (piece)
             {
-                case "Q": return 9;
-                case "R": return 5;
-                case "B": return 3;
-                case "N": return 3;
-                case "P": return 1;
+                case 'P': return 1;
+                case 'N': return 3;
+                case 'B': return 3;
+                case 'R': return 5;
+                case 'Q': return 9;
                 default: return 0;
             }
         }
