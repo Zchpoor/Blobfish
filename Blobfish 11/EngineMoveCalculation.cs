@@ -53,15 +53,20 @@ namespace Blobfish_11
             bool pieceIsWhite = isWhite(pieceChar);
             if (pieceIsWhite != pos.whiteToMove)
                 return null;
-            switch (pieceChar.ToString().ToUpper())
+            if (pieceChar == '\0') return null;
+
+            if (pieceChar > 'a')
+                pieceChar = (char)(pieceChar - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+
+            switch (pieceChar)
             {
-                case "": return null;
-                case "P": return pawnMoves(pos, pieceSquare, pieceIsWhite);
-                case "N": return knightMoves(pos, pieceSquare, pieceIsWhite);
-                case "B": return bishopMoves(pos, pieceSquare, pieceIsWhite);
-                case "R": return rookMoves(pos, pieceSquare, pieceIsWhite);
-                case "Q": return queenMoves(pos, pieceSquare, pieceIsWhite);
-                case "K": return kingMoves(pos, pieceSquare, pieceIsWhite);
+                case '\0': return null;
+                case 'P': return pawnMoves(pos, pieceSquare, pieceIsWhite);
+                case 'N': return knightMoves(pos, pieceSquare, pieceIsWhite);
+                case 'B': return bishopMoves(pos, pieceSquare, pieceIsWhite);
+                case 'R': return rookMoves(pos, pieceSquare, pieceIsWhite);
+                case 'Q': return queenMoves(pos, pieceSquare, pieceIsWhite);
+                case 'K': return kingMoves(pos, pieceSquare, pieceIsWhite);
                 default: return null;
             }
         }

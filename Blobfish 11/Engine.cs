@@ -129,7 +129,7 @@ namespace Blobfish_11
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
         {
-            string moveName = ""; //Endast i debug-syfte
+            //string moveName = ""; //Endast i debug-syfte
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
@@ -154,7 +154,7 @@ namespace Blobfish_11
                         beta.setValue(betaContainer.getValue());
 
                     //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
+                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -186,7 +186,7 @@ namespace Blobfish_11
                     if (alphaContainer is SecureFloat && alphaContainer.getValue() > alpha.getValue())
                         alpha.setValue(alphaContainer.getValue());
                     //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
+                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -230,11 +230,12 @@ namespace Blobfish_11
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
             float pieceValue = 0;
+            char[,] board = pos.board;
             for (sbyte rank = 0; rank < 8; rank++)
             {
                 for (sbyte line = 0; line < 8; line++)
                 {
-                    switch (pos.board[rank, line])
+                    switch (board[rank, line])
                     {
                         case 'p':
                             numberOfPawns[0]++;
@@ -335,11 +336,13 @@ namespace Blobfish_11
             float defenceAccumulator = 0;
             sbyte direction = forWhite ? (sbyte) -1 : (sbyte) 1;
             Square kingSquare = forWhite ? pos.kingPositions[1] : pos.kingPositions[0];
+            Square currentSquare = new Square();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = -2; j < 3; j++)
                 {
-                    Square currentSquare = new Square(kingSquare.rank + (direction * i), kingSquare.line + j);
+                    currentSquare.rank = (sbyte)(kingSquare.rank + (direction * i));
+                    currentSquare.line = (sbyte)(kingSquare.line + j);
                     if (!validSquare(currentSquare)){
                         continue;
                     }
@@ -352,8 +355,7 @@ namespace Blobfish_11
                     float defCoeff = defence[2-i, j + 2];
                     float finDefValue = defValue * defCoeff;
 
-                    //Tag bort denna
-                    float DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
+                    //float DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
 
                     defenceAccumulator += finDefValue;
                 }

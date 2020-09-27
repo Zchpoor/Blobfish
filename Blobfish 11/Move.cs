@@ -8,8 +8,8 @@ namespace Blobfish_11
 {
     public class Move
     {
-        public Square from = new Square();
-        public Square to = new Square();
+        public Square from;
+        public Square to;
         public Move(Square fromSquare, Square toSquare)
         {
             this.from = fromSquare;

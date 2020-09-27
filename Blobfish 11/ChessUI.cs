@@ -39,9 +39,23 @@ namespace Blobfish_11
             ponderingLabel.Text = "Datorn tänker.";
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
             #region fetchImages
+            
             try
             {
-                piecesPictures.Add('\0', Image.FromFile("null.png"));
+                piecesPictures.Add('\0', Properties.Resources._null);
+                piecesPictures.Add('p', Properties.Resources.Bp);
+                piecesPictures.Add('P', Properties.Resources.Wp);
+                piecesPictures.Add('b', Properties.Resources.Bb);
+                piecesPictures.Add('B', Properties.Resources.WB);
+                piecesPictures.Add('n', Properties.Resources.Bn);
+                piecesPictures.Add('N', Properties.Resources.WN);
+                piecesPictures.Add('r', Properties.Resources.Br);
+                piecesPictures.Add('R', Properties.Resources.WR);
+                piecesPictures.Add('q', Properties.Resources.Bq);
+                piecesPictures.Add('Q', Properties.Resources.WQ);
+                piecesPictures.Add('k', Properties.Resources.Bk);
+                piecesPictures.Add('K', Properties.Resources.WK);
+                /*piecesPictures.Add('\0', Image.FromFile("null.png"));
                 piecesPictures.Add('p', Image.FromFile("Bp.png"));
                 piecesPictures.Add('P', Image.FromFile("WP.png"));
                 piecesPictures.Add('n', Image.FromFile("Bn.png"));
@@ -53,12 +67,12 @@ namespace Blobfish_11
                 piecesPictures.Add('q', Image.FromFile("Bq.png"));
                 piecesPictures.Add('Q', Image.FromFile("WQ.png"));
                 piecesPictures.Add('k', Image.FromFile("Bk.png"));
-                piecesPictures.Add('K', Image.FromFile("WK.png"));
+                piecesPictures.Add('K', Image.FromFile("WK.png"));*/
             }
             catch (Exception e)
             {
                 MessageBox.Show("Ett fel inträffade vid inladdning av bilder. Programmet kommer att avslutas. " +
-                    Environment.NewLine + "Felmeddelande: " + Environment.NewLine + e.Message);
+                    Environment.NewLine + "Felmeddelande: " + Environment.NewLine + e.ToString());
                 this.Close();
             }
             #endregion

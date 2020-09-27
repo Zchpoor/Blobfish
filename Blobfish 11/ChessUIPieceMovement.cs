@@ -52,11 +52,13 @@ namespace Blobfish_11
                 return;
 
             fromImage = from.Image;
-            from.Image = Image.FromFile("null.png");
+            from.Image = piecesPictures['\0'];
             from.DoDragDrop(fromImage, DragDropEffects.Copy);
         }
         private void squareDragEnter(object sender, DragEventArgs e)
         {
+            if (!(sender is PictureBox) || fromImage == null)
+                return;
             PictureBox to = sender as PictureBox;
             e.Effect = DragDropEffects.Copy;
 
@@ -74,6 +76,8 @@ namespace Blobfish_11
         }
         private void squareDragDrop(object sender, DragEventArgs e)
         {
+            if (!(sender is PictureBox) || fromImage == null)
+                return;
             bool moveWasPlayed = false;
             Square newSquare = picBoxSquare(sender as PictureBox);
             foreach (Move item in currentMoves)
@@ -98,14 +102,19 @@ namespace Blobfish_11
                     Falt[7 - dragFromSquare.rank, 7 - dragFromSquare.line].Image = fromImage;
             }
             dragFromSquare = new Square(-1, -1);
+            fromImage = null;
             moveLabel.Text = "";
         }
         private void squareDragLeave(object sender, EventArgs e)
         {
+            if (!(sender is PictureBox) || fromImage == null)
+                return;
             (sender as PictureBox).Image = toOldImage;
         }
         private void squareGiveFeedBack(object sender, GiveFeedbackEventArgs e)
         {
+            if (!(sender is PictureBox) || fromImage == null)
+                return;
             if (e.Effect == DragDropEffects.Copy)
             {
                 e.UseDefaultCursors = false;
