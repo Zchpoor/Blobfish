@@ -687,11 +687,12 @@ namespace Blobfish_11
  *  Koordinater
  *  Gå framåt/bakåt i partiet.
  *  Dra nu!
- *  Tidtagarur i spec-kommandot.
+ *  Förbättra validSquare()
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Minska behov av att ställa ut damen.
+ *  Öka behov av att flytta centrumbönder.
  * 
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
@@ -705,10 +706,9 @@ namespace Blobfish_11
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  Lägg till värde för att vara vid draget?
+ *  Lägg till de beräknade dragen direkt i listan.
+ *  
  *  
  *  Buggar:
- *  Förbättra validSquare()
- *  Krash om annat än pjäser dras.
- *  Negativa dragantal
- *  Fel vid bildinladdning i "release"-läge
  */

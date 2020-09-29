@@ -17,20 +17,22 @@ namespace Blobfish_11
         {
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
+            List<Move> newMoves;
             for (sbyte i = 0; i < 8; i++)
             {
                 for (sbyte j = 0; j < 8; j++)
                 {
-                    List<Move> moves = pieceCalculation(pos, new Square(i, j));
-                    if (moves != null)
-                        allMoves.AddRange(moves);
+                    newMoves = pieceCalculation(pos, new Square(i, j));
+                    if (newMoves != null)
+                        allMoves.AddRange(newMoves);
                 }
             }
 
+            Position newPos;
             for (int i = 0; i < allMoves.Count; i++)
             {
                 //Tar bort alla ogiltiga drag
-                Position newPos = allMoves[i].execute(pos);
+                newPos = allMoves[i].execute(pos);
 
                 if (newPos.whiteToMove && isControlledBy(newPos, newPos.kingPositions[0], true))
                 {
@@ -146,9 +148,10 @@ namespace Blobfish_11
         private List<Move> knightMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
         {
             List<Move> possibleMoves = new List<Move>();
+            char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -160,9 +163,10 @@ namespace Blobfish_11
         private List<Move> bishopMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
         {
             List<Move> possibleMoves = new List<Move>();
+            char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -174,9 +178,10 @@ namespace Blobfish_11
         private List<Move> rookMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
         {
             List<Move> possibleMoves = new List<Move>();
+            char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -195,9 +200,10 @@ namespace Blobfish_11
         private List<Move> kingMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
         {
             List<Move> possibleMoves = new List<Move>();
+            char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
                 {
                     possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -243,39 +249,54 @@ namespace Blobfish_11
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             Square currentSquare = new Square();
+            int newRank, newLine;
             void callbackByOffset(sbyte rankOffset, sbyte lineOffset)
             {
-                currentSquare.rank = (sbyte) (pieceSquare.rank + rankOffset);
-                currentSquare.line = (sbyte) (pieceSquare.line + lineOffset);
-
-                if (validSquare(currentSquare))
+                newRank = (pieceSquare.rank + rankOffset);
+                newLine = (pieceSquare.line + lineOffset);
+                if(newLine < 8 && newLine >= 0)
                 {
+                    currentSquare.rank = (sbyte)newRank;
+                    currentSquare.line = (sbyte)newLine;
                     callback(currentSquare);
                 }
             }
-            callbackByOffset(2, 1);
-            callbackByOffset(2, -1);
-            callbackByOffset(1, 2);
-            callbackByOffset(1, -2);
-            callbackByOffset(-1, 2);
-            callbackByOffset(-1, -2);
-            callbackByOffset(-2, 1);
-            callbackByOffset(-2, -1);
+            if(pieceSquare.rank < 7)
+            {
+                callbackByOffset(1, 2);
+                callbackByOffset(1, -2);
+
+                if(pieceSquare.rank < 6)
+                {
+                    callbackByOffset(2, 1);
+                    callbackByOffset(2, -1);
+                }
+            }
+            if(pieceSquare.rank > 0)
+            {
+                callbackByOffset(-1, 2);
+                callbackByOffset(-1, -2);
+                if(pieceSquare.rank > 1)
+                {
+                    callbackByOffset(-2, 1);
+                    callbackByOffset(-2, -1);
+                }
+            }
         }
         private void foreachLineSquare(Position pos, Square pieceSquare, sbyte rankOffset, sbyte lineOffset, functionByPiece callback)
         {
             //Generell funktion som itererar över en linje/diagonal så länge det är giltiga fält.
-            bool done = false;
             pieceSquare.rank += rankOffset;
             pieceSquare.line += lineOffset;
+            char[,] board = pos.board;
 
-            while (validSquare(pieceSquare) && !done)
+            while (validSquare(pieceSquare))
             {
                 callback(pieceSquare);
-                char pieceOnCurrentSquare = pos.board[pieceSquare.rank, pieceSquare.line];
+                char pieceOnCurrentSquare = board[pieceSquare.rank, pieceSquare.line];
                 if (pieceOnCurrentSquare != '\0') //Ett fält där en pjäs står.
                 {
-                    done = true;
+                    break;
                 }
                 pieceSquare.rank += rankOffset;
                 pieceSquare.line += lineOffset;
@@ -324,13 +345,14 @@ namespace Blobfish_11
         }
         private bool isControlledBy(Position pos, Square relevantSquare, bool byWhite)
         {
-            //Tab (\t) används om inget annat tecken skall användas.
+            //Tab (\t) används om inget annat tecken skall sökas efter.
 
             char[] piecesToLookFor = byWhite ? new char[2] { 'B', 'Q' } : new char[2] { 'b', 'q' };
             bool isControlled = false;
+            char pieceOnCurrentSquare;
             void CheckIfPieceToLookFor(Square currentSquare)
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
+                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (piecesToLookFor[0] == pieceOnCurrentSquare || piecesToLookFor[1] == pieceOnCurrentSquare)
                     isControlled = true;
             }
@@ -353,13 +375,15 @@ namespace Blobfish_11
 
             //Bönder
             sbyte riktning = byWhite ? (sbyte)1 : (sbyte)-1;
+            char pawnToLookFor = byWhite ? 'P' : 'p';
+            Square currentPawnSquare;
+            currentPawnSquare.rank = (sbyte)(relevantSquare.rank + riktning);
             for (sbyte i = -1; i <= 1; i+=2)
             {
-                Square currentSquare = new Square(relevantSquare.rank + riktning, relevantSquare.line + i);
-                if (validSquare(currentSquare))
+                currentPawnSquare.line = (sbyte)(relevantSquare.line + i);
+                if (validSquare(currentPawnSquare))
                 {
-                    char pawnToLookFor = byWhite ? 'P' : 'p';
-                    if(pos.board[currentSquare.rank, currentSquare.line] == pawnToLookFor)
+                    if(pos.board[currentPawnSquare.rank, currentPawnSquare.line] == pawnToLookFor)
                     {
                         return true;
                     }

@@ -155,6 +155,8 @@ namespace Blobfish_11
             this.halfMoveClock = sbyte.Parse(clockString);
             string moveString = lastString.Substring(lastString.IndexOf(' '), lastString.Length - lastString.IndexOf(' '));
             this.moveCounter = sbyte.Parse(moveString);
+            if(this.halfMoveClock < 0 || this.moveCounter < 0)
+                throw new Exception("Felaktig FEN.");
             //Till exempel: "2".
 
         }
