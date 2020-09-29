@@ -17,14 +17,14 @@ namespace Blobfish_11
         {
             //Public för att kunna användas av testerna.
             List<Move> allMoves = new List<Move>();
-            List<Move> newMoves;
+            Square currentSquare = new Square();
             for (sbyte i = 0; i < 8; i++)
             {
                 for (sbyte j = 0; j < 8; j++)
                 {
-                    newMoves = pieceCalculation(pos, new Square(i, j));
-                    if (newMoves != null)
-                        allMoves.AddRange(newMoves);
+                    currentSquare.rank = i;
+                    currentSquare.line = j;
+                    pieceCalculation(pos, currentSquare, allMoves);
                 }
             }
 
@@ -47,35 +47,33 @@ namespace Blobfish_11
 
             }
             if(sorted) return sortByEstQuality(allMoves, pos);
-            return allMoves;
+            else return allMoves;
         }
-        private List<Move> pieceCalculation(Position pos, Square pieceSquare)
+        private void pieceCalculation(Position pos, Square pieceSquare, List<Move> allMoves)
         {
             char pieceChar = pos.board[pieceSquare.rank, pieceSquare.line];
             bool pieceIsWhite = isWhite(pieceChar);
             if (pieceIsWhite != pos.whiteToMove)
-                return null;
-            if (pieceChar == '\0') return null;
+                return;
+            if (pieceChar == '\0') return;
 
             if (pieceChar > 'a')
                 pieceChar = (char)(pieceChar - ('a' - 'A')); //Gör om tecknet till stor bokstav.
 
             switch (pieceChar)
             {
-                case '\0': return null;
-                case 'P': return pawnMoves(pos, pieceSquare, pieceIsWhite);
-                case 'N': return knightMoves(pos, pieceSquare, pieceIsWhite);
-                case 'B': return bishopMoves(pos, pieceSquare, pieceIsWhite);
-                case 'R': return rookMoves(pos, pieceSquare, pieceIsWhite);
-                case 'Q': return queenMoves(pos, pieceSquare, pieceIsWhite);
-                case 'K': return kingMoves(pos, pieceSquare, pieceIsWhite);
-                default: return null;
+                case '\0': return;
+                case 'P': pawnMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case 'N': knightMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case 'B': bishopMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case 'R': rookMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case 'Q': queenMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case 'K': kingMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                default: return;
             }
         }
-        private List<Move> pawnMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void pawnMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
-
             void addPromotions(Square fromSquare, Square toSquare)
             {
                 string allPromotions = pieceIsWhite ? "QRBN" : "qrbn";
@@ -143,11 +141,9 @@ namespace Blobfish_11
 
                 }
             }
-            return possibleMoves;
         }
-        private List<Move> knightMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void knightMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
             char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
@@ -158,11 +154,9 @@ namespace Blobfish_11
                 }
             }
             foreachKnightSquare(pos, pieceSquare, addMoveIfValid);
-            return possibleMoves;
         }
-        private List<Move> bishopMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void bishopMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
             char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
@@ -173,11 +167,9 @@ namespace Blobfish_11
                 }
             }
             foreachBishopSquare(pos, pieceSquare, addMoveIfValid);
-            return possibleMoves;
         }
-        private List<Move> rookMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void rookMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
             char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
@@ -188,18 +180,14 @@ namespace Blobfish_11
                 }
             }
             foreachRookSquare(pos, pieceSquare, addMoveIfValid);
-            return possibleMoves;
         }
-        private List<Move> queenMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void queenMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
-            possibleMoves.AddRange(rookMoves(pos, pieceSquare, pieceIsWhite));
-            possibleMoves.AddRange(bishopMoves(pos, pieceSquare, pieceIsWhite));
-            return possibleMoves;
+            rookMoves(pos, pieceSquare, pieceIsWhite, possibleMoves);
+            bishopMoves(pos, pieceSquare, pieceIsWhite,possibleMoves);
         }
-        private List<Move> kingMoves(Position pos, Square pieceSquare, bool pieceIsWhite)
+        private void kingMoves(Position pos, Square pieceSquare, bool pieceIsWhite, List<Move> possibleMoves)
         {
-            List<Move> possibleMoves = new List<Move>();
             char pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
@@ -244,7 +232,6 @@ namespace Blobfish_11
                     }
                 }
             }
-            return possibleMoves;
         }
         private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
@@ -412,7 +399,9 @@ namespace Blobfish_11
             //Dragen läggs till i "omvänd ordning".
             for (int i = priorities-1; i >= 0; i--)
             {
-                sortedList.AddRange(listArray[i]);
+                List<Move> currentList = listArray[i];
+                if (currentList.Count > 0)
+                    sortedList.AddRange(currentList);
             }
             if (sortedList.Count != moves.Count)
                 throw new Exception("Fel i dragsorteringsfunktionen.");
