@@ -11,10 +11,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Blobfish_11
 {
-    public partial class Form1 : Form
+    public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
         List<Position> gamePositions = new List<Position>();
@@ -27,11 +28,9 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
-        private Square dragFromSquare = new Square(-1, -1);
-        private Image toOldImage = null;
-        private Image fromImage = null;
+        Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
-        public Form1()
+        public ChessUI()
         {
             InitializeComponent();
             int squareSize = 50;
@@ -39,6 +38,44 @@ namespace Blobfish_11
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
+            #region fetchImages
+            
+            try
+            {
+                piecesPictures.Add('\0', Properties.Resources._null);
+                piecesPictures.Add('p', Properties.Resources.Bp);
+                piecesPictures.Add('P', Properties.Resources.Wp);
+                piecesPictures.Add('b', Properties.Resources.Bb);
+                piecesPictures.Add('B', Properties.Resources.WB);
+                piecesPictures.Add('n', Properties.Resources.Bn);
+                piecesPictures.Add('N', Properties.Resources.WN);
+                piecesPictures.Add('r', Properties.Resources.Br);
+                piecesPictures.Add('R', Properties.Resources.WR);
+                piecesPictures.Add('q', Properties.Resources.Bq);
+                piecesPictures.Add('Q', Properties.Resources.WQ);
+                piecesPictures.Add('k', Properties.Resources.Bk);
+                piecesPictures.Add('K', Properties.Resources.WK);
+                /*piecesPictures.Add('\0', Image.FromFile("null.png"));
+                piecesPictures.Add('p', Image.FromFile("Bp.png"));
+                piecesPictures.Add('P', Image.FromFile("WP.png"));
+                piecesPictures.Add('n', Image.FromFile("Bn.png"));
+                piecesPictures.Add('N', Image.FromFile("WN.png"));
+                piecesPictures.Add('b', Image.FromFile("Bb.png"));
+                piecesPictures.Add('B', Image.FromFile("WB.png"));
+                piecesPictures.Add('r', Image.FromFile("Br.png"));
+                piecesPictures.Add('R', Image.FromFile("WR.png"));
+                piecesPictures.Add('q', Image.FromFile("Bq.png"));
+                piecesPictures.Add('Q', Image.FromFile("WQ.png"));
+                piecesPictures.Add('k', Image.FromFile("Bk.png"));
+                piecesPictures.Add('K', Image.FromFile("WK.png"));*/
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Ett fel inträffade vid inladdning av bilder. Programmet kommer att avslutas. " +
+                    Environment.NewLine + "Felmeddelande: " + Environment.NewLine + e.ToString());
+                this.Close();
+            }
+            #endregion
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -53,7 +90,7 @@ namespace Blobfish_11
                     picBox.SizeMode = PictureBoxSizeMode.Zoom;
                     picBox.Margin = new Padding(0);
                     picBox.Padding = new Padding(0);
-                    picBox.Image = Image.FromFile("null.png");
+                    picBox.Image = piecesPictures['\0'];
 
                     picBox.AllowDrop = true;
                     picBox.MouseDown += new MouseEventHandler(squareMouseDown);
@@ -76,33 +113,22 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
+            currentPosition = pos;
+            currentMoves = blobFish.allValidMoves(pos, false);
+
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     char piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
-                    string picName = "null.png";
-                    if (piece != '\0')
-                    {
-                        if (piece > 'Z')
-                        {
-                            picName = "B" + piece + ".png";
-                        }
-                        else
-                        {
-                            picName = "W" + piece + ".png";
-                        }
-                    }
-
-                    Falt[i, j].Image = Image.FromFile(picName);
+                    Falt[i, j].Image = piecesPictures[piece];
+                    Cursor cursor = moveablePiece(piece) ? dragCursor : Cursors.Default;
+                    Falt[i, j].Cursor = cursor;
                 }
             }
 
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
-            currentPosition = pos;
-
-            currentMoves = blobFish.allValidMoves(pos, false);
 
             int res = blobFish.decisiveResult(pos, currentMoves);
             if (res != -2)
@@ -116,7 +142,6 @@ namespace Blobfish_11
         }
         private void playBestEngineMove()
         {
-            setPonderingMode(true);
             if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
@@ -125,6 +150,7 @@ namespace Blobfish_11
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 ponderingWorker.RunWorkerAsync();
             }
+            setPonderingMode(true);
         }
         private void playMove(Move move)
         {
@@ -143,16 +169,20 @@ namespace Blobfish_11
                     evalBox.Text = Tests.runTests();
                     break;
                 case "moves":
-                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
                     break;
                 case "drag":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
                     break;
                 case "sorted":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
                     break;
                 case "sorterade":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
                     break;
                 case "takeback":
                     takeback(2);
@@ -201,8 +231,8 @@ namespace Blobfish_11
                     printEval(choosePlayingStyle().eval(currentPosition, minDepth));
                     break;
                 case "num":
-                    double res = choosePlayingStyle().numericEval(currentPosition);
-                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + res.ToString();
+                    float res = choosePlayingStyle().numericEval(currentPosition);
+                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res,2).ToString();
                     break;
                 case "time":
                     evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
@@ -211,19 +241,35 @@ namespace Blobfish_11
                     evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
                     break;
                 case "spec":
-                    //Endast för att se vilke tid som går åt för numericEval respektive allValidMoves.
+                    string posToEvaluate = "r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13";
+                    Stopwatch sw = new Stopwatch();
+                    long t0, t1, t2;
+                    sw.Start();
                     for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.numericEval(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"));
+                        blobFish.numericEval(new Position(posToEvaluate));
                     }
-                    for (int i = 0; i < 10000; i++) //Verkar vara ca 10-20ggr långsammare än numericEval.
+                    sw.Stop();
+                    t0 = sw.ElapsedMilliseconds;
+                    sw.Restart();
+                    for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), false);
+                        blobFish.allValidMoves(new Position(posToEvaluate), false);
                     }
-                    for (int i = 0; i < 10000; i++) //Extra tid för att sortera dragen verkar vara försumbar
+                    sw.Stop();
+                    t1 = sw.ElapsedMilliseconds;
+                    sw.Restart();
+                    for (int i = 0; i < 10000; i++)
                     {
-                        blobFish.allValidMoves(new Position("r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13"), true);
+                        blobFish.allValidMoves(new Position(posToEvaluate), true);
                     }
+                    sw.Stop();
+                    t2 = sw.ElapsedMilliseconds;
+                    evalBox.Text = "Tider för 10000 iterationer (ms): "
+                        + "\r\n  Evaluering av ställning: " + t0.ToString()
+                        + "\r\n  Alla drag (osorterade): " + t1.ToString()
+                        + "\r\n  Alla drag (sorterade): " + t2.ToString()
+                        + "\r\n  Extra tid för att sortera: " + Math.Round((((float)t2 / (float)t1)-1) * 100, 1) + "%";
                     break;
                 default:
                     try
@@ -315,7 +361,7 @@ namespace Blobfish_11
             }
             else if (result.bestMove != null)
             {
-                double eval = result.evaluation;
+                float eval = result.evaluation;
                 string textEval;
                 if (eval > 1000)
                 {
@@ -373,7 +419,7 @@ namespace Blobfish_11
                 evalBox.Text = "För få drag har spelats!";
             }
         }
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void ChessUI_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Modifiers == Keys.Control)
             {
@@ -513,22 +559,22 @@ namespace Blobfish_11
             resultPlace.evaluation = res.evaluation;
             return;
         }
-        private void timer1_Tick(object sender, EventArgs e)
+        private void ponderingTimer_Tick(object sender, EventArgs e)
         {
             numberOfDots = (numberOfDots % 3) + 1;
             ponderingLabel.Text = "Datorn tänker" + string.Join("", Enumerable.Repeat(".", numberOfDots));
-            ponderingTime = ponderingTime.Add(new TimeSpan(0, 0, 0, 0, timer1.Interval));
+            ponderingTime = ponderingTime.Add(new TimeSpan(0, 0, 0, 0, ponderingTimer.Interval));
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
         }
         private void cancelButton_Click(object sender, EventArgs e)
         {
             ponderingWorker.CancelAsync();
-            if(!radioButton4.Checked)
+            if (!radioButton4.Checked)
                 takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             setPonderingMode(false);
         }
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void ChessUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             ponderingWorker.CancelAsync();
         }
@@ -539,15 +585,39 @@ namespace Blobfish_11
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
             if (setTo)
-                timer1.Start();
+                ponderingTimer.Start();
             else
-                timer1.Stop();
+                ponderingTimer.Stop();
+            for (int rank = 0; rank < 7; rank++)
+            {
+                for (int line = 0; line < 7; line++)
+                {
+                    if (setTo)
+                    {
+                        Falt[rank, line].Cursor = Cursors.Default;
+                    }
+                    else
+                    {
+                        char pieceOnSquare = currentPosition.board[rank, line];
+                        Cursor cursor = moveablePiece(pieceOnSquare) ? dragCursor : Cursors.Default;
+                        if (flipped)
+                        {
+                            Falt[7 - rank, 7 - line].Cursor = cursor;
+                        }
+                        else
+                        {
+                            Falt[rank, line].Cursor = cursor;
+                        }
+                    }
+
+                }
+            }
         }
         private Engine choosePlayingStyle()
         {
             //Byt namn på funktionen?
             int[] MIL = { };
-            if (depthRB1.Checked || depthRB3.Checked)
+            if (depthRB3.Checked)
             {
                 MIL = new int[] {8};
             }
@@ -560,15 +630,15 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new double[] {1, 3, 3, 5, 9 }, 0.6f, new double[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 0.875f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.6f, new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
-                    return new Engine(new double[] {1.2f, 4, 4, 6.5f, 12 }, 0.4f, new double[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 1.25f, MIL);
+                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f, new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, MIL);
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new double[] {1, 3, 3.1f, 5, 9f }, 0.4f, new double[] { 1, 1.4f, 0.8f, 0.1f, 0.05f }, 8, 1f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3.1f, 5f, 9f }, 0.4f, new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 0.85f, MIL);
                 }
                 else
                 {
@@ -586,7 +656,7 @@ namespace Blobfish_11
             if((sender as RadioButton).Checked)
             {
                 if (depthRB0.Checked)
-                    minDepth = 3;
+                    minDepth = 2;
                 else if (depthRB1.Checked)
                     minDepth = 3;
                 else if (depthRB2.Checked)
@@ -600,92 +670,6 @@ namespace Blobfish_11
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
-        }
-
-        private void squareMouseDown(object sender, MouseEventArgs e)
-        {
-            if (ponderingWorker.IsBusy) return;
-
-            PictureBox from = sender as PictureBox;
-            dragFromSquare = picBoxSquare(from);
-            fromImage = from.Image;
-            from.Image = Image.FromFile("null.png");
-            from.DoDragDrop(fromImage, DragDropEffects.Copy);
-        }
-        private void squareDragEnter(object sender, DragEventArgs e)
-        {
-            PictureBox to = sender as PictureBox;
-            e.Effect = DragDropEffects.Copy;
-
-            toOldImage = to.Image;
-            Image cpy = (Image)fromImage.Clone();
-            using (Graphics g = Graphics.FromImage(cpy))
-            {
-                using (SolidBrush br =
-                new SolidBrush(Color.FromArgb(100, 255, 255, 255)))
-                {
-                    g.FillRectangle(br, 0, 0, cpy.Width, cpy.Height);
-                }
-            }
-            to.Image = cpy;
-        }
-        private void squareDragDrop(object sender, DragEventArgs e)
-        {
-            bool moveWasPlayed = false;
-            Square newSquare = picBoxSquare(sender as PictureBox);
-            foreach (Move item in currentMoves)
-            {
-                if (dragFromSquare.rank == item.from.rank && dragFromSquare.line == item.from.line &&
-                    newSquare.rank == item.to.rank && newSquare.line == item.to.line)
-                {
-                    (sender as PictureBox).Image = fromImage;
-                    playMove(item);
-                    moveWasPlayed = true;
-                    break;
-                }
-            }
-            if (!moveWasPlayed)
-            {
-                if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
-                    evalBox.Text = "Felaktigt drag!";
-                (sender as PictureBox).Image = toOldImage;
-                if(!flipped)
-                    Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;
-                else
-                    Falt[7-dragFromSquare.rank, 7-dragFromSquare.line].Image = fromImage;
-            }
-            dragFromSquare = new Square(-1, -1);
-            moveLabel.Text = "";
-        }
-        private void squareDragLeave(object sender, EventArgs e)
-        {
-            (sender as PictureBox).Image = toOldImage;
-        }
-        private void squareGiveFeedBack(object sender, GiveFeedbackEventArgs e)
-        {
-            //Byt ut till annan pekare?
-            if (e.Effect == DragDropEffects.Copy)
-            {
-                e.UseDefaultCursors = false;
-                
-                Cursor.Current = Cursors.Hand;
-            }
-            else
-                e.UseDefaultCursors = true;
-
-        }
-        private Square picBoxSquare(PictureBox picBox)
-        {
-            int xVal = picBox.Location.X; //a-h
-            int yVal = picBox.Location.Y; //1-8
-            xVal = xVal / (boardPanel.Size.Width / 8);
-            yVal = yVal / (boardPanel.Size.Height / 8);
-            if (flipped)
-            {
-                xVal = 7 - xVal;
-                yVal = 7 - yVal;
-            }
-            return new Square(yVal, xVal);
         }
     }
 }
@@ -701,28 +685,30 @@ namespace Blobfish_11
  *  Mattbart material
  *  Gör fönstret skalbart.
  *  Koordinater
- *  Double -> Float (Volatile)
  *  Gå framåt/bakåt i partiet.
  *  Dra nu!
+ *  Förbättra validSquare()
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Minska behov av att ställa ut damen.
+ *  Öka behov av att flytta centrumbönder.
  * 
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
- *  Gör om system för att betckna forcerad matt.
+ *  Gör om system för att beteckna forcerad matt.
  *  Beräkna nästa lager av drag tidigare.
  *  
  * Förbättringar:
  *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
- *  Bli av med Le3/Le6
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  Lägg till värde för att vara vid draget?
+ *  Lägg till de beräknade dragen direkt i listan.
+ *  
  *  
  *  Buggar:
- *  
  */

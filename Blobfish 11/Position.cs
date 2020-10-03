@@ -10,17 +10,28 @@ namespace Blobfish_11
     public class Position
     {
         //TODO: Gör om till struct?
-        //TODO: Ändra allt till Square.
         public bool whiteToMove;
-        public sbyte halfMoveClock = 0;
-        public short moveCounter = 0;
-        public Square enPassantSquare = new Square(); //{-1, -1} om en passant ej kan spelas.
-        public bool[] castlingRights = new bool[4]; //KQkq
-        public char[,] board = new char[8, 8]; //[0] är rader (siffror), [1] är kolumner (bokstäver)
-        public Square[] kingPositions = new Square[2]; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
+        public sbyte halfMoveClock;
+        public short moveCounter;
+        public Square enPassantSquare; //{-1, -1} om en passant ej kan spelas.
+        public bool[] castlingRights; //KQkq
+        public char[,] board; //[0] är rader (siffror), [1] är kolumner (bokstäver)
+        public Square[] kingPositions; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
+        public Position()
+        {
+            this.halfMoveClock = 0;
+            this.moveCounter = 0;
+            this.enPassantSquare = new Square();
+            this.castlingRights = new bool[4];
+            this.board = new char[8, 8];
+            this.kingPositions = new Square[2];
+        }
         public Position(string FEN)
         {
+            this.board = new char[8, 8];
+            this.kingPositions = new Square[2];
+            this.castlingRights = new bool[4];
             sbyte line = 0, rank = 0;
             string boardString = FEN.Substring(0, FEN.IndexOf(' '));
             foreach (char tkn in boardString)
@@ -59,11 +70,13 @@ namespace Blobfish_11
 
                     case 'k':
                         board[rank, line] = tkn;
-                        kingPositions[0] = new Square(rank, line);
+                        kingPositions[0].rank = rank;
+                        kingPositions[0].line = line;
                         line++; break;
                     case 'K':
                         board[rank, line] = tkn;
-                        kingPositions[1] = new Square(rank, line);
+                        kingPositions[1].rank = rank;
+                        kingPositions[1].line = line;
                         line++; break;
 
                     case 'q':
@@ -142,6 +155,8 @@ namespace Blobfish_11
             this.halfMoveClock = sbyte.Parse(clockString);
             string moveString = lastString.Substring(lastString.IndexOf(' '), lastString.Length - lastString.IndexOf(' '));
             this.moveCounter = sbyte.Parse(moveString);
+            if(this.halfMoveClock < 0 || this.moveCounter < 0)
+                throw new Exception("Felaktig FEN.");
             //Till exempel: "2".
 
         }
@@ -158,9 +173,17 @@ namespace Blobfish_11
         }
         public Position deepCopy()
         {
-           return new Position((char[,])board.Clone(), whiteToMove, (bool[])castlingRights.Clone(),
+            char[,] newBoard = new char[8, 8];
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    newBoard[i, j] = this.board[i, j];
+                }
+            }
+            //castlingRights och kingPositions går av oklar anledning snabbare att klona automatiskt.
+            return new Position(newBoard, whiteToMove, (bool[])castlingRights.Clone(),
                 new Square(-1, -1), halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
-
         }
         public string getFEN()
         {

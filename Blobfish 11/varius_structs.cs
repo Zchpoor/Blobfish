@@ -10,9 +10,9 @@ namespace Blobfish_11
 {
     public class EvalResult
     {
-        public double evaluation;
+        public float evaluation;
         public List<Move> allMoves;
-        public List<SecureDouble> allEvals;
+        public List<SecureFloat> allEvals;
         public Move bestMove;
     }
     public struct Square
@@ -30,47 +30,47 @@ namespace Blobfish_11
             this.line = (sbyte)line;
         }
     }
-    public abstract class DoubleContainer
+    public abstract class FloatContainer
     {
-        protected double val;
-        public abstract double getValue();
-        public abstract void setValue(double value);
+        protected float val;
+        public abstract float getValue();
+        public abstract void setValue(float value);
     }
-    public class OrdinaryDouble : DoubleContainer
+    public class OrdinaryFloat : FloatContainer
     {
-        public OrdinaryDouble()
+        public OrdinaryFloat()
         {
-            this.val = double.NaN;
+            this.val = float.NaN;
         }
-        public OrdinaryDouble(double value)
+        public OrdinaryFloat(float value)
         {
             this.val = value;
         }
-        public override double getValue()
+        public override float getValue()
         {
             return val;
         }
-        public override void setValue(double value)
+        public override void setValue(float value)
         {
             this.val = value;
         }
     }
-    public class SecureDouble : DoubleContainer
+    public class SecureFloat : FloatContainer
     {
         public Mutex mutex;
-        public SecureDouble()
+        public SecureFloat()
         {
-            this.val = double.NaN;
+            this.val = float.NaN;
             this.mutex = new Mutex();
         }
-        public SecureDouble(double val)
+        public SecureFloat(float val)
         {
             this.val = val;
             this.mutex = new Mutex();
         }
-        public override double getValue()
+        public override float getValue()
         {
-            double ret;
+            float ret;
             try
             {
                 mutex.WaitOne();
@@ -82,7 +82,7 @@ namespace Blobfish_11
             }
             return ret;
         }
-        public override void setValue(double value)
+        public override void setValue(float value)
         {
             try
             {

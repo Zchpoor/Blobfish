@@ -10,7 +10,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        public SecureDouble cancelFlag = new SecureDouble(0);
+        public SecureFloat cancelFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
             List<Move> moves = allValidMoves(pos, true);
@@ -19,19 +19,19 @@ namespace Blobfish_11
             int gameResult = decisiveResult(pos, moves);
             if (gameResult != -2)
             {
-                result.evaluation = (double)gameResult;
+                result.evaluation = gameResult;
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
             }
             else
             {
-                List<SecureDouble> allEvals = new List<SecureDouble>();
-                double bestValue = pos.whiteToMove ? double.NegativeInfinity : double.PositiveInfinity;
+                List<SecureFloat> allEvals = new List<SecureFloat>();
+                float bestValue = pos.whiteToMove ? float.NegativeInfinity : float.PositiveInfinity;
 
                 if (moves.Count == 1)
                 {
-                    EvalResult res = eval(moves[0].execute(pos), minDepth);
+                    EvalResult res = eval(moves[0].execute(pos), minDepth-1);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
@@ -50,18 +50,18 @@ namespace Blobfish_11
 
                 //TODO: Öka längden om antalet tunga pjäser är få.
 
-                SecureDouble globalAlpha = new SecureDouble();
-                globalAlpha.setValue(double.NegativeInfinity);
-                SecureDouble globalBeta = new SecureDouble();
-                globalBeta.setValue(double.PositiveInfinity);
+                SecureFloat globalAlpha = new SecureFloat();
+                globalAlpha.setValue(float.NegativeInfinity);
+                SecureFloat globalBeta = new SecureFloat();
+                globalBeta.setValue(float.PositiveInfinity);
                 List<Thread> threadList = new List<Thread>();
                 foreach (Move currentMove in moves)
                 {
-                    SecureDouble newDouble = new SecureDouble();
-                    allEvals.Add(newDouble);
+                    SecureFloat newFloat = new SecureFloat();
+                    allEvals.Add(newFloat);
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newDouble, globalAlpha, globalBeta);
+                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
@@ -70,8 +70,8 @@ namespace Blobfish_11
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
-                    SecureDouble threadResult = allEvals[i];
-                    double value = threadResult.getValue();
+                    SecureFloat threadResult = allEvals[i];
+                    float value = threadResult.getValue();
 #pragma warning disable CS1718 // Comparison made to same variable
                     if (value != value) //Kollar om talet är odefinierat.
 #pragma warning restore CS1718 // Comparison made to same variable
@@ -81,7 +81,7 @@ namespace Blobfish_11
                         {
                             abortAll(threadList);
                             result.bestMove = null;
-                            result.evaluation = double.NaN;
+                            result.evaluation = float.NaN;
                             result.allEvals = null;
                             Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
                             return result;
@@ -114,9 +114,9 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, sbyte depth, SecureDouble ansPlace, SecureDouble globalAlpha, SecureDouble globalBeta)
+        public void threadStart(Position pos, sbyte depth, SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
-            double value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
+            float value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
             if (!pos.whiteToMove)
             {
@@ -127,9 +127,9 @@ namespace Blobfish_11
                 globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
             }
         }
-        private double alphaBeta(Position pos, sbyte depth, DoubleContainer alphaContainer, DoubleContainer betaContainer, bool forceBranching)
+        private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
         {
-            string moveName = ""; //Endast i debug-syfte
+            //string moveName = ""; //Endast i debug-syfte
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
@@ -141,20 +141,20 @@ namespace Blobfish_11
             if (moves.Count == 0)
                 return decisiveResult(pos, moves);
 
-            OrdinaryDouble alpha = new OrdinaryDouble(alphaContainer.getValue());
-            OrdinaryDouble beta = new OrdinaryDouble(betaContainer.getValue());
+            OrdinaryFloat alpha = new OrdinaryFloat(alphaContainer.getValue());
+            OrdinaryFloat beta = new OrdinaryFloat(betaContainer.getValue());
 
 
             if (pos.whiteToMove)
             {
-                double value = double.NegativeInfinity;
+                float value = float.NegativeInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    if (betaContainer is SecureDouble && betaContainer.getValue() < beta.getValue())
+                    if (betaContainer is SecureFloat && betaContainer.getValue() < beta.getValue())
                         beta.setValue(betaContainer.getValue());
 
                     //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
+                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -168,8 +168,8 @@ namespace Blobfish_11
                     alpha.setValue(Math.Max(alpha.getValue(), value));
                     if (alpha.getValue() >= beta.getValue())
                     {
-                        if (alphaContainer is SecureDouble)
-                            return double.PositiveInfinity;
+                        if (alphaContainer is SecureFloat)
+                            return float.PositiveInfinity;
                         else
                             break; //Pruning
 
@@ -180,13 +180,13 @@ namespace Blobfish_11
             }
             else
             {
-                double value = double.PositiveInfinity;
+                float value = float.PositiveInfinity;
                 foreach (Move currentMove in moves)
                 {
-                    if (alphaContainer is SecureDouble && alphaContainer.getValue() > alpha.getValue())
+                    if (alphaContainer is SecureFloat && alphaContainer.getValue() > alpha.getValue())
                         alpha.setValue(alphaContainer.getValue());
                     //Endast i debug-syfte
-                    moveName = currentMove.toString(pos.board);
+                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -200,8 +200,8 @@ namespace Blobfish_11
                     beta.setValue(Math.Min(beta.getValue(), value));
                     if (beta.getValue() <= alpha.getValue())
                     {
-                        if (betaContainer is SecureDouble)
-                            return double.NegativeInfinity;
+                        if (betaContainer is SecureFloat)
+                            return float.NegativeInfinity;
                         else
                             break; //Pruning
                     }
@@ -210,7 +210,7 @@ namespace Blobfish_11
                 return value;
             }
         }
-        public double numericEval(Position pos)
+        public float numericEval(Position pos)
         {
             /* 
              * [rank, line]
@@ -220,7 +220,7 @@ namespace Blobfish_11
              * line==7    -> h-linjen.
              */
             int[] numberOfPawns = new int[2];
-            double[] pawnPosFactor = { 1f, 1f };
+            float[] pawnPosFactor = { 1f, 1f };
 
             //Grov uppskattning av moståndarens tunga pjäser.
             //0 = svart, 1 = vit.
@@ -229,12 +229,13 @@ namespace Blobfish_11
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //bool whiteSquare = true; //TODO: ordna med färgkomplex.
             bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
-            double pieceValue = 0;
+            float pieceValue = 0;
+            char[,] board = pos.board;
             for (sbyte rank = 0; rank < 8; rank++)
             {
                 for (sbyte line = 0; line < 8; line++)
                 {
-                    switch (pos.board[rank, line])
+                    switch (board[rank, line])
                     {
                         case 'p':
                             numberOfPawns[0]++;
@@ -308,7 +309,7 @@ namespace Blobfish_11
                 }
             }
 
-            double kingSafteyDifference = kingSaftey(pos, true, heavyMaterial[0])
+            float kingSafteyDifference = kingSaftey(pos, true, heavyMaterial[0])
                 - kingSaftey(pos, false, heavyMaterial[1]);
 
             if (bishopColors[0] && bishopColors[1])
@@ -327,40 +328,46 @@ namespace Blobfish_11
                 else
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
-            double pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
+            float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
             return pieceValue + pawnValue + kingSafteyDifference;
         }
-        private double kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
+        private float kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
-            double defenceAccumulator = 0;
+            float defenceAccumulator = 0;
             sbyte direction = forWhite ? (sbyte) -1 : (sbyte) 1;
             Square kingSquare = forWhite ? pos.kingPositions[1] : pos.kingPositions[0];
+            Square currentSquare = new Square();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = -2; j < 3; j++)
                 {
-                    Square currentSquare = new Square(kingSquare.rank + (direction * i), kingSquare.line + j);
+                    currentSquare.rank = (sbyte)(kingSquare.rank + (direction * i));
+                    currentSquare.line = (sbyte)(kingSquare.line + j);
                     if (!validSquare(currentSquare)){
                         continue;
                     }
                     char currentPiece = pos.board[currentSquare.rank, currentSquare.line];
-                    double defValue = defenceValueOf(currentPiece);
-                    if(defValue == 0)
+                    float defValue = defenceValueOf(currentPiece);
+                    if(defValue == 0f)
                     {
                         continue;
                     }
-                    double defCoeff = defence[2-i, j + 2];
-                    double finDefValue = defValue * defCoeff;
+                    float defCoeff = defence[2-i, j + 2];
+                    float finDefValue = defValue * defCoeff;
 
-                    //Tag bort denna
-                    double DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
+                    //float DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
 
                     defenceAccumulator += finDefValue;
                 }
             }
-            double safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+            if(defenceAccumulator > safteySoftCap)
+            {
+                //Halverar nyttan av kungsförsvar efter en viss gräns.
+                defenceAccumulator -= (defenceAccumulator - safteySoftCap) / 2;
+            }
+            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
 
-            double kingCoefficient;
+            float kingCoefficient;
             if (oppHeavyMaterial > endgameLimit)
             {
                 kingCoefficient =   king[0, kingSquare.rank, kingSquare.line];
@@ -372,22 +379,26 @@ namespace Blobfish_11
             }
             return kingCoefficient * safteyValue;
         }
-        private double defenceValueOf(char piece)
+        private float defenceValueOf(char piece)
         {
-            switch (piece.ToString().ToUpper())
+            if (piece == '\0') return 0;
+            if (piece > 'a') 
+                piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            switch (piece)
             {
-                case "": return 0; //Kolla om denna fungerar.
-                case "P": return defenceValues[0];
-                case "N": return defenceValues[1];
-                case "B": return defenceValues[2];
-                case "R": return defenceValues[3];
-                case "Q": return defenceValues[4];
-                default: return 0;
+                case 'P': return defenceValues[0];
+                case 'N': return defenceValues[1];
+                case 'B': return defenceValues[2];
+                case 'R': return defenceValues[3];
+                case 'Q': return defenceValues[4];
+                case 'K': return 0;
+                default: 
+                    throw new Exception("Okänt tecken!");
             }
         }
-        private double evalPawns(int[] numberOfPawns, double[] posFactor, sbyte[,] pawns)
+        private float evalPawns(int[] numberOfPawns, float[] posFactor, sbyte[,] pawns)
         {
-            double[] pawnValues = new double[2];
+            float[] pawnValues = new float[2];
             for (sbyte c = 0; c < 2; c++)
             {
                 sbyte neighbours = 0;
@@ -455,7 +466,7 @@ namespace Blobfish_11
             bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
             return isCheck;
         }
-        private double evaluationStep(double value)
+        private float evaluationStep(float value)
         {
             //Ökar antal drag till matt, ifall evalueringen är forcerad matt.
             if (value > 1000)
