@@ -21,6 +21,7 @@ namespace Blobfish_11
         List<Position> gamePositions = new List<Position>();
         List<Move> gameMoves = new List<Move>();
         Position currentPosition;
+        bool gameIsGoingOn = true;
         readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
@@ -41,7 +42,7 @@ namespace Blobfish_11
             #region fetchImages
             
             try
-            {
+            {/*
                 piecesPictures.Add('\0', Properties.Resources._null);
                 piecesPictures.Add('p', Properties.Resources.Bp);
                 piecesPictures.Add('P', Properties.Resources.Wp);
@@ -54,8 +55,8 @@ namespace Blobfish_11
                 piecesPictures.Add('q', Properties.Resources.Bq);
                 piecesPictures.Add('Q', Properties.Resources.WQ);
                 piecesPictures.Add('k', Properties.Resources.Bk);
-                piecesPictures.Add('K', Properties.Resources.WK);
-                /*piecesPictures.Add('\0', Image.FromFile("null.png"));
+                piecesPictures.Add('K', Properties.Resources.WK);*/
+                piecesPictures.Add('\0', Image.FromFile("null.png"));
                 piecesPictures.Add('p', Image.FromFile("Bp.png"));
                 piecesPictures.Add('P', Image.FromFile("WP.png"));
                 piecesPictures.Add('n', Image.FromFile("Bn.png"));
@@ -67,7 +68,7 @@ namespace Blobfish_11
                 piecesPictures.Add('q', Image.FromFile("Bq.png"));
                 piecesPictures.Add('Q', Image.FromFile("WQ.png"));
                 piecesPictures.Add('k', Image.FromFile("Bk.png"));
-                piecesPictures.Add('K', Image.FromFile("WK.png"));*/
+                piecesPictures.Add('K', Image.FromFile("WK.png"));
             }
             catch (Exception e)
             {
@@ -129,11 +130,17 @@ namespace Blobfish_11
 
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
-
+            //TODO: Faktorisera ut med liknande kod nedan.
             int res = blobFish.decisiveResult(pos, currentMoves);
             if (res != -2)
             {
                 resultPopUp(res);
+                gameIsGoingOn = false;
+            }
+            else if (!blobFish.mateableMaterial(currentPosition.board))
+            {
+                resultPopUp(-1);
+                gameIsGoingOn = false;
             }
             else if (engineIsToMove())
             {
@@ -142,7 +149,7 @@ namespace Blobfish_11
         }
         private void playBestEngineMove()
         {
-            if (!ponderingWorker.IsBusy)
+            if (!ponderingWorker.IsBusy && gameIsGoingOn)
             {
                 blobFish = choosePlayingStyle();
                 //evalBox.Text = "";
@@ -275,6 +282,7 @@ namespace Blobfish_11
                     try
                     {
                         Position pos = new Position(inputText);
+                        gameIsGoingOn = true;
                         this.gamePositions.Clear();
                         this.gameMoves.Clear();
                         displayAndAddPosition(pos);
@@ -314,6 +322,7 @@ namespace Blobfish_11
         }
         private void reset()
         {
+            gameIsGoingOn = true;
             gamePositions.Clear();
             gameMoves.Clear();
             displayAndAddPosition(startingPosition);
@@ -358,6 +367,12 @@ namespace Blobfish_11
             if (decisiveResult != -2)
             {
                 resultPopUp(decisiveResult);
+                gameIsGoingOn = false;  
+            }
+            else if (!blobFish.mateableMaterial(currentPosition.board))
+            {
+                resultPopUp(-1);
+                gameIsGoingOn = false;
             }
             else if (result.bestMove != null)
             {
@@ -386,7 +401,7 @@ namespace Blobfish_11
             }
         }
         private void resultPopUp(int result)
-        { 
+        {
             if (result > 1000)
             {
                 MessageBox.Show("Vit vann på schack matt!");
@@ -395,9 +410,13 @@ namespace Blobfish_11
             {
                 MessageBox.Show("Svart vann på schack matt!");
             }
-            else if(result == 0)
+            else if (result == 0)
             {
                 MessageBox.Show("Partiet slutade remi!");
+            }
+            else if (result == -1)
+            {
+                MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
             }
         }
         private void takeback(int numberOfMoves)
@@ -682,7 +701,6 @@ namespace Blobfish_11
  *  Välja pjäs att promotera till.
  *  Se material.
  *  Se bästa variant
- *  Mattbart material
  *  Gör fönstret skalbart.
  *  Koordinater
  *  Gå framåt/bakåt i partiet.
@@ -707,7 +725,6 @@ namespace Blobfish_11
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  Lägg till värde för att vara vid draget?
- *  Lägg till de beräknade dragen direkt i listan.
  *  
  *  
  *  Buggar:

@@ -95,4 +95,20 @@ namespace Blobfish_11
             }
         }
     }
+    public class ThreadStartArguments
+    {
+        public Position pos;
+        public sbyte depth;
+        public SecureFloat ansPlace;
+        public SecureFloat globalAlpha;
+        public SecureFloat globalBeta;
+        public ThreadStartArguments(Position pos, sbyte depth, SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
+        {
+            this.pos = pos;
+            this.depth = depth;
+            this.ansPlace = ansPlace;
+            this.globalAlpha = globalAlpha;
+            this.globalBeta = globalBeta;
+        }
+    }
 }

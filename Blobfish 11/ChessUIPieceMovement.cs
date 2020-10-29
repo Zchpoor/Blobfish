@@ -43,7 +43,7 @@ namespace Blobfish_11
         }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
-            if (ponderingWorker.IsBusy) return;
+            if (ponderingWorker.IsBusy || !gameIsGoingOn) return;
 
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);

@@ -36,8 +36,6 @@ namespace Blobfish_11
                     result.allMoves = moves;
                     result.bestMove = moves[0];
                     return result;
-                    //Forcerande drag beräknas alltid ytterligare ett drag.
-                    //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
                 }
 
                 // Ökar minimum-djupet om antalet tillgängliga drag är färre än de som anges
@@ -59,6 +57,7 @@ namespace Blobfish_11
                 {
                     SecureFloat newFloat = new SecureFloat();
                     allEvals.Add(newFloat);
+
                     Thread thread = new Thread(delegate ()
                     {
                         threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta);
@@ -66,6 +65,13 @@ namespace Blobfish_11
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
                     threadList.Add(thread);
+
+                    //bool success = ThreadPool.SetMinThreads(8, 1);
+                    //bool success2 = ThreadPool.SetMaxThreads(8, 1);
+                    //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
+
+                    //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
+                    //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
                 }
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
@@ -113,6 +119,11 @@ namespace Blobfish_11
 
             result.allMoves = moves;
             return result;
+        }
+        public void threadStartStarter(Object t)
+        {
+            ThreadStartArguments tsa = (ThreadStartArguments)t;
+            threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
         }
         public void threadStart(Position pos, sbyte depth, SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
@@ -482,6 +493,43 @@ namespace Blobfish_11
                 if (item.IsAlive)
                     item.Abort();
             }
+        }
+        public bool mateableMaterial(char[,] board)
+        {
+            //TODO: Fixa för mattbart material för de respektive spelarna.
+            bool anyKnight = false;
+            bool anyLightSquaredBishop = false;
+            bool anyDarkSquaredBishop = false;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+
+                switch (myToUpper(board[i,j]))
+                {
+                    case 'P': return true;
+                    case 'Q': return true;
+                    case 'R': return true;
+                    case 'N': if (anyKnight) return true; else anyKnight = true; break;
+                    case 'B': 
+                            if ((i + j) % 2 == 0) anyLightSquaredBishop = true;
+                            else anyDarkSquaredBishop = true;
+                            if (anyDarkSquaredBishop && anyLightSquaredBishop) return true;
+                            break;
+                    default: break;
+                    }
+                }
+            }
+            if (anyKnight && (anyDarkSquaredBishop || anyLightSquaredBishop)) return true;
+                return false;
+        }
+        private char myToUpper(char piece)
+        {
+            if (piece > 'a')
+            {
+                return (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            }
+            return piece;
         }
     }
 }
