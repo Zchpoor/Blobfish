@@ -389,8 +389,13 @@ namespace Blobfish_11
                 {
                     textEval = Math.Round(eval, 2).ToString();
                 }
-                evalBox.Text = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
+                String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
                     Environment.NewLine + "Datorns evaluering: " + textEval;
+                if (depthRBAuto.Checked)
+                {
+                    completeString += Environment.NewLine + "Djup: " + minDepth;
+                }
+                evalBox.Text = completeString;
             }
             else
             {
@@ -429,6 +434,7 @@ namespace Blobfish_11
                 gamePositions.RemoveAt(gamePositions.Count - 1);
                 evalBox.Text = "Ett drag har återtagits.";
                 displayAndAddPosition(newCurrentPosition);
+                gameIsGoingOn = true;
             }
             else
             {
@@ -499,6 +505,10 @@ namespace Blobfish_11
             blobFish.cancelFlag.setValue(0);
             EvalResult resultPlace = new EvalResult();
             resultPlace.bestMove = null;
+            if (depthRBAuto.Checked)
+            {
+                minDepth = setAutomaticDepth();
+            }
             Thread thread = new Thread(delegate ()
             {
                 engineStart(minDepth, currentPosition.deepCopy(), resultPlace);
@@ -634,7 +644,7 @@ namespace Blobfish_11
         {
             //Byt namn på funktionen?
             int[] MIL = { };
-            if (depthRB3.Checked)
+            if (depthRBAuto.Checked)
             {
                 MIL = new int[] {8};
             }
@@ -672,21 +682,61 @@ namespace Blobfish_11
         {
             if((sender as RadioButton).Checked)
             {
-                if (depthRB0.Checked)
+                if (depthRB2.Checked)
                     minDepth = 2;
-                else if (depthRB1.Checked)
-                    minDepth = 3;
-                else if (depthRB2.Checked)
-                    minDepth = 4;
                 else if (depthRB3.Checked)
-                    minDepth = 4;
+                    minDepth = 3;
                 else if (depthRB4.Checked)
-                    minDepth = 5;
+                    minDepth = 4;
+                else if (depthRBAuto.Checked)
+                    minDepth = setAutomaticDepth();
                 else if (depthRB5.Checked)
+                    minDepth = 5;
+                else if (depthRB6.Checked)
                     minDepth = 6;
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
+        }
+        private int setAutomaticDepth()
+        {
+            double materialSum = 0;
+            double[] weights = { 1f, 3f, 4f, 7f, 14f }; //PNBRQ
+            double weightForPawnOnLastRank = 10f;
+            //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
+
+            for (int rank = 0; rank < 8; rank++)
+            {
+                for (int line = 0; line < 8; line++)
+                {
+                    char piece = currentPosition.board[rank, line];
+                    if (piece == 'P' || piece == 'p')
+                    {
+                        if ((piece == 'P' && rank == 1) || (piece == 'p' && rank == 6))
+                        {
+                            //Bönder som är ett steg ifrån att promotera.
+                            materialSum += weightForPawnOnLastRank;
+                        }
+                        else
+                        {
+                            materialSum += weights[0];
+                        }
+                }
+                else if (piece == 'N' || piece == 'n')
+                        materialSum += weights[1];
+                    else if (piece == 'B' || piece == 'b')
+                        materialSum += weights[2];
+                    else if (piece == 'R' || piece == 'r')
+                        materialSum += weights[3];
+                    if (piece == 'Q' || piece == 'q')
+                        materialSum += weights[4];
+                }
+            }
+            if (materialSum < 10)
+                return 6;
+            else if (materialSum < 25)
+                return 5;
+            else return 4;
         }
     }
 }
@@ -705,11 +755,13 @@ namespace Blobfish_11
  *  Dra nu!
  *  Förbättra validSquare()
  *  Träd för varianter.
+ *  Hantera PGN
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Minska behov av att ställa ut damen.
  *  Öka behov av att flytta centrumbönder.
+ *  Föredra Sc3 före Sd2
  * 
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
@@ -718,7 +770,6 @@ namespace Blobfish_11
  *  Beräkna nästa lager av drag tidigare.
  *  
  * Förbättringar:
- *  Variera djup utifrån antal pjäser.
  *  Ta öppna linjer med torn.
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
@@ -726,4 +777,6 @@ namespace Blobfish_11
  *  
  *  
  *  Buggar:
+ *  Antal drag till matt fel vid eval.
+ *  Timer räknar när drag återtas efter matt.
  */
