@@ -1,6 +1,6 @@
 ﻿namespace Blobfish_11
 {
-    partial class ChessUI
+    public partial class ChessUI
     {
         /// <summary>
         /// Required designer variable.
@@ -261,7 +261,7 @@
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
-            // timer1
+            // ponderingTimer
             // 
             this.ponderingTimer.Interval = 500;
             this.ponderingTimer.Tick += new System.EventHandler(this.ponderingTimer_Tick);
@@ -301,6 +301,7 @@
             this.depthRB4.TabIndex = 8;
             this.depthRB4.Text = "5   (Mycket långsam)";
             this.depthRB4.UseVisualStyleBackColor = true;
+            this.depthRB4.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
             // depthRB5
             // 

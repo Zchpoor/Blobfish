@@ -588,6 +588,7 @@ namespace Blobfish_11
             if (!radioButton4.Checked)
                 takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
+            ponderingTime = new TimeSpan(0);
             setPonderingMode(false);
         }
         private void ChessUI_FormClosing(object sender, FormClosingEventArgs e)
@@ -725,5 +726,4 @@ namespace Blobfish_11
  *  
  *  
  *  Buggar:
- *  Ingen skillnad på djup 4 och 5?
  */
