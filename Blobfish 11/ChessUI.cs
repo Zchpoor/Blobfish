@@ -42,7 +42,17 @@ namespace Blobfish_11
             #region fetchImages
             
             try
-            {/*
+            {
+                string[] picNames = 
+                    {"null.png", "Bp.png","WP.png","Bn.png","WN.png","Bb.png","WB.png","Br.png","WR.png","Bq.png","WQ.png","Bk.png","WK.png"};
+                char[] pieceNames =
+                    {'\0', 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
+                for (int i = 0; i < picNames.Length; i++)
+                {
+                    piecesPictures.Add(pieceNames[i], Image.FromFile(picNames[i]));
+                }
+
+                /*
                 piecesPictures.Add('\0', Properties.Resources._null);
                 piecesPictures.Add('p', Properties.Resources.Bp);
                 piecesPictures.Add('P', Properties.Resources.Wp);
@@ -56,19 +66,6 @@ namespace Blobfish_11
                 piecesPictures.Add('Q', Properties.Resources.WQ);
                 piecesPictures.Add('k', Properties.Resources.Bk);
                 piecesPictures.Add('K', Properties.Resources.WK);*/
-                piecesPictures.Add('\0', Image.FromFile("null.png"));
-                piecesPictures.Add('p', Image.FromFile("Bp.png"));
-                piecesPictures.Add('P', Image.FromFile("WP.png"));
-                piecesPictures.Add('n', Image.FromFile("Bn.png"));
-                piecesPictures.Add('N', Image.FromFile("WN.png"));
-                piecesPictures.Add('b', Image.FromFile("Bb.png"));
-                piecesPictures.Add('B', Image.FromFile("WB.png"));
-                piecesPictures.Add('r', Image.FromFile("Br.png"));
-                piecesPictures.Add('R', Image.FromFile("WR.png"));
-                piecesPictures.Add('q', Image.FromFile("Bq.png"));
-                piecesPictures.Add('Q', Image.FromFile("WQ.png"));
-                piecesPictures.Add('k', Image.FromFile("Bk.png"));
-                piecesPictures.Add('K', Image.FromFile("WK.png"));
             }
             catch (Exception e)
             {
@@ -706,6 +703,7 @@ namespace Blobfish_11
  *  Gå framåt/bakåt i partiet.
  *  Dra nu!
  *  Förbättra validSquare()
+ *  Träd för varianter.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -724,8 +722,8 @@ namespace Blobfish_11
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
- *  Lägg till värde för att vara vid draget?
  *  
  *  
  *  Buggar:
+ *  Ingen skillnad på djup 4 och 5?
  */

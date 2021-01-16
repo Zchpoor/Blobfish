@@ -53,6 +53,11 @@ namespace Blobfish_11
                 SecureFloat globalBeta = new SecureFloat();
                 globalBeta.setValue(float.PositiveInfinity);
                 List<Thread> threadList = new List<Thread>();
+
+                //bool success = ThreadPool.SetMinThreads(2, 1);
+                //bool success2 = ThreadPool.SetMaxThreads(2, 1);
+                //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
+
                 foreach (Move currentMove in moves)
                 {
                     SecureFloat newFloat = new SecureFloat();
@@ -66,9 +71,6 @@ namespace Blobfish_11
                     thread.Start();
                     threadList.Add(thread);
 
-                    //bool success = ThreadPool.SetMinThreads(8, 1);
-                    //bool success2 = ThreadPool.SetMaxThreads(8, 1);
-                    //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
 
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
                     //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
@@ -340,7 +342,9 @@ namespace Blobfish_11
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
             float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
-            return pieceValue + pawnValue + kingSafteyDifference;
+            float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
+            // TODO: Variera värdet av att vara vid draget?
+            return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }
         private float kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {

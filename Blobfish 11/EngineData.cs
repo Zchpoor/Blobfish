@@ -12,6 +12,7 @@ namespace Blobfish_11
         readonly float[] pieceValues = {1, 3, 3, 5, 9 };
         readonly float kingValue = 4f;
         readonly float bishopPairValue = 0.4f;
+        readonly float toMoveValue = 0.25f;
         readonly float[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
         readonly float safteySoftCap = 6f;
 
