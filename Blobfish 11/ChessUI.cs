@@ -688,12 +688,12 @@ namespace Blobfish_11
                     minDepth = 3;
                 else if (depthRB4.Checked)
                     minDepth = 4;
-                else if (depthRBAuto.Checked)
-                    minDepth = setAutomaticDepth();
                 else if (depthRB5.Checked)
                     minDepth = 5;
                 else if (depthRB6.Checked)
                     minDepth = 6;
+                else if (depthRBAuto.Checked)
+                    minDepth = setAutomaticDepth();
                 else
                     throw new Exception("Fel på djupinställningen!");
             }
@@ -701,8 +701,8 @@ namespace Blobfish_11
         private int setAutomaticDepth()
         {
             double materialSum = 0;
-            double[] weights = { 1f, 3f, 4f, 7f, 14f }; //PNBRQ
-            double weightForPawnOnLastRank = 10f;
+            double[] weights = { 1, 3, 5, 7, 14 }; //PNBRQ
+            double weightForPawnOnLastRank = 10;
             //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
 
             for (int rank = 0; rank < 8; rank++)
@@ -732,7 +732,9 @@ namespace Blobfish_11
                         materialSum += weights[4];
                 }
             }
-            if (materialSum < 10)
+            if (materialSum < 11)
+                return 7;
+            else if (materialSum <= weights[4])
                 return 6;
             else if (materialSum < 25)
                 return 5;
