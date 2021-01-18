@@ -401,11 +401,11 @@ namespace Blobfish_11
                 piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
             switch (piece)
             {
-                case 'P': return defenceValues[0];
-                case 'N': return defenceValues[1];
-                case 'B': return defenceValues[2];
-                case 'R': return defenceValues[3];
-                case 'Q': return defenceValues[4];
+                case 'P': return pieceDefenceValues[0];
+                case 'N': return pieceDefenceValues[1];
+                case 'B': return pieceDefenceValues[2];
+                case 'R': return pieceDefenceValues[3];
+                case 'Q': return pieceDefenceValues[4];
                 case 'K': return 0;
                 default: 
                     throw new Exception("Okänt tecken!");

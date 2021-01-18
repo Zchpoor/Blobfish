@@ -13,7 +13,7 @@ namespace Blobfish_11
         readonly float kingValue = 4f;
         readonly float bishopPairValue = 0.4f;
         readonly float toMoveValue = 0.25f;
-        readonly float[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
+        readonly float[] pieceDefenceValues = { 1, 1.5f, 1.2f, 0.4f, 0.1f };
         readonly float safteySoftCap = 6f;
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
@@ -43,7 +43,7 @@ namespace Blobfish_11
             this.bishopPairValue = bishopPairValue;
             if (defenceValues.Length != 5)
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
-            this.defenceValues = defenceValues;
+            this.pieceDefenceValues = defenceValues;
             this.endgameLimit = endgameLimit;
             this.kingSafteyDivisor = 200f / kingSafteyCoefficient;
             this.moveIncreaseLimits = moveIncreaseLimits;
@@ -146,8 +146,8 @@ namespace Blobfish_11
 
         private static readonly float[,] defence =
         {
-            {0.25f,  0.8f, 1f,   0.8f, 0.25f,},
-            {0.2f,   1.4f, 1.8f, 1.4f, 0.2f, },
+            {0.25f,  0.6f, 0.8f,   0.6f, 0.25f,},
+            {0.2f,   1.3f, 1.4f, 1.3f, 0.2f, },
             {0.1f,   1f,   0f,   1f,   0.1f, }
         };
     }
