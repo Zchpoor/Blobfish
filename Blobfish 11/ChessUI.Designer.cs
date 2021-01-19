@@ -297,9 +297,9 @@
             this.depthRB5.AutoSize = true;
             this.depthRB5.Location = new System.Drawing.Point(6, 129);
             this.depthRB5.Name = "depthRB5";
-            this.depthRB5.Size = new System.Drawing.Size(160, 21);
+            this.depthRB5.Size = new System.Drawing.Size(117, 21);
             this.depthRB5.TabIndex = 8;
-            this.depthRB5.Text = "5   (Mycket långsam)";
+            this.depthRB5.Text = "5   (Långsam)";
             this.depthRB5.UseVisualStyleBackColor = true;
             this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -308,9 +308,9 @@
             this.depthRB6.AutoSize = true;
             this.depthRB6.Location = new System.Drawing.Point(6, 156);
             this.depthRB6.Name = "depthRB6";
-            this.depthRB6.Size = new System.Drawing.Size(155, 21);
+            this.depthRB6.Size = new System.Drawing.Size(160, 21);
             this.depthRB6.TabIndex = 7;
-            this.depthRB6.Text = "6   (Endast slutspel)";
+            this.depthRB6.Text = "6   (Mycket långsam)";
             this.depthRB6.UseVisualStyleBackColor = true;
             this.depthRB6.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -332,9 +332,9 @@
             this.depthRB4.AutoSize = true;
             this.depthRB4.Location = new System.Drawing.Point(6, 102);
             this.depthRB4.Name = "depthRB4";
-            this.depthRB4.Size = new System.Drawing.Size(166, 21);
+            this.depthRB4.Size = new System.Drawing.Size(104, 21);
             this.depthRB4.TabIndex = 5;
-            this.depthRB4.Text = "4   (Rekommenderas)";
+            this.depthRB4.Text = "4   (Normal)";
             this.depthRB4.UseVisualStyleBackColor = true;
             this.depthRB4.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 
@@ -343,9 +343,9 @@
             this.depthRB3.AutoSize = true;
             this.depthRB3.Location = new System.Drawing.Point(6, 75);
             this.depthRB3.Name = "depthRB3";
-            this.depthRB3.Size = new System.Drawing.Size(96, 21);
+            this.depthRB3.Size = new System.Drawing.Size(100, 21);
             this.depthRB3.TabIndex = 4;
-            this.depthRB3.Text = "3  (Snabb)";
+            this.depthRB3.Text = "3   (Snabb)";
             this.depthRB3.UseVisualStyleBackColor = true;
             this.depthRB3.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
             // 

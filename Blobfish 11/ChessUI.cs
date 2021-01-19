@@ -377,12 +377,12 @@ namespace Blobfish_11
                 string textEval;
                 if (eval > 1000)
                 {
-                    int plysToMate = (int)(2001 - eval);
+                    int plysToMate = (int)(2002 - eval);
                     textEval = "M" + (plysToMate / 2).ToString();
                 }
                 else if (eval < -1000)
                 {
-                    int plysToMate = (int)(2001 + eval);
+                    int plysToMate = (int)(2002 + eval);
                     textEval = "m-" + (plysToMate / 2).ToString();
                 }
                 else
@@ -644,10 +644,10 @@ namespace Blobfish_11
         {
             //Byt namn på funktionen?
             int[] MIL = { };
-            if (depthRBAuto.Checked)
-            {
-                MIL = new int[] {8};
-            }
+            //if (depthRBAuto.Checked)
+            //{
+            //    MIL = new int[] {8};
+            //}
 
             try
             {
@@ -657,7 +657,7 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.6f, new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.8f, new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
                 }
                 else if (playStyleRB2.Checked) //Materialistisk
                 {
@@ -701,8 +701,8 @@ namespace Blobfish_11
         private int setAutomaticDepth()
         {
             double materialSum = 0;
-            double[] weights = { 1, 3, 5, 7, 14 }; //PNBRQ
-            double weightForPawnOnLastRank = 10;
+            double[] weights = { 1, 4, 6, 7, 20 }; //PNBRQ
+            double weightForPawnOnLastRank = weights[4] * 0.75f;
             //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
 
             for (int rank = 0; rank < 8; rank++)
@@ -758,11 +758,11 @@ namespace Blobfish_11
  *  Förbättra validSquare()
  *  Träd för varianter.
  *  Hantera PGN
+ *  Spela forcerande drag omedelbart?
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Minska behov av att ställa ut damen.
- *  Öka behov av att flytta centrumbönder.
  *  Föredra Sc3 före Sd2
  * 
  * Effektiviseringar:
@@ -779,6 +779,5 @@ namespace Blobfish_11
  *  
  *  
  *  Buggar:
- *  Antal drag till matt fel vid eval.
  *  Timer räknar när drag återtas efter matt.
  */

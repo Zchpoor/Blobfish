@@ -380,7 +380,7 @@ namespace Blobfish_11
                 //Halverar nyttan av kungsförsvar efter en viss gräns.
                 defenceAccumulator -= (defenceAccumulator - safteySoftCap) / 2;
             }
-            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)* kingSafteyCoefficient) /200f;
 
             float kingCoefficient;
             if (oppHeavyMaterial > endgameLimit)

@@ -19,7 +19,7 @@ namespace Blobfish_11
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
         //tunga pjäser uppgår till mindre än eller lika med endgameLimit.
         readonly int endgameLimit = 8;
-        readonly float kingSafteyDivisor = 200f;
+        readonly float kingSafteyCoefficient = 1;
         readonly int sleepTime = 100;
 
         //För vart och ett av talen som är större än antalet drag i ställningen så
@@ -44,8 +44,8 @@ namespace Blobfish_11
             if (defenceValues.Length != 5)
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
             this.pieceDefenceValues = defenceValues;
+            this.kingSafteyCoefficient = kingSafteyCoefficient;
             this.endgameLimit = endgameLimit;
-            this.kingSafteyDivisor = 200f / kingSafteyCoefficient;
             this.moveIncreaseLimits = moveIncreaseLimits;
         }
         
