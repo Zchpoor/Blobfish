@@ -21,6 +21,7 @@ namespace Blobfish_11
         List<Position> gamePositions = new List<Position>();
         List<Move> gameMoves = new List<Move>();
         Position currentPosition;
+        int displayedPly = 0;
         bool gameIsGoingOn = true;
         readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> currentMoves = new List<Move>();
@@ -108,6 +109,7 @@ namespace Blobfish_11
         {
             gamePositions.Add(pos);
             display(pos);
+            displayedPly = gamePositions.Count - 1;
         }
         private void display(Position pos)
         {
@@ -443,6 +445,25 @@ namespace Blobfish_11
         }
         private void ChessUI_KeyDown(object sender, KeyEventArgs e)
         {
+            if(e.Modifiers == Keys.None)
+            {
+                if (e.KeyCode == Keys.Left)
+                {
+                    displayGamePosition(displayedPly - 1);
+                }
+                else if (e.KeyCode == Keys.Right)
+                {
+                    displayGamePosition(displayedPly + 1);
+                }
+                else if (e.KeyCode == Keys.Up)
+                {
+                    displayGamePosition(0);
+                }
+                else if (e.KeyCode == Keys.Down)
+                {
+                    displayGamePosition(gamePositions.Count-1);
+                }
+            }
             if (e.Modifiers == Keys.Control)
             {
                 if (e.KeyCode == Keys.F)
@@ -490,6 +511,22 @@ namespace Blobfish_11
                     }
                 }
             }
+        }
+        private void displayGamePosition(int ply)
+        {
+            if (ply < 0) ply = 0;
+            if (ply > gamePositions.Count -1) ply = gamePositions.Count-1;
+
+            display(gamePositions[ply]);
+            if(ply == gamePositions.Count - 1)
+            {
+                setBoardDisabled(false);
+            }
+            else
+            {
+                setBoardDisabled(true);
+            }
+            displayedPly = ply;
         }
         private bool engineIsToMove()
         {
@@ -615,6 +652,10 @@ namespace Blobfish_11
                 ponderingTimer.Start();
             else
                 ponderingTimer.Stop();
+            setBoardDisabled(setTo);
+        }
+        private void setBoardDisabled(bool setTo)
+        {
             for (int rank = 0; rank < 7; rank++)
             {
                 for (int line = 0; line < 7; line++)
@@ -636,7 +677,6 @@ namespace Blobfish_11
                             Falt[rank, line].Cursor = cursor;
                         }
                     }
-
                 }
             }
         }
@@ -753,7 +793,6 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Gör fönstret skalbart.
  *  Koordinater
- *  Gå framåt/bakåt i partiet.
  *  Dra nu!
  *  Förbättra validSquare()
  *  Träd för varianter.
@@ -780,4 +819,6 @@ namespace Blobfish_11
  *  
  *  Buggar:
  *  Timer räknar när drag återtas efter matt.
+ *  Ställningar tas ej bort när drag återtas?
+ *  Radioknapparna reagerar på piltangenterna.
  */
