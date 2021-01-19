@@ -177,6 +177,7 @@
             this.radioButton4.Text = "Bägge";
             this.radioButton4.UseVisualStyleBackColor = true;
             this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.radioButton4.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
             // 
             // radioButton3
             // 
@@ -190,6 +191,7 @@
             this.radioButton3.Text = "Svart";
             this.radioButton3.UseVisualStyleBackColor = true;
             this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.radioButton3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
             // 
             // radioButton2
             // 
@@ -201,6 +203,7 @@
             this.radioButton2.Text = "Vit";
             this.radioButton2.UseVisualStyleBackColor = true;
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.radioButton2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
             // 
             // radioButton1
             // 
@@ -212,6 +215,7 @@
             this.radioButton1.Text = "Ingen dator";
             this.radioButton1.UseVisualStyleBackColor = true;
             this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.radioButton1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
             // 
             // ponderingWorker
             // 

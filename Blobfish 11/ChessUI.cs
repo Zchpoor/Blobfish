@@ -445,6 +445,7 @@ namespace Blobfish_11
         }
         private void ChessUI_KeyDown(object sender, KeyEventArgs e)
         {
+            bool r = radioButton1.Checked;
             if(e.Modifiers == Keys.None)
             {
                 if (e.KeyCode == Keys.Left)
@@ -780,6 +781,11 @@ namespace Blobfish_11
                 return 5;
             else return 4;
         }
+        private void radioButton1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if(e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
+                e.IsInputKey = true;
+        }
     }
 }
 
@@ -816,9 +822,7 @@ namespace Blobfish_11
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
- *  
  *  Buggar:
  *  Timer räknar när drag återtas efter matt.
  *  Ställningar tas ej bort när drag återtas?
- *  Radioknapparna reagerar på piltangenterna.
  */
