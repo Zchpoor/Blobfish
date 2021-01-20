@@ -15,6 +15,7 @@ using System.Diagnostics;
 
 namespace Blobfish_11
 {
+    //[System.ComponentModel.DesignerCategory("Form")]
     public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
@@ -164,152 +165,6 @@ namespace Blobfish_11
             this.gameMoves.Add(move);
             displayAndAddPosition(newPosition);
         }
-        private void fenButton_Click(object sender, EventArgs e)
-        {
-            string inputText = fenBox.Text;
-            string lowerInput = inputText.ToLower();
-
-            switch (lowerInput)
-            {
-                case "test":
-                    evalBox.Text = Tests.runTests();
-                    break;
-                case "moves":
-                    evalBox.Text = "Alla drag:\n" + Environment.NewLine + 
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
-                    break;
-                case "drag":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
-                    break;
-                case "sorted":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
-                    break;
-                case "sorterade":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine + 
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
-                    break;
-                case "takeback":
-                    takeback(2);
-                    break;
-                case "tb":
-                    takeback(2);
-                    break;
-                case "undo":
-                    takeback(2);
-                    break;
-                case "återta":
-                    takeback(2);
-                    break;
-                case "stb":
-                    takeback(1);
-                    break;
-                case "scoresheet":
-                    evalBox.Text = scoresheet();
-                    break;
-                case "protokoll":
-                    evalBox.Text = scoresheet();
-                    break;
-                case "reset":
-                    reset();
-                    break;
-                case "omstart":
-                    reset();
-                    break;
-                case "fen":
-                    fenBox.Text = currentPosition.getFEN();
-                    fenBox.SelectAll();
-                    break;
-                case "flip":
-                    flipBoard();
-                    break;
-                case "vänd":
-                    flipBoard();
-                    break;
-                case "eval":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
-                    break;
-                case "evaluate":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
-                    break;
-                case "bedöm":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
-                    break;
-                case "num":
-                    float res = choosePlayingStyle().numericEval(currentPosition);
-                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res,2).ToString();
-                    break;
-                case "time":
-                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
-                    break;
-                case "tid":
-                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
-                    break;
-                case "spec":
-                    string posToEvaluate = "r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13";
-                    Stopwatch sw = new Stopwatch();
-                    long t0, t1, t2;
-                    sw.Start();
-                    for (int i = 0; i < 10000; i++)
-                    {
-                        blobFish.numericEval(new Position(posToEvaluate));
-                    }
-                    sw.Stop();
-                    t0 = sw.ElapsedMilliseconds;
-                    sw.Restart();
-                    for (int i = 0; i < 10000; i++)
-                    {
-                        blobFish.allValidMoves(new Position(posToEvaluate), false);
-                    }
-                    sw.Stop();
-                    t1 = sw.ElapsedMilliseconds;
-                    sw.Restart();
-                    for (int i = 0; i < 10000; i++)
-                    {
-                        blobFish.allValidMoves(new Position(posToEvaluate), true);
-                    }
-                    sw.Stop();
-                    t2 = sw.ElapsedMilliseconds;
-                    evalBox.Text = "Tider för 10000 iterationer (ms): "
-                        + "\r\n  Evaluering av ställning: " + t0.ToString()
-                        + "\r\n  Alla drag (osorterade): " + t1.ToString()
-                        + "\r\n  Alla drag (sorterade): " + t2.ToString()
-                        + "\r\n  Extra tid för att sortera: " + Math.Round((((float)t2 / (float)t1)-1) * 100, 1) + "%";
-                    break;
-                default:
-                    try
-                    {
-                        Position pos = new Position(inputText);
-                        gameIsGoingOn = true;
-                        this.gamePositions.Clear();
-                        this.gameMoves.Clear();
-                        displayAndAddPosition(pos);
-                    }
-                    catch
-                    {
-                        evalBox.Text = "Felaktig FEN!";
-                        return;
-                    }
-                    break;
-            }
-        }
-        private void radioButtons_CheckedChanged(object sender, EventArgs e)
-        {
-            if((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
-            {
-                if (engineIsToMove())
-                    playBestEngineMove();
-            }
-        }
-        private void fenBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                fenButton_Click(null, null);
-            }
-        }
         private string getMovesString(List<Move> moves, char[,] board)
         {
             string text = "";
@@ -393,10 +248,6 @@ namespace Blobfish_11
                 }
                 String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
                     Environment.NewLine + "Datorns evaluering: " + textEval;
-                if (depthRBAuto.Checked)
-                {
-                    completeString += Environment.NewLine + "Djup: " + minDepth;
-                }
                 evalBox.Text = completeString;
             }
             else
@@ -444,76 +295,6 @@ namespace Blobfish_11
                 evalBox.Text = "För få drag har spelats!";
             }
         }
-        private void ChessUI_KeyDown(object sender, KeyEventArgs e)
-        {
-            bool r = computerRBNone.Checked;
-            if(e.Modifiers == Keys.None)
-            {
-                if (e.KeyCode == Keys.Left)
-                {
-                    displayGamePosition(displayedPly - 1);
-                }
-                else if (e.KeyCode == Keys.Right)
-                {
-                    displayGamePosition(displayedPly + 1);
-                }
-                else if (e.KeyCode == Keys.Up)
-                {
-                    displayGamePosition(0);
-                }
-                else if (e.KeyCode == Keys.Down)
-                {
-                    displayGamePosition(gamePositions.Count-1);
-                }
-            }
-            if (e.Modifiers == Keys.Control)
-            {
-                if (e.KeyCode == Keys.F)
-                {
-                    e.SuppressKeyPress = true;
-                    flipBoard();
-                }
-                if (e.KeyCode == Keys.W)
-                {
-                    e.SuppressKeyPress = true;
-                    DialogResult result = MessageBox.Show("Vill du stänga ned programmet?", "Avsluta", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
-                    {
-                        this.Close();
-                    }
-                }
-                if(!ponderingWorker.IsBusy)
-                {
-                    //Kortkommandon som endast tillåts om motorn inte är igång.
-                    if (e.KeyCode == Keys.R)
-                    {
-                        e.SuppressKeyPress = true;
-                        DialogResult result = MessageBox.Show("Vill du starta ett nytt parti?", "Återställning av partiet", MessageBoxButtons.YesNo);
-                        if (result == DialogResult.Yes)
-                        {
-                            reset();
-                        }
-                    }
-                    if (e.KeyCode == Keys.Z)
-                    {
-                        e.SuppressKeyPress = true;
-                        takeback(2);
-                    }
-                }
-            }
-            if(e.Modifiers == (Keys.Control | Keys.Shift))
-            {
-                if (!ponderingWorker.IsBusy)
-                {
-                    //Kortkommandon som endast tillåts om motorn inte är igång.
-                    if (e.KeyCode == Keys.Z)
-                    {
-                        e.SuppressKeyPress = true;
-                        takeback(1);
-                    }
-                }
-            }
-        }
         private void displayGamePosition(int ply)
         {
             if (ply < 0) ply = 0;
@@ -546,7 +327,7 @@ namespace Blobfish_11
             resultPlace.bestMove = null;
             if (depthRBAuto.Checked)
             {
-                minDepth = setAutomaticDepth();
+                minDepth = -1;
             }
             Thread thread = new Thread(delegate ()
             {
@@ -631,15 +412,6 @@ namespace Blobfish_11
             ponderingTime = ponderingTime.Add(new TimeSpan(0, 0, 0, 0, ponderingTimer.Interval));
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
         }
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            ponderingWorker.CancelAsync();
-            if (!computerRBBoth.Checked)
-                takeback(1);
-            evalBox.Text = "Beräkningen avbröts.";
-            ponderingTime = new TimeSpan(0);
-            setPonderingMode(false);
-        }
         private void ChessUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             ponderingWorker.CancelAsync();
@@ -720,73 +492,6 @@ namespace Blobfish_11
                 return new Engine();
             }
         }
-        private void depthRB_CheckedChanged(object sender, EventArgs e)
-        {
-            if((sender as RadioButton).Checked)
-            {
-                if (depthRB2.Checked)
-                    minDepth = 2;
-                else if (depthRB3.Checked)
-                    minDepth = 3;
-                else if (depthRB4.Checked)
-                    minDepth = 4;
-                else if (depthRB5.Checked)
-                    minDepth = 5;
-                else if (depthRB6.Checked)
-                    minDepth = 6;
-                else if (depthRBAuto.Checked)
-                    minDepth = setAutomaticDepth();
-                else
-                    throw new Exception("Fel på djupinställningen!");
-            }
-        }
-        private int setAutomaticDepth()
-        {
-            double materialSum = 0;
-            double[] weights = { 1, 4, 6, 7, 20 }; //PNBRQ
-            double weightForPawnOnLastRank = weights[4] * 0.75f;
-            //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
-
-            for (int rank = 0; rank < 8; rank++)
-            {
-                for (int line = 0; line < 8; line++)
-                {
-                    char piece = currentPosition.board[rank, line];
-                    if (piece == 'P' || piece == 'p')
-                    {
-                        if ((piece == 'P' && rank == 1) || (piece == 'p' && rank == 6))
-                        {
-                            //Bönder som är ett steg ifrån att promotera.
-                            materialSum += weightForPawnOnLastRank;
-                        }
-                        else
-                        {
-                            materialSum += weights[0];
-                        }
-                }
-                else if (piece == 'N' || piece == 'n')
-                        materialSum += weights[1];
-                    else if (piece == 'B' || piece == 'b')
-                        materialSum += weights[2];
-                    else if (piece == 'R' || piece == 'r')
-                        materialSum += weights[3];
-                    if (piece == 'Q' || piece == 'q')
-                        materialSum += weights[4];
-                }
-            }
-            if (materialSum < 11)
-                return 7;
-            else if (materialSum <= weights[4])
-                return 6;
-            else if (materialSum < 25)
-                return 5;
-            else return 4;
-        }
-        private void radioButton_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if(e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
-                e.IsInputKey = true;
-        }
     }
 }
 
@@ -808,7 +513,6 @@ namespace Blobfish_11
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
- *  Minska behov av att ställa ut damen.
  *  Föredra Sc3 före Sd2
  * 
  * Effektiviseringar:

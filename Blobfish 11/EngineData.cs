@@ -22,6 +22,9 @@ namespace Blobfish_11
         readonly float kingSafteyCoefficient = 1;
         readonly int sleepTime = 100;
 
+        //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
+        double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBR
+
         //För vart och ett av talen som är större än antalet drag i ställningen så
         //ökas djupet med ett.
         //Talen bör vara i minskande ordning.

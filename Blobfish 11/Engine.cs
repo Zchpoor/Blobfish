@@ -13,6 +13,11 @@ namespace Blobfish_11
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
+
+            if(minDepth == -1)
+            {
+                minDepth = automaticDepth(pos);
+            }
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
@@ -533,6 +538,46 @@ namespace Blobfish_11
                 return (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
             }
             return piece;
+        }
+        private int automaticDepth(Position pos)
+        {
+            double materialSum = 0;
+            double weightForPawnOnLastRank = calculationWeights[4] * 0.75f;
+
+            for (int rank = 0; rank < 8; rank++)
+            {
+                for (int line = 0; line < 8; line++)
+                {
+                    char piece = pos.board[rank, line];
+                    if (piece == 'P' || piece == 'p')
+                    {
+                        if ((piece == 'P' && rank == 1) || (piece == 'p' && rank == 6))
+                        {
+                            //Bönder som är ett steg ifrån att promotera.
+                            materialSum += weightForPawnOnLastRank;
+                        }
+                        else
+                        {
+                            materialSum += calculationWeights[0];
+                        }
+                    }
+                    else if (piece == 'N' || piece == 'n')
+                        materialSum += calculationWeights[1];
+                    else if (piece == 'B' || piece == 'b')
+                        materialSum += calculationWeights[2];
+                    else if (piece == 'R' || piece == 'r')
+                        materialSum += calculationWeights[3];
+                    if (piece == 'Q' || piece == 'q')
+                        materialSum += calculationWeights[4];
+                }
+            }
+            if (materialSum < 11)
+                return 7;
+            else if (materialSum <= calculationWeights[4])
+                return 6;
+            else if (materialSum < 25)
+                return 5;
+            else return 4;
         }
     }
 }
