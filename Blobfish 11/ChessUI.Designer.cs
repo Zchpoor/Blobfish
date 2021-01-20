@@ -33,7 +33,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.fenButton = new System.Windows.Forms.Button();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
             this.compColorBox = new System.Windows.Forms.GroupBox();
@@ -61,6 +60,8 @@
             this.playStyleRB1 = new System.Windows.Forms.RadioButton();
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
+            this.moveLabel = new System.Windows.Forms.Label();
+            this.moveNowButton = new System.Windows.Forms.Button();
             this.compColorBox.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
@@ -122,15 +123,6 @@
             this.boardPanel.Size = new System.Drawing.Size(480, 480);
             this.boardPanel.TabIndex = 5;
             // 
-            // moveLabel
-            // 
-            this.moveLabel.AutoSize = true;
-            this.moveLabel.Location = new System.Drawing.Point(704, 31);
-            this.moveLabel.Name = "moveLabel";
-            this.moveLabel.Size = new System.Drawing.Size(87, 17);
-            this.moveLabel.TabIndex = 6;
-            this.moveLabel.Text = "(default text)";
-            // 
             // evalBox
             // 
             this.evalBox.AcceptsReturn = true;
@@ -140,7 +132,7 @@
             this.evalBox.Name = "evalBox";
             this.evalBox.ReadOnly = true;
             this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(254, 543);
+            this.evalBox.Size = new System.Drawing.Size(254, 518);
             this.evalBox.TabIndex = 7;
             this.evalBox.TabStop = false;
             // 
@@ -236,12 +228,13 @@
             // ponderingPanel
             // 
             this.ponderingPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.ponderingPanel.Controls.Add(this.moveNowButton);
             this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
-            this.ponderingPanel.Location = new System.Drawing.Point(553, 65);
+            this.ponderingPanel.Location = new System.Drawing.Point(553, 54);
             this.ponderingPanel.Name = "ponderingPanel";
-            this.ponderingPanel.Size = new System.Drawing.Size(200, 110);
+            this.ponderingPanel.Size = new System.Drawing.Size(227, 110);
             this.ponderingPanel.TabIndex = 11;
             this.ponderingPanel.Visible = false;
             // 
@@ -276,7 +269,7 @@
             this.settingsPanel.Controls.Add(this.depthBox);
             this.settingsPanel.Controls.Add(this.playStyleBox);
             this.settingsPanel.Controls.Add(this.compColorBox);
-            this.settingsPanel.Location = new System.Drawing.Point(553, 211);
+            this.settingsPanel.Location = new System.Drawing.Point(554, 187);
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(285, 337);
             this.settingsPanel.TabIndex = 12;
@@ -433,17 +426,36 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(550, 191);
+            this.label2.Location = new System.Drawing.Point(551, 167);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 17);
             this.label2.TabIndex = 13;
             this.label2.Text = "Inställningar:";
             // 
+            // moveLabel
+            // 
+            this.moveLabel.AutoSize = true;
+            this.moveLabel.Location = new System.Drawing.Point(704, 31);
+            this.moveLabel.Name = "moveLabel";
+            this.moveLabel.Size = new System.Drawing.Size(87, 17);
+            this.moveLabel.TabIndex = 6;
+            this.moveLabel.Text = "(default text)";
+            // 
+            // moveNowButton
+            // 
+            this.moveNowButton.Location = new System.Drawing.Point(125, 64);
+            this.moveNowButton.Name = "moveNowButton";
+            this.moveNowButton.Size = new System.Drawing.Size(95, 39);
+            this.moveNowButton.TabIndex = 13;
+            this.moveNowButton.Text = "Dra nu!";
+            this.moveNowButton.UseVisualStyleBackColor = true;
+            this.moveNowButton.Click += new System.EventHandler(this.moveNowButton_Click);
+            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1110, 560);
+            this.ClientSize = new System.Drawing.Size(1110, 530);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.settingsPanel);
             this.Controls.Add(this.ponderingPanel);
@@ -479,7 +491,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button fenButton;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
-        private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
         private System.Windows.Forms.Label toMoveLabel;
         private System.Windows.Forms.GroupBox compColorBox;
@@ -507,6 +518,8 @@
         private System.Windows.Forms.RadioButton depthRB6;
         private System.Windows.Forms.RadioButton depthRB5;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label moveLabel;
+        private System.Windows.Forms.Button moveNowButton;
     }
 }
 

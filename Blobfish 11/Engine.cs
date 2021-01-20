@@ -11,6 +11,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         public SecureFloat cancelFlag = new SecureFloat(0f);
+        public SecureFloat moveNowFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
             //Om minDepth är -1, skall datorn själv bestämma djup.
@@ -62,14 +63,18 @@ namespace Blobfish_11
                 //bool success2 = ThreadPool.SetMaxThreads(2, 1);
                 //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
 
-                foreach (Move currentMove in moves)
+                SecureFloat bestMove = new SecureFloat(0);
+                for(int i = 0;i<moves.Count;i++)
+                //foreach (Move currentMove in moves)
                 {
+                    Move currentMove = moves[i];
                     SecureFloat newFloat = new SecureFloat();
+                    int iCopy = i;
                     allEvals.Add(newFloat);
 
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta);
+                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
@@ -79,6 +84,7 @@ namespace Blobfish_11
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
                     //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
                 }
+                //result.bestMove = moves[0];
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
@@ -98,28 +104,26 @@ namespace Blobfish_11
                             Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
                             return result;
                         }
+                        else if(this.moveNowFlag.getValue() != 0)
+                        {
+                            abortAll(threadList);
+                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
+                            result.bestMove = moves[(int)bestMove.getValue()];
+                            return result;
+                        }
                         Thread.Sleep(sleepTime);
                         i--;
                     }
                     else
-                    { //Om resultatet är klart.
-                        if (pos.whiteToMove)
-                        {
-                            bestValue = Math.Max(bestValue, value);
-                        }
-                        else
-                        {
-                            bestValue = Math.Min(bestValue, value);
-                        }
-
-                        //TODO: Gör finare
-                        if (bestValue == value)
-                        {
-                            result.bestMove = moves[i];
-                        }
+                    {
+                        //Om resultatet är klart.
+                        result.bestMove = moves[(int)bestMove.getValue()];
                     }
                 }
-                result.evaluation = bestValue;
+                if (pos.whiteToMove)
+                    result.evaluation = globalAlpha.getValue();
+                else
+                    result.evaluation = globalBeta.getValue();
                 result.allEvals = allEvals;
             }
 
@@ -129,19 +133,28 @@ namespace Blobfish_11
         public void threadStartStarter(Object t)
         {
             ThreadStartArguments tsa = (ThreadStartArguments)t;
-            threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
+            //threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
         }
-        public void threadStart(Position pos, sbyte depth, SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
+        public void threadStart(Position pos, sbyte depth, int moveIndex, SecureFloat bestMove,
+            SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
             float value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
-            if (!pos.whiteToMove)
+                if (!pos.whiteToMove)
             {
-                globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value));
+                if(value > globalAlpha.getValue())
+                {
+                    globalAlpha.setValue(value);
+                    bestMove.setValue(moveIndex);
+                }
             }
             else
             {
-                globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
+                if (value < globalBeta.getValue())
+                {
+                    globalBeta.setValue(value);
+                    bestMove.setValue(moveIndex);
+                }
             }
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
@@ -150,7 +163,7 @@ namespace Blobfish_11
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth <= -maximumDepth) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }

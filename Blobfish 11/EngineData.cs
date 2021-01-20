@@ -37,7 +37,10 @@ namespace Blobfish_11
         //För vart och ett av talen som är större än antalet drag i ställningen så
         //ökas djupet med ett. Talen bör vara i minskande ordning.
         //Till exempel: {20, 8, 2}
-        readonly int[] moveIncreaseLimits = {}; 
+        readonly int[] moveIncreaseLimits = {};
+
+        //Maximalt djup en variant kan beräknas efter minDepth uppnåtts.
+        readonly int maximumDepth = 8;
 
         public Engine() {}
         public Engine(int[] moveIncreaseLimits)

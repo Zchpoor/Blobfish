@@ -35,6 +35,8 @@ namespace Blobfish_11
         public ChessUI()
         {
             InitializeComponent();
+            this.MinimumSize = this.Size;
+            this.MaximumSize = this.Size;
             int squareSize = 50;
             boardPanel.AutoSize = true;
             moveLabel.Text = "";
@@ -256,6 +258,8 @@ namespace Blobfish_11
         }
         private void resultPopUp(int result)
         {
+            if (!gameIsGoingOn)
+                return;
             if (result > 1000)
             {
                 MessageBox.Show("Vit vann på schack matt!");
@@ -373,7 +377,9 @@ namespace Blobfish_11
                     else
                     {
                         setPonderingMode(false);
-                        printEval(res);
+                        if(gameIsGoingOn)
+                            printEval(res);
+
                         if (engineIsToMove())
                         {
                             playMove(res.bestMove);
@@ -496,6 +502,10 @@ namespace Blobfish_11
                 return new Engine();
             }
         }
+        private void moveNowButton_Click(object sender, EventArgs e)
+        {
+            blobFish.moveNowFlag.setValue(1);
+        }
     }
 }
 
@@ -507,9 +517,8 @@ namespace Blobfish_11
  *  Välja pjäs att promotera till.
  *  Se material.
  *  Se bästa variant
- *  Gör fönstret skalbart.
  *  Koordinater
- *  Dra nu!
+ *  Få "dra nu" att fungera bättre.
  *  Förbättra validSquare()
  *  Träd för varianter.
  *  Hantera PGN
@@ -522,7 +531,6 @@ namespace Blobfish_11
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
- *  Gör om system för att beteckna forcerad matt.
  *  Beräkna nästa lager av drag tidigare.
  *  
  * Förbättringar:
@@ -532,6 +540,4 @@ namespace Blobfish_11
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  
  *  Buggar:
- *  Timer räknar när drag återtas efter matt.
- *  Ställningar tas ej bort när drag återtas?
  */
