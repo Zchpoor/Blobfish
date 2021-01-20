@@ -46,7 +46,6 @@ namespace Blobfish_11
                     else break;
                 }
 
-                //TODO: Öka längden om antalet tunga pjäser är få.
 
                 SecureFloat globalAlpha = new SecureFloat();
                 globalAlpha.setValue(float.NegativeInfinity);

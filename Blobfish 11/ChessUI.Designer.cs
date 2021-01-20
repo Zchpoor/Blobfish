@@ -36,11 +36,11 @@
             this.moveLabel = new System.Windows.Forms.Label();
             this.evalBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
-            this.compColorBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.compColorBox = new System.Windows.Forms.GroupBox();
+            this.computerRBBoth = new System.Windows.Forms.RadioButton();
+            this.computerRBBlack = new System.Windows.Forms.RadioButton();
+            this.computerRBWhite = new System.Windows.Forms.RadioButton();
+            this.computerRBNone = new System.Windows.Forms.RadioButton();
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
             this.ponderingPanel = new System.Windows.Forms.Panel();
@@ -48,7 +48,7 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.ponderingTimer = new System.Windows.Forms.Timer(this.components);
             this.settingsPanel = new System.Windows.Forms.Panel();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.depthBox = new System.Windows.Forms.GroupBox();
             this.depthRB5 = new System.Windows.Forms.RadioButton();
             this.depthRB6 = new System.Windows.Forms.RadioButton();
             this.depthRBAuto = new System.Windows.Forms.RadioButton();
@@ -61,10 +61,10 @@
             this.playStyleRB1 = new System.Windows.Forms.RadioButton();
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
-            this.compColorBox1.SuspendLayout();
+            this.compColorBox.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.depthBox.SuspendLayout();
             this.playStyleBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -154,68 +154,68 @@
             this.toMoveLabel.TabIndex = 8;
             this.toMoveLabel.Text = "(default text)";
             // 
-            // compColorBox1
+            // compColorBox
             // 
-            this.compColorBox1.Controls.Add(this.radioButton4);
-            this.compColorBox1.Controls.Add(this.radioButton3);
-            this.compColorBox1.Controls.Add(this.radioButton2);
-            this.compColorBox1.Controls.Add(this.radioButton1);
-            this.compColorBox1.Location = new System.Drawing.Point(9, 3);
-            this.compColorBox1.Name = "compColorBox1";
-            this.compColorBox1.Size = new System.Drawing.Size(130, 132);
-            this.compColorBox1.TabIndex = 9;
-            this.compColorBox1.TabStop = false;
-            this.compColorBox1.Text = "Färg";
+            this.compColorBox.Controls.Add(this.computerRBBoth);
+            this.compColorBox.Controls.Add(this.computerRBBlack);
+            this.compColorBox.Controls.Add(this.computerRBWhite);
+            this.compColorBox.Controls.Add(this.computerRBNone);
+            this.compColorBox.Location = new System.Drawing.Point(9, 3);
+            this.compColorBox.Name = "compColorBox";
+            this.compColorBox.Size = new System.Drawing.Size(130, 132);
+            this.compColorBox.TabIndex = 9;
+            this.compColorBox.TabStop = false;
+            this.compColorBox.Text = "Färg";
             // 
-            // radioButton4
+            // computerRBBoth
             // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(6, 102);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(70, 21);
-            this.radioButton4.TabIndex = 6;
-            this.radioButton4.Text = "Bägge";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.radioButton4.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
+            this.computerRBBoth.AutoSize = true;
+            this.computerRBBoth.Location = new System.Drawing.Point(6, 102);
+            this.computerRBBoth.Name = "computerRBBoth";
+            this.computerRBBoth.Size = new System.Drawing.Size(70, 21);
+            this.computerRBBoth.TabIndex = 6;
+            this.computerRBBoth.Text = "Bägge";
+            this.computerRBBoth.UseVisualStyleBackColor = true;
+            this.computerRBBoth.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.computerRBBoth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
-            // radioButton3
+            // computerRBBlack
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Checked = true;
-            this.radioButton3.Location = new System.Drawing.Point(6, 75);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(62, 21);
-            this.radioButton3.TabIndex = 5;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Svart";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.radioButton3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
+            this.computerRBBlack.AutoSize = true;
+            this.computerRBBlack.Checked = true;
+            this.computerRBBlack.Location = new System.Drawing.Point(6, 75);
+            this.computerRBBlack.Name = "computerRBBlack";
+            this.computerRBBlack.Size = new System.Drawing.Size(62, 21);
+            this.computerRBBlack.TabIndex = 5;
+            this.computerRBBlack.TabStop = true;
+            this.computerRBBlack.Text = "Svart";
+            this.computerRBBlack.UseVisualStyleBackColor = true;
+            this.computerRBBlack.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.computerRBBlack.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
-            // radioButton2
+            // computerRBWhite
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(6, 48);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(45, 21);
-            this.radioButton2.TabIndex = 4;
-            this.radioButton2.Text = "Vit";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.radioButton2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
+            this.computerRBWhite.AutoSize = true;
+            this.computerRBWhite.Location = new System.Drawing.Point(6, 48);
+            this.computerRBWhite.Name = "computerRBWhite";
+            this.computerRBWhite.Size = new System.Drawing.Size(45, 21);
+            this.computerRBWhite.TabIndex = 4;
+            this.computerRBWhite.Text = "Vit";
+            this.computerRBWhite.UseVisualStyleBackColor = true;
+            this.computerRBWhite.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.computerRBWhite.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
-            // radioButton1
+            // computerRBNone
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(6, 21);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(101, 21);
-            this.radioButton1.TabIndex = 3;
-            this.radioButton1.Text = "Ingen dator";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.radioButton1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton1_PreviewKeyDown);
+            this.computerRBNone.AutoSize = true;
+            this.computerRBNone.Location = new System.Drawing.Point(6, 21);
+            this.computerRBNone.Name = "computerRBNone";
+            this.computerRBNone.Size = new System.Drawing.Size(101, 21);
+            this.computerRBNone.TabIndex = 3;
+            this.computerRBNone.Text = "Ingen dator";
+            this.computerRBNone.UseVisualStyleBackColor = true;
+            this.computerRBNone.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
+            this.computerRBNone.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // ponderingWorker
             // 
@@ -273,28 +273,28 @@
             // settingsPanel
             // 
             this.settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.settingsPanel.Controls.Add(this.groupBox1);
+            this.settingsPanel.Controls.Add(this.depthBox);
             this.settingsPanel.Controls.Add(this.playStyleBox);
-            this.settingsPanel.Controls.Add(this.compColorBox1);
+            this.settingsPanel.Controls.Add(this.compColorBox);
             this.settingsPanel.Location = new System.Drawing.Point(553, 211);
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(285, 337);
             this.settingsPanel.TabIndex = 12;
             // 
-            // groupBox1
+            // depthBox
             // 
-            this.groupBox1.Controls.Add(this.depthRB5);
-            this.groupBox1.Controls.Add(this.depthRB6);
-            this.groupBox1.Controls.Add(this.depthRBAuto);
-            this.groupBox1.Controls.Add(this.depthRB4);
-            this.groupBox1.Controls.Add(this.depthRB3);
-            this.groupBox1.Controls.Add(this.depthRB2);
-            this.groupBox1.Location = new System.Drawing.Point(9, 141);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(271, 188);
-            this.groupBox1.TabIndex = 10;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Djup";
+            this.depthBox.Controls.Add(this.depthRB5);
+            this.depthBox.Controls.Add(this.depthRB6);
+            this.depthBox.Controls.Add(this.depthRBAuto);
+            this.depthBox.Controls.Add(this.depthRB4);
+            this.depthBox.Controls.Add(this.depthRB3);
+            this.depthBox.Controls.Add(this.depthRB2);
+            this.depthBox.Location = new System.Drawing.Point(9, 141);
+            this.depthBox.Name = "depthBox";
+            this.depthBox.Size = new System.Drawing.Size(271, 188);
+            this.depthBox.TabIndex = 10;
+            this.depthBox.TabStop = false;
+            this.depthBox.Text = "Djup";
             // 
             // depthRB5
             // 
@@ -306,6 +306,7 @@
             this.depthRB5.Text = "5   (Långsam)";
             this.depthRB5.UseVisualStyleBackColor = true;
             this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRB5.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // depthRB6
             // 
@@ -317,6 +318,7 @@
             this.depthRB6.Text = "6   (Mycket långsam)";
             this.depthRB6.UseVisualStyleBackColor = true;
             this.depthRB6.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRB6.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // depthRBAuto
             // 
@@ -330,6 +332,7 @@
             this.depthRBAuto.Text = "Automatisk";
             this.depthRBAuto.UseVisualStyleBackColor = true;
             this.depthRBAuto.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRBAuto.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // depthRB4
             // 
@@ -341,6 +344,7 @@
             this.depthRB4.Text = "4   (Normal)";
             this.depthRB4.UseVisualStyleBackColor = true;
             this.depthRB4.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRB4.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // depthRB3
             // 
@@ -352,6 +356,7 @@
             this.depthRB3.Text = "3   (Snabb)";
             this.depthRB3.UseVisualStyleBackColor = true;
             this.depthRB3.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRB3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // depthRB2
             // 
@@ -363,6 +368,7 @@
             this.depthRB2.Text = "2   (Mycket snabb)";
             this.depthRB2.UseVisualStyleBackColor = true;
             this.depthRB2.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
+            this.depthRB2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // playStyleBox
             // 
@@ -387,6 +393,7 @@
             this.playStyleRB3.TabIndex = 6;
             this.playStyleRB3.Text = "Experimentell";
             this.playStyleRB3.UseVisualStyleBackColor = true;
+            this.playStyleRB3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // playStyleRB2
             // 
@@ -397,6 +404,7 @@
             this.playStyleRB2.TabIndex = 5;
             this.playStyleRB2.Text = "Materialistisk";
             this.playStyleRB2.UseVisualStyleBackColor = true;
+            this.playStyleRB2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // playStyleRB1
             // 
@@ -407,6 +415,7 @@
             this.playStyleRB1.TabIndex = 4;
             this.playStyleRB1.Text = "Försiktig";
             this.playStyleRB1.UseVisualStyleBackColor = true;
+            this.playStyleRB1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // playStyleRB0
             // 
@@ -419,6 +428,7 @@
             this.playStyleRB0.TabStop = true;
             this.playStyleRB0.Text = "Normal";
             this.playStyleRB0.UseVisualStyleBackColor = true;
+            this.playStyleRB0.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // label2
             // 
@@ -449,13 +459,13 @@
             this.Text = "Blobfish 11";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChessUI_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChessUI_KeyDown);
-            this.compColorBox1.ResumeLayout(false);
-            this.compColorBox1.PerformLayout();
+            this.compColorBox.ResumeLayout(false);
+            this.compColorBox.PerformLayout();
             this.ponderingPanel.ResumeLayout(false);
             this.ponderingPanel.PerformLayout();
             this.settingsPanel.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.depthBox.ResumeLayout(false);
+            this.depthBox.PerformLayout();
             this.playStyleBox.ResumeLayout(false);
             this.playStyleBox.PerformLayout();
             this.ResumeLayout(false);
@@ -472,10 +482,10 @@
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.TextBox evalBox;
         private System.Windows.Forms.Label toMoveLabel;
-        private System.Windows.Forms.GroupBox compColorBox1;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.GroupBox compColorBox;
+        private System.Windows.Forms.RadioButton computerRBBlack;
+        private System.Windows.Forms.RadioButton computerRBWhite;
+        private System.Windows.Forms.RadioButton computerRBNone;
         private System.ComponentModel.BackgroundWorker ponderingWorker;
         private System.Windows.Forms.Label ponderingLabel;
         private System.Windows.Forms.Panel ponderingPanel;
@@ -488,12 +498,12 @@
         private System.Windows.Forms.RadioButton playStyleRB1;
         private System.Windows.Forms.RadioButton playStyleRB0;
         private System.Windows.Forms.RadioButton playStyleRB3;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox depthBox;
         private System.Windows.Forms.RadioButton depthRBAuto;
         private System.Windows.Forms.RadioButton depthRB4;
         private System.Windows.Forms.RadioButton depthRB3;
         private System.Windows.Forms.RadioButton depthRB2;
-        private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.RadioButton computerRBBoth;
         private System.Windows.Forms.RadioButton depthRB6;
         private System.Windows.Forms.RadioButton depthRB5;
         private System.Windows.Forms.Label label2;

@@ -366,7 +366,7 @@ namespace Blobfish_11
             if (decisiveResult != -2)
             {
                 resultPopUp(decisiveResult);
-                gameIsGoingOn = false;  
+                gameIsGoingOn = false;
             }
             else if (!blobFish.mateableMaterial(currentPosition.board))
             {
@@ -422,6 +422,7 @@ namespace Blobfish_11
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
             }
+            computerRBNone.Checked = true;
         }
         private void takeback(int numberOfMoves)
         {
@@ -445,7 +446,7 @@ namespace Blobfish_11
         }
         private void ChessUI_KeyDown(object sender, KeyEventArgs e)
         {
-            bool r = radioButton1.Checked;
+            bool r = computerRBNone.Checked;
             if(e.Modifiers == Keys.None)
             {
                 if (e.KeyCode == Keys.Left)
@@ -531,8 +532,8 @@ namespace Blobfish_11
         }
         private bool engineIsToMove()
         {
-            return (radioButton4.Checked || radioButton2.Checked && currentPosition.whiteToMove) ||
-                (radioButton3.Checked && !currentPosition.whiteToMove);
+            return (computerRBBoth.Checked || computerRBWhite.Checked && currentPosition.whiteToMove) ||
+                (computerRBBlack.Checked && !currentPosition.whiteToMove);
         }
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -633,7 +634,7 @@ namespace Blobfish_11
         private void cancelButton_Click(object sender, EventArgs e)
         {
             ponderingWorker.CancelAsync();
-            if (!radioButton4.Checked)
+            if (!computerRBBoth.Checked)
                 takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             ponderingTime = new TimeSpan(0);
@@ -781,7 +782,7 @@ namespace Blobfish_11
                 return 5;
             else return 4;
         }
-        private void radioButton1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void radioButton_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             if(e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
                 e.IsInputKey = true;
