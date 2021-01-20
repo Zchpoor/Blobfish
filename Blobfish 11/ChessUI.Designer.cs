@@ -400,9 +400,9 @@
             this.playStyleRB2.AutoSize = true;
             this.playStyleRB2.Location = new System.Drawing.Point(6, 75);
             this.playStyleRB2.Name = "playStyleRB2";
-            this.playStyleRB2.Size = new System.Drawing.Size(110, 21);
+            this.playStyleRB2.Size = new System.Drawing.Size(91, 21);
             this.playStyleRB2.TabIndex = 5;
-            this.playStyleRB2.Text = "Materialistisk";
+            this.playStyleRB2.Text = "Aggressiv";
             this.playStyleRB2.UseVisualStyleBackColor = true;
             this.playStyleRB2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 

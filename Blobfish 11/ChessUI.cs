@@ -15,7 +15,6 @@ using System.Diagnostics;
 
 namespace Blobfish_11
 {
-    //[System.ComponentModel.DesignerCategory("Form")]
     public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
@@ -109,8 +108,8 @@ namespace Blobfish_11
         private void displayAndAddPosition(Position pos)
         {
             gamePositions.Add(pos);
-            display(pos);
             displayedPly = gamePositions.Count - 1;
+            display(pos);
         }
         private void display(Position pos)
         {
@@ -299,6 +298,7 @@ namespace Blobfish_11
         {
             if (ply < 0) ply = 0;
             if (ply > gamePositions.Count -1) ply = gamePositions.Count-1;
+            displayedPly = ply;
 
             display(gamePositions[ply]);
             if(ply == gamePositions.Count - 1)
@@ -309,10 +309,11 @@ namespace Blobfish_11
             {
                 setBoardDisabled(true);
             }
-            displayedPly = ply;
         }
         private bool engineIsToMove()
         {
+            if (displayedPly != gamePositions.Count - 1)
+                return false;
             return (computerRBBoth.Checked || computerRBWhite.Checked && currentPosition.whiteToMove) ||
                 (computerRBBlack.Checked && !currentPosition.whiteToMove);
         }
@@ -471,15 +472,18 @@ namespace Blobfish_11
                 }
                 else if (playStyleRB1.Checked) //Försiktig
                 {
-                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.8f, new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.8f, 
+                        new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, 5f, MIL, 0.15f);
                 }
-                else if (playStyleRB2.Checked) //Materialistisk
+                else if (playStyleRB2.Checked) //Aggressiv
                 {
-                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f, new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, MIL);
+                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f,
+                        new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, 2.5f, MIL, 0.4f);
                 }
                 else if (playStyleRB3.Checked) //Experimentell
                 {
-                    return new Engine(new float[] {1f, 3f, 3.1f, 5f, 9f }, 0.4f, new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 0.85f, MIL);
+                    return new Engine(new float[] {1f, 3f, 3f, 4.5f, 9f }, 0.4f,
+                        new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 1f, 1f, MIL, 0.25f);
                 }
                 else
                 {

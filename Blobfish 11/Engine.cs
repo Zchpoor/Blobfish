@@ -13,7 +13,7 @@ namespace Blobfish_11
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
-
+            //Om minDepth är -1, skall datorn själv bestämma djup.
             if(minDepth == -1)
             {
                 minDepth = automaticDepth(pos);
