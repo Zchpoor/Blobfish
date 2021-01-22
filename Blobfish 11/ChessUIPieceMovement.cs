@@ -41,9 +41,14 @@ namespace Blobfish_11
                 return false;
             }
         }
+        private bool possibleToMove()
+        {
+            return !ponderingWorker.IsBusy && gameIsGoingOn && displayedPly == gamePositions.Count - 1;
+        }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
-            if (ponderingWorker.IsBusy) return;
+            if (!possibleToMove())
+                return;
 
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);

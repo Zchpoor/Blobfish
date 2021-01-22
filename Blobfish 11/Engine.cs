@@ -11,8 +11,14 @@ namespace Blobfish_11
     public partial class Engine
     {
         public SecureFloat cancelFlag = new SecureFloat(0f);
+        public SecureFloat moveNowFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
+            //Om minDepth är -1, skall datorn själv bestämma djup.
+            if(minDepth == -1)
+            {
+                minDepth = automaticDepth(pos);
+            }
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
@@ -36,8 +42,6 @@ namespace Blobfish_11
                     result.allMoves = moves;
                     result.bestMove = moves[0];
                     return result;
-                    //Forcerande drag beräknas alltid ytterligare ett drag.
-                    //Bör testas. Skulle eventuellt kunna orsaka buggar i extremfall.
                 }
 
                 // Ökar minimum-djupet om antalet tillgängliga drag är färre än de som anges
@@ -48,25 +52,39 @@ namespace Blobfish_11
                     else break;
                 }
 
-                //TODO: Öka längden om antalet tunga pjäser är få.
 
                 SecureFloat globalAlpha = new SecureFloat();
                 globalAlpha.setValue(float.NegativeInfinity);
                 SecureFloat globalBeta = new SecureFloat();
                 globalBeta.setValue(float.PositiveInfinity);
                 List<Thread> threadList = new List<Thread>();
-                foreach (Move currentMove in moves)
+
+                //bool success = ThreadPool.SetMinThreads(2, 1);
+                //bool success2 = ThreadPool.SetMaxThreads(2, 1);
+                //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
+
+                SecureFloat bestMove = new SecureFloat(0);
+                for(int i = 0;i<moves.Count;i++)
+                //foreach (Move currentMove in moves)
                 {
+                    Move currentMove = moves[i];
                     SecureFloat newFloat = new SecureFloat();
+                    int iCopy = i;
                     allEvals.Add(newFloat);
+
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta);
+                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos.board);
                     thread.Start();
                     threadList.Add(thread);
+
+
+                    //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
+                    //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
                 }
+                //result.bestMove = moves[0];
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
@@ -86,45 +104,57 @@ namespace Blobfish_11
                             Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
                             return result;
                         }
+                        else if(this.moveNowFlag.getValue() != 0)
+                        {
+                            abortAll(threadList);
+                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
+                            result.bestMove = moves[(int)bestMove.getValue()];
+                            return result;
+                        }
                         Thread.Sleep(sleepTime);
                         i--;
                     }
                     else
-                    { //Om resultatet är klart.
-                        if (pos.whiteToMove)
-                        {
-                            bestValue = Math.Max(bestValue, value);
-                        }
-                        else
-                        {
-                            bestValue = Math.Min(bestValue, value);
-                        }
-
-                        //TODO: Gör finare
-                        if (bestValue == value)
-                        {
-                            result.bestMove = moves[i];
-                        }
+                    {
+                        //Om resultatet är klart.
+                        result.bestMove = moves[(int)bestMove.getValue()];
                     }
                 }
-                result.evaluation = bestValue;
+                if (pos.whiteToMove)
+                    result.evaluation = globalAlpha.getValue();
+                else
+                    result.evaluation = globalBeta.getValue();
                 result.allEvals = allEvals;
             }
 
             result.allMoves = moves;
             return result;
         }
-        public void threadStart(Position pos, sbyte depth, SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
+        public void threadStartStarter(Object t)
+        {
+            ThreadStartArguments tsa = (ThreadStartArguments)t;
+            //threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
+        }
+        public void threadStart(Position pos, sbyte depth, int moveIndex, SecureFloat bestMove,
+            SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
             float value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
-            if (!pos.whiteToMove)
+                if (!pos.whiteToMove)
             {
-                globalAlpha.setValue(Math.Max(globalAlpha.getValue(), value));
+                if(value > globalAlpha.getValue())
+                {
+                    globalAlpha.setValue(value);
+                    bestMove.setValue(moveIndex);
+                }
             }
             else
             {
-                globalBeta.setValue(Math.Min(globalBeta.getValue(), value));
+                if (value < globalBeta.getValue())
+                {
+                    globalBeta.setValue(value);
+                    bestMove.setValue(moveIndex);
+                }
             }
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
@@ -133,7 +163,7 @@ namespace Blobfish_11
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -8) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth <= -maximumDepth) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
@@ -329,7 +359,9 @@ namespace Blobfish_11
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
             float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
-            return pieceValue + pawnValue + kingSafteyDifference;
+            float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
+            // TODO: Variera värdet av att vara vid draget?
+            return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }
         private float kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
@@ -365,7 +397,7 @@ namespace Blobfish_11
                 //Halverar nyttan av kungsförsvar efter en viss gräns.
                 defenceAccumulator -= (defenceAccumulator - safteySoftCap) / 2;
             }
-            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)) /kingSafteyDivisor;
+            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)* kingSafteyCoefficient) /200f;
 
             float kingCoefficient;
             if (oppHeavyMaterial > endgameLimit)
@@ -386,11 +418,11 @@ namespace Blobfish_11
                 piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
             switch (piece)
             {
-                case 'P': return defenceValues[0];
-                case 'N': return defenceValues[1];
-                case 'B': return defenceValues[2];
-                case 'R': return defenceValues[3];
-                case 'Q': return defenceValues[4];
+                case 'P': return pieceDefenceValues[0];
+                case 'N': return pieceDefenceValues[1];
+                case 'B': return pieceDefenceValues[2];
+                case 'R': return pieceDefenceValues[3];
+                case 'Q': return pieceDefenceValues[4];
                 case 'K': return 0;
                 default: 
                     throw new Exception("Okänt tecken!");
@@ -482,6 +514,83 @@ namespace Blobfish_11
                 if (item.IsAlive)
                     item.Abort();
             }
+        }
+        public bool mateableMaterial(char[,] board)
+        {
+            //TODO: Fixa för mattbart material för de respektive spelarna.
+            bool anyKnight = false;
+            bool anyLightSquaredBishop = false;
+            bool anyDarkSquaredBishop = false;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+
+                switch (myToUpper(board[i,j]))
+                {
+                    case 'P': return true;
+                    case 'Q': return true;
+                    case 'R': return true;
+                    case 'N': if (anyKnight) return true; else anyKnight = true; break;
+                    case 'B': 
+                            if ((i + j) % 2 == 0) anyLightSquaredBishop = true;
+                            else anyDarkSquaredBishop = true;
+                            if (anyDarkSquaredBishop && anyLightSquaredBishop) return true;
+                            break;
+                    default: break;
+                    }
+                }
+            }
+            if (anyKnight && (anyDarkSquaredBishop || anyLightSquaredBishop)) return true;
+                return false;
+        }
+        private char myToUpper(char piece)
+        {
+            if (piece > 'a')
+            {
+                return (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            }
+            return piece;
+        }
+        private int automaticDepth(Position pos)
+        {
+            double materialSum = 0;
+            double weightForPawnOnLastRank = calculationWeights[4] * 0.75f;
+
+            for (int rank = 0; rank < 8; rank++)
+            {
+                for (int line = 0; line < 8; line++)
+                {
+                    char piece = pos.board[rank, line];
+                    if (piece == 'P' || piece == 'p')
+                    {
+                        if ((piece == 'P' && rank == 1) || (piece == 'p' && rank == 6))
+                        {
+                            //Bönder som är ett steg ifrån att promotera.
+                            materialSum += weightForPawnOnLastRank;
+                        }
+                        else
+                        {
+                            materialSum += calculationWeights[0];
+                        }
+                    }
+                    else if (piece == 'N' || piece == 'n')
+                        materialSum += calculationWeights[1];
+                    else if (piece == 'B' || piece == 'b')
+                        materialSum += calculationWeights[2];
+                    else if (piece == 'R' || piece == 'r')
+                        materialSum += calculationWeights[3];
+                    if (piece == 'Q' || piece == 'q')
+                        materialSum += calculationWeights[4];
+                }
+            }
+            if (materialSum < 11)
+                return 7;
+            else if (materialSum <= calculationWeights[4])
+                return 6;
+            else if (materialSum < 25)
+                return 5;
+            else return 4;
         }
     }
 }

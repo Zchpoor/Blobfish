@@ -20,9 +20,9 @@ namespace Blobfish_11
             Square currentSquare = new Square();
             for (sbyte i = 0; i < 8; i++)
             {
+                currentSquare.rank = i;
                 for (sbyte j = 0; j < 8; j++)
                 {
-                    currentSquare.rank = i;
                     currentSquare.line = j;
                     pieceCalculation(pos, currentSquare, allMoves);
                 }

@@ -9,23 +9,38 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
+        //Pjäsernas grundvärde.
         readonly float[] pieceValues = {1, 3, 3, 5, 9 };
         readonly float kingValue = 4f;
+
+        //Löparparets egenvärde.
         readonly float bishopPairValue = 0.4f;
-        readonly float[] defenceValues = { 1, 2, 1.4f, 0.4f, 0.1f };
-        readonly float safteySoftCap = 6f;
+
+        //Värdet av att vara vid draget när en variant slutar.
+        readonly float toMoveValue = 0.25f;
+
+        //Pjäsernas försvarsvärde.
+        readonly float[] pieceDefenceValues = { 1, 1.5f, 1.2f, 0.4f, 0.1f };
+
+        //Gränsen efter vilken försvarsnyttan halveras.
+        readonly float safteySoftCap = 4f;
+        readonly float kingSafteyCoefficient = 1;
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
         //tunga pjäser uppgår till mindre än eller lika med endgameLimit.
         readonly int endgameLimit = 8;
-        readonly float kingSafteyDivisor = 200f;
         readonly int sleepTime = 100;
 
+        //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
+        double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBR
+
         //För vart och ett av talen som är större än antalet drag i ställningen så
-        //ökas djupet med ett.
-        //Talen bör vara i minskande ordning.
+        //ökas djupet med ett. Talen bör vara i minskande ordning.
         //Till exempel: {20, 8, 2}
-        readonly int[] moveIncreaseLimits = {}; 
+        readonly int[] moveIncreaseLimits = {};
+
+        //Maximalt djup en variant kan beräknas efter minDepth uppnåtts.
+        readonly int maximumDepth = 8;
 
         public Engine() {}
         public Engine(int[] moveIncreaseLimits)
@@ -33,7 +48,8 @@ namespace Blobfish_11
             this.moveIncreaseLimits = moveIncreaseLimits;
         }
         public Engine(float[] pieceValues, float bishopPairValue, float[] defenceValues,
-            int endgameLimit, float kingSafteyCoefficient, int[] moveIncreaseLimits)
+            int endgameLimit, float kingSafteyCoefficient, float safteySoftCap, 
+            int[] moveIncreaseLimits, float toMoveValue)
         {
             if (pieceValues.Length != 5)
                 throw new Exception("Fel längd på pjäsvärdesvektorn!");
@@ -42,10 +58,12 @@ namespace Blobfish_11
             this.bishopPairValue = bishopPairValue;
             if (defenceValues.Length != 5)
                 throw new Exception("Fel längd på försvarsvärdesvektorn!");
-            this.defenceValues = defenceValues;
+            this.pieceDefenceValues = defenceValues;
+            this.safteySoftCap = safteySoftCap;
+            this.kingSafteyCoefficient = kingSafteyCoefficient;
             this.endgameLimit = endgameLimit;
-            this.kingSafteyDivisor = 200f / kingSafteyCoefficient;
             this.moveIncreaseLimits = moveIncreaseLimits;
+            this.toMoveValue = toMoveValue;
         }
         
         private static readonly float[,,] pawn =
@@ -145,8 +163,8 @@ namespace Blobfish_11
 
         private static readonly float[,] defence =
         {
-            {0.25f,  0.8f, 1f,   0.8f, 0.25f,},
-            {0.2f,   1.4f, 1.8f, 1.4f, 0.2f, },
+            {0.25f,  0.6f, 0.8f,   0.6f, 0.25f,},
+            {0.2f,   1.3f, 1.4f, 1.3f, 0.2f, },
             {0.1f,   1f,   0f,   1f,   0.1f, }
         };
     }
