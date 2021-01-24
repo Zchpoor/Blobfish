@@ -12,6 +12,8 @@ namespace Blobfish_11
     public partial class Engine
     {
         private delegate void functionByPiece(Square square);
+        [ThreadStatic]
+        private static char[] piecesToLookFor = new char[] { '\0', '\0' };
 
         public List<Move> allValidMoves(Position pos, bool sorted)
         {
@@ -333,31 +335,31 @@ namespace Blobfish_11
         private bool isControlledBy(Position pos, Square relevantSquare, bool byWhite)
         {
             //Tab (\t) används om inget annat tecken skall sökas efter.
-
-            char[] piecesToLookFor = byWhite ? new char[2] { 'B', 'Q' } : new char[2] { 'b', 'q' };
             bool isControlled = false;
-            char pieceOnCurrentSquare;
+            char pieceOnCurrentSquare = '\0';
+            piecesToLookFor[0] = byWhite ? 'B' : 'b';
+            piecesToLookFor[1] = byWhite ? 'Q' : 'q'; //Kommer aldrig återfinnas.
             void CheckIfPieceToLookFor(Square currentSquare)
             {
                 pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
                 if (piecesToLookFor[0] == pieceOnCurrentSquare || piecesToLookFor[1] == pieceOnCurrentSquare)
                     isControlled = true;
             }
-
-            foreachBishopSquare(pos, relevantSquare, CheckIfPieceToLookFor);
+            functionByPiece ciptlf = new functionByPiece(CheckIfPieceToLookFor);
+            foreachBishopSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
             piecesToLookFor[0] = byWhite ? 'R' : 'r';
-            foreachRookSquare(pos, relevantSquare, CheckIfPieceToLookFor);
+            foreachRookSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
             piecesToLookFor[0] = byWhite ? 'K' : 'k';
             piecesToLookFor[1] = byWhite ? '\t' : '\t'; //Kommer aldrig återfinnas.
-            foreachKingSquare(pos, relevantSquare, CheckIfPieceToLookFor);
+            foreachKingSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
             piecesToLookFor[0] = byWhite ? 'N' : 'n';
-            foreachKnightSquare(pos, relevantSquare, CheckIfPieceToLookFor);
+            foreachKnightSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
             //Bönder

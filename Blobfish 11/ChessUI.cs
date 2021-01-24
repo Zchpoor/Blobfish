@@ -532,12 +532,14 @@ namespace Blobfish_11
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
  *  Beräkna nästa lager av drag tidigare.
+ *  Gemensamt bräde i tråd?
  *  
  * Förbättringar:
  *  Ta öppna linjer med torn.
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  Avbryt inputi trådarna.
  *  
  *  Buggar:
  */

@@ -14,8 +14,10 @@ namespace Blobfish_11
         public SecureFloat moveNowFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
+            piecesToLookFor = new char[] { '\0', '\0' };
+
             //Om minDepth är -1, skall datorn själv bestämma djup.
-            if(minDepth == -1)
+            if (minDepth == -1)
             {
                 minDepth = automaticDepth(pos);
             }
@@ -138,6 +140,9 @@ namespace Blobfish_11
         public void threadStart(Position pos, sbyte depth, int moveIndex, SecureFloat bestMove,
             SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
+            //De tråd-globala värdena initieras.
+            piecesToLookFor = new char[]{'\0','\0'};
+
             float value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
                 if (!pos.whiteToMove)
