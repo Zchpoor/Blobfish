@@ -514,6 +514,7 @@ namespace Blobfish_11
  * Bekvämligheter:
  *  +/#
  *  Fler tester.
+ *  Tester för rockad.
  *  Välja pjäs att promotera till.
  *  Se material.
  *  Se bästa variant
@@ -533,6 +534,8 @@ namespace Blobfish_11
  *  Tråd-pool?
  *  Beräkna nästa lager av drag tidigare.
  *  Gemensamt bräde i tråd?
+ *  Klass med värden åt tråd.
+ *  Bli av med delegates?
  *  
  * Förbättringar:
  *  Ta öppna linjer med torn.

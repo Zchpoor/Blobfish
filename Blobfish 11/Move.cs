@@ -40,15 +40,19 @@ namespace Blobfish_11
             }
             if (pieceOnCurrentSquare == 'k')
             {
-                newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
-                newPos.castlingRights[3] = false;
+                newPos.castlingRights = new bool[] { oldPos.castlingRights[0], 
+                    oldPos.castlingRights[1], false, false};
+                //newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
+                //newPos.castlingRights[3] = false;
                 newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
                 newPos.kingPositions[0].line = this.to.line;
             }
             else if (pieceOnCurrentSquare == 'K')
             {
-                newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
-                newPos.castlingRights[1] = false;
+                newPos.castlingRights = new bool[] { false, false, 
+                    oldPos.castlingRights[2], oldPos.castlingRights[3]};
+                //newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
+                //newPos.castlingRights[1] = false;
                 newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
                 newPos.kingPositions[1].line = this.to.line;
             }
@@ -58,11 +62,15 @@ namespace Blobfish_11
 
                 if (from.line == 0)//Om tornet står på a-linjen
                 {
-                    newPos.castlingRights[3] = false;
+                    newPos.castlingRights = new bool[] { oldPos.castlingRights[0], oldPos.castlingRights[1],
+                    oldPos.castlingRights[2], false};
+                    //newPos.castlingRights[3] = false;
                 }
                 else if (from.line == 7) //Om tornet står på h-linjen.
                 {
-                    newPos.castlingRights[2] = false;
+                    newPos.castlingRights = new bool[] { oldPos.castlingRights[0], oldPos.castlingRights[1],
+                    false, oldPos.castlingRights[3]};
+                    //newPos.castlingRights[2] = false;
                 }
             }
             else if (pieceOnCurrentSquare == 'R')
@@ -71,11 +79,15 @@ namespace Blobfish_11
 
                 if (from.line == 0)//Om tornet står på a-linjen
                 {
-                    newPos.castlingRights[1] = false;
+                    newPos.castlingRights = new bool[] { oldPos.castlingRights[0], false,
+                    oldPos.castlingRights[2], oldPos.castlingRights[3]};
+                    //newPos.castlingRights[1] = false;
                 }
                 else if (from.line == 7) //Om tornet står på h-linjen.
                 {
-                    newPos.castlingRights[0] = false;
+                    newPos.castlingRights = new bool[] {false,  oldPos.castlingRights[1],
+                    oldPos.castlingRights[2], oldPos.castlingRights[3]};
+                    //newPos.castlingRights[0] = false;
                 }
             }
 
@@ -147,15 +159,19 @@ namespace Blobfish_11
             newPos.board[rookFrom.rank, rookFrom.line] = '\0';
             if (oldPos.whiteToMove) //Ta bort alla rockadmöjligheter för spelaren som rockerar.
             {
-                newPos.castlingRights[0] = false; 
-                newPos.castlingRights[1] = false;
+                newPos.castlingRights = new bool[] { false, false,
+                    oldPos.castlingRights[2], oldPos.castlingRights[3]};
+                //newPos.castlingRights[0] = false; 
+                //newPos.castlingRights[1] = false;
                 newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
                 newPos.kingPositions[1].line = this.to.line;
             }
             else
             {
-                newPos.castlingRights[2] = false;
-                newPos.castlingRights[3] = false;
+                newPos.castlingRights = new bool[] { oldPos.castlingRights[0],
+                    oldPos.castlingRights[1], false, false};
+                //newPos.castlingRights[2] = false;
+                //newPos.castlingRights[3] = false;
                 newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
                 newPos.kingPositions[0].line = this.to.line;
             }
