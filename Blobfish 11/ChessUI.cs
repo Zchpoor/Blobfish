@@ -336,7 +336,7 @@ namespace Blobfish_11
             }
             Thread thread = new Thread(delegate ()
             {
-                engineStart(minDepth, currentPosition.deepCopy(), resultPlace);
+                engineStart(minDepth, currentPosition.boardCopy(), resultPlace);
             });
             thread.Name = "engineThread";
             thread.Start();

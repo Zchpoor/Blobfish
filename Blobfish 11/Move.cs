@@ -19,7 +19,7 @@ namespace Blobfish_11
         {
             //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
 
-            Position newPos = oldPos.deepCopy();
+            Position newPos = oldPos.boardCopy();
             char pieceOnCurrentSquare = oldPos.board[from.rank, from.line];
             newPos.board[to.rank, to.line] = pieceOnCurrentSquare;
             newPos.board[from.rank, from.line] = '\0';
@@ -44,8 +44,9 @@ namespace Blobfish_11
                     oldPos.castlingRights[1], false, false};
                 //newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 //newPos.castlingRights[3] = false;
-                newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
-                newPos.kingPositions[0].line = this.to.line;
+                newPos.kingPositions = new Square[] { new Square(this.to.rank, this.to.line), newPos.kingPositions[1] };
+                //newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
+                //newPos.kingPositions[0].line = this.to.line;
             }
             else if (pieceOnCurrentSquare == 'K')
             {
@@ -53,8 +54,9 @@ namespace Blobfish_11
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
                 //newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 //newPos.castlingRights[1] = false;
-                newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
-                newPos.kingPositions[1].line = this.to.line;
+                newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
+                //newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
+                //newPos.kingPositions[1].line = this.to.line;
             }
             else if (pieceOnCurrentSquare == 'r')
             {
@@ -151,7 +153,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            Position newPos = oldPos.deepCopy();
+            Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = oldPos.board[from.rank, from.line];
             newPos.board[from.rank, from.line] = '\0';
@@ -163,8 +165,9 @@ namespace Blobfish_11
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
                 //newPos.castlingRights[0] = false; 
                 //newPos.castlingRights[1] = false;
-                newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
-                newPos.kingPositions[1].line = this.to.line;
+                newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
+                //newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
+                //newPos.kingPositions[1].line = this.to.line;
             }
             else
             {
@@ -172,8 +175,9 @@ namespace Blobfish_11
                     oldPos.castlingRights[1], false, false};
                 //newPos.castlingRights[2] = false;
                 //newPos.castlingRights[3] = false;
-                newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
-                newPos.kingPositions[0].line = this.to.line;
+                newPos.kingPositions = new Square[] {new Square(this.to.rank, this.to.line), newPos.kingPositions[1] };
+                //newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
+                //newPos.kingPositions[0].line = this.to.line;
             }
             if (!oldPos.whiteToMove)
             {
@@ -201,7 +205,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            Position newPos = oldPos.deepCopy();
+            Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = oldPos.board[from.rank, from.line];
             newPos.board[from.rank, from.line] = '\0';
@@ -231,7 +235,7 @@ namespace Blobfish_11
         }
         public override Position execute(Position oldPos)
         {
-            Position newPos = oldPos.deepCopy();
+            Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = promoteTo;
             newPos.board[from.rank, from.line] = '\0';

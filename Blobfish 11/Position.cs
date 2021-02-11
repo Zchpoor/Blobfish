@@ -162,7 +162,7 @@ namespace Blobfish_11
             this.enPassantSquare = enPassantSquare;
             this.kingPositions = kingPositions;
         }
-        public Position deepCopy()
+        public Position boardCopy()
         {
             char[,] newBoard = new char[8, 8];
             for (int i = 0; i < 8; i++)
@@ -173,7 +173,7 @@ namespace Blobfish_11
                 }
             }
             return new Position(newBoard, whiteToMove, castlingRights,
-                new Square(-1, -1), halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
+                new Square(-1, -1), halfMoveClock, moveCounter, kingPositions);
         }
         public string getFEN()
         {
