@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Blobfish_11
 {
@@ -11,7 +12,13 @@ namespace Blobfish_11
         //TODO: Lägg till fler tester.
         static public string runTests()
         {
-            return testNumberOfMoves() + Environment.NewLine + testForcedMates();
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            string r1 = testNumberOfMoves();
+            string r2 = testForcedMates();
+            timer.Stop();
+            string timeText =  "Testerna tog sammanlagt " + timer.ElapsedMilliseconds + "ms.";
+            return r1 + Environment.NewLine + r2 + Environment.NewLine + timeText;
         }
         static private string testNumberOfMoves()
         {
@@ -99,11 +106,14 @@ namespace Blobfish_11
             
             makeTest("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4", 1); //Skolmatt
             makeTest("r1b1k2r/ppppqppp/2n5/4n3/1PP2B2/5N2/1P1NPPPP/R2QKB1R b KQkq - 0 8", 1); //Budapestmatten
+            makeTest("8/8/8/8/8/8/6R1/1k2K2R w K - 0 1", 1); //Matt genom rockad
+            makeTest("3r4/8/8/8/8/8/6R1/k3K2R w K - 0 1", 2); //Matt genom rockad
             makeTest("8/5P1k/5K2/8/8/8/8/8 w - - 0 1", 2); //Underpromotering
             makeTest("8/6k1/R7/1R6/8/8/8/4K3 w - - 0 1", 2); //Trappstegsmatt
             makeTest("r7/ppp2kpp/2nb4/5K2/2PP1P1q/2N5/PP1Q2PP/R4BNR b - - 0 16", 2); //Portugisiskt
             makeTest("r4rk1/pp3Npp/1b6/8/2Q5/P6P/1q3PP1/R4RK1 w - - 0 1", 3); //Kvävmatt
-
+            makeTest("6k1/ppp3pp/6r1/8/4nP1K/N1Pr4/PP5P/R4R2 b - - 8 26", 3); //Inte lika forcerande matt i tre.
+            makeTest("8/8/8/5B2/8/6K1/6N1/5k2 w - - 0 1", 5); //Matt med springare och löpare.
             if (testFailed)
                 return detailedResult;
             else

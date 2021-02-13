@@ -40,6 +40,10 @@ namespace Blobfish_11
             }
             if (e.Modifiers == Keys.Control)
             {
+                if(e.KeyCode == Keys.T)
+                {
+                    evalBox.Text = Tests.runTests();
+                }
                 if (e.KeyCode == Keys.F)
                 {
                     e.SuppressKeyPress = true;
