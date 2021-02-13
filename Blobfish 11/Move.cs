@@ -17,17 +17,11 @@ namespace Blobfish_11
         }
         public virtual Position execute(Position oldPos)
         {
-            //TODO: Dela upp denna i underfunktioner, som kan anropas av subklasser.
-
             Position newPos = oldPos.boardCopy();
             char pieceOnCurrentSquare = oldPos.board[from.rank, from.line];
             newPos.board[to.rank, to.line] = pieceOnCurrentSquare;
             newPos.board[from.rank, from.line] = '\0';
-            if (!oldPos.whiteToMove)
-            {
-                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
-            }
-            newPos.whiteToMove = !oldPos.whiteToMove;
+            plyForward(newPos);
             if(pieceOnCurrentSquare == 'p' || pieceOnCurrentSquare == 'P' ||
                 oldPos.board[to.rank, to.line] != '\0')
             {
@@ -40,23 +34,22 @@ namespace Blobfish_11
             }
             if (pieceOnCurrentSquare == 'k')
             {
+                //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights = new bool[] { oldPos.castlingRights[0], 
                     oldPos.castlingRights[1], false, false};
-                //newPos.castlingRights[2] = false; //Ta bort svarts rockadmöjligheter om kungen förflyttas.
-                //newPos.castlingRights[3] = false;
+
+                //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] { new Square(this.to.rank, this.to.line), newPos.kingPositions[1] };
-                //newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
-                //newPos.kingPositions[0].line = this.to.line;
             }
             else if (pieceOnCurrentSquare == 'K')
             {
+                //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights = new bool[] { false, false, 
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
-                //newPos.castlingRights[0] = false; //Ta bort vits rockadmöjligheter om kungen förflyttas.
-                //newPos.castlingRights[1] = false;
+
+                //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
-                //newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
-                //newPos.kingPositions[1].line = this.to.line;
+                
             }
             else if (pieceOnCurrentSquare == 'r')
             {
@@ -66,13 +59,11 @@ namespace Blobfish_11
                 {
                     newPos.castlingRights = new bool[] { oldPos.castlingRights[0], oldPos.castlingRights[1],
                     oldPos.castlingRights[2], false};
-                    //newPos.castlingRights[3] = false;
                 }
                 else if (from.line == 7) //Om tornet står på h-linjen.
                 {
                     newPos.castlingRights = new bool[] { oldPos.castlingRights[0], oldPos.castlingRights[1],
                     false, oldPos.castlingRights[3]};
-                    //newPos.castlingRights[2] = false;
                 }
             }
             else if (pieceOnCurrentSquare == 'R')
@@ -83,13 +74,11 @@ namespace Blobfish_11
                 {
                     newPos.castlingRights = new bool[] { oldPos.castlingRights[0], false,
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
-                    //newPos.castlingRights[1] = false;
                 }
                 else if (from.line == 7) //Om tornet står på h-linjen.
                 {
                     newPos.castlingRights = new bool[] {false,  oldPos.castlingRights[1],
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
-                    //newPos.castlingRights[0] = false;
                 }
             }
 
@@ -109,6 +98,14 @@ namespace Blobfish_11
                 newPos.enPassantSquare.line = -1;
             }
             return newPos;
+        }
+        protected void plyForward(Position pos)
+        {
+            if (!pos.whiteToMove)
+            {
+                pos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
+            }
+            pos.whiteToMove = !pos.whiteToMove;
         }
         public virtual bool isCapture(char [,] board)
         {
@@ -163,30 +160,23 @@ namespace Blobfish_11
             {
                 newPos.castlingRights = new bool[] { false, false,
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
-                //newPos.castlingRights[0] = false; 
-                //newPos.castlingRights[1] = false;
+
+                //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
-                //newPos.kingPositions[1].rank = this.to.rank; //Sparar om kungens placering.
-                //newPos.kingPositions[1].line = this.to.line;
+               
             }
             else
             {
                 newPos.castlingRights = new bool[] { oldPos.castlingRights[0],
                     oldPos.castlingRights[1], false, false};
-                //newPos.castlingRights[2] = false;
-                //newPos.castlingRights[3] = false;
+
+                //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] {new Square(this.to.rank, this.to.line), newPos.kingPositions[1] };
-                //newPos.kingPositions[0].rank = this.to.rank; //Sparar om kungens placering.
-                //newPos.kingPositions[0].line = this.to.line;
             }
-            if (!oldPos.whiteToMove)
-            {
-                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
-            }
+            plyForward(newPos);
             newPos.enPassantSquare.rank = -1;
             newPos.enPassantSquare.line = -1;
             newPos.halfMoveClock = 0;
-            newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
         }
         public override string toString(char[,] board)
@@ -210,14 +200,10 @@ namespace Blobfish_11
             newPos.board[to.rank, to.line] = oldPos.board[from.rank, from.line];
             newPos.board[from.rank, from.line] = '\0';
             newPos.board[pawnToRemove.rank, pawnToRemove.line] = '\0';
-            if (!oldPos.whiteToMove)
-            {
-                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
-            }
+            plyForward(newPos);
             newPos.enPassantSquare.rank = -1;
             newPos.enPassantSquare.line = -1;
             newPos.halfMoveClock = 0;
-            newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
         }
         public override bool isCapture(char[,] board)
@@ -239,14 +225,10 @@ namespace Blobfish_11
 
             newPos.board[to.rank, to.line] = promoteTo;
             newPos.board[from.rank, from.line] = '\0';
-            if (!oldPos.whiteToMove)
-            {
-                newPos.moveCounter++; //Om det var svarts drag, så öka antalet spelade drag i partiet.
-            }
+            plyForward(newPos);
             newPos.enPassantSquare.rank = -1;
             newPos.enPassantSquare.line = -1;
             newPos.halfMoveClock = 0;
-            newPos.whiteToMove = !oldPos.whiteToMove;
             return newPos;
         }
         public override string toString(char[,] board)
