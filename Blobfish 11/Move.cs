@@ -181,7 +181,7 @@ namespace Blobfish_11
         }
         public override string toString(char[,] board)
         {
-            string ret = rookFrom.line == 7 ? "0-0" : "0-0-0";
+            string ret = rookFrom.line == 7 ? "O-O" : "O-O-O";
             return ret;
         }
     }

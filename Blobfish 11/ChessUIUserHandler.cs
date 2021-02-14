@@ -44,6 +44,11 @@ namespace Blobfish_11
                 {
                     evalBox.Text = Tests.runTests();
                 }
+                if (e.KeyCode == Keys.S)
+                {
+                    PGNHandler handler = new PGNHandler();
+                    handler.save(gamePositions, gameMoves, this.latestResult);
+                }
                 if (e.KeyCode == Keys.F)
                 {
                     e.SuppressKeyPress = true;

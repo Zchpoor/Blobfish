@@ -29,6 +29,7 @@ namespace Blobfish_11
         Engine blobFish = new Engine();
         int minDepth = 4;
         int numberOfDots = 1;
+        string latestResult = "*";
         TimeSpan ponderingTime = new TimeSpan(0);
         Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
@@ -177,6 +178,7 @@ namespace Blobfish_11
         }
         private void reset()
         {
+            latestResult = "*";
             gameIsGoingOn = true;
             gamePositions.Clear();
             gameMoves.Clear();
@@ -263,18 +265,22 @@ namespace Blobfish_11
             if (result > 1000)
             {
                 MessageBox.Show("Vit vann på schack matt!");
+                latestResult = "1-0";
             }
             else if (result < -1000)
             {
                 MessageBox.Show("Svart vann på schack matt!");
+                latestResult = "0-1";
             }
             else if (result == 0)
             {
                 MessageBox.Show("Partiet slutade remi!");
+                latestResult = "1/2-1/2";
             }
             else if (result == -1)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
+                latestResult = "1/2-1/2";
             }
             computerRBNone.Checked = true;
         }
@@ -514,7 +520,6 @@ namespace Blobfish_11
  * Bekvämligheter:
  *  +/#
  *  Fler tester.
- *  Tester för rockad.
  *  Välja pjäs att promotera till.
  *  Se material.
  *  Se bästa variant
