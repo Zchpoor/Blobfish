@@ -167,12 +167,12 @@ namespace Blobfish_11
             this.gameMoves.Add(move);
             displayAndAddPosition(newPosition);
         }
-        private string getMovesString(List<Move> moves, char[,] board)
+        private string getMovesString(List<Move> moves, Position pos)
         {
             string text = "";
             foreach (Move item in moves)
             {
-                text += item.toString(board) + Environment.NewLine;
+                text += item.toString(pos) + Environment.NewLine;
             }
             return text;
         }
@@ -213,7 +213,7 @@ namespace Blobfish_11
                         }
                         scoresheet += ((i / 2) + initialMoveNumber).ToString() + ".";
                     }
-                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
+                    scoresheet += " " + gameMoves[i].toString(gamePositions[i]);
                 }
             }
             return scoresheet;
@@ -249,7 +249,7 @@ namespace Blobfish_11
                 {
                     textEval = Math.Round(eval, 2).ToString();
                 }
-                String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
+                String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition) +
                     Environment.NewLine + "Datorns evaluering: " + textEval;
                 evalBox.Text = completeString;
             }

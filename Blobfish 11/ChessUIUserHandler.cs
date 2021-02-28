@@ -149,19 +149,19 @@ namespace Blobfish_11
                     break;
                 case "moves":
                     evalBox.Text = "Alla drag:\n" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition);
                     break;
                 case "drag":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition.board);
+                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition);
                     break;
                 case "sorted":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
                     break;
                 case "sorterade":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition.board);
+                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
                     break;
                 case "takeback":
                     takeback(2);

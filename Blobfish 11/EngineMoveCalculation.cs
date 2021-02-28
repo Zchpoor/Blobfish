@@ -11,7 +11,7 @@ namespace Blobfish_11
 {
     public partial class Engine
     {
-        private delegate void functionByPiece(Square square);
+        public delegate void functionByPiece(Square square);
 
         public List<Move> allValidMoves(Position pos, bool sorted)
         {
@@ -191,7 +191,7 @@ namespace Blobfish_11
                 }
             }
         }
-        private void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
+        public static void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             Square currentSquare = new Square();
             int newRank, newLine;
@@ -228,7 +228,7 @@ namespace Blobfish_11
                 }
             }
         }
-        private void foreachLineSquare(Position pos, Square pieceSquare, sbyte rankOffset, sbyte lineOffset, functionByPiece callback)
+        public static void foreachLineSquare(Position pos, Square pieceSquare, sbyte rankOffset, sbyte lineOffset, functionByPiece callback)
         {
             //Generell funktion som itererar över en linje/diagonal så länge det är giltiga fält.
             pieceSquare.rank += rankOffset;
@@ -247,21 +247,21 @@ namespace Blobfish_11
                 pieceSquare.line += lineOffset;
             }
         }
-        private void foreachBishopSquare(Position pos, Square pieceSquare, functionByPiece callback)
+        public static void foreachBishopSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             foreachLineSquare(pos, pieceSquare, -1, -1, callback);
             foreachLineSquare(pos, pieceSquare, -1, 1, callback);
             foreachLineSquare(pos, pieceSquare, 1, -1, callback);
             foreachLineSquare(pos, pieceSquare, 1, 1, callback);
         }
-        private void foreachRookSquare(Position pos, Square pieceSquare, functionByPiece callback)
+        public static void foreachRookSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             foreachLineSquare(pos, pieceSquare, 0, 1, callback);
             foreachLineSquare(pos, pieceSquare, 0, -1, callback);
             foreachLineSquare(pos, pieceSquare, 1, 0, callback);
             foreachLineSquare(pos, pieceSquare, -1, 0, callback);
         }
-        private void foreachKingSquare(Position pos, Square pieceSquare, functionByPiece callback)
+        public static void foreachKingSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             Square currentSquare = new Square();
             for (sbyte i = -1; i <= 1; i++)
@@ -280,7 +280,7 @@ namespace Blobfish_11
             }
         }
 
-        private bool validSquare(Square square)
+        public static bool validSquare(Square square)
         {
             return (square.rank < 8) && (square.rank >= 0) && (square.line < 8) && (square.line >= 0);
         }

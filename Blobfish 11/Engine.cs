@@ -77,7 +77,7 @@ namespace Blobfish_11
                     {
                         threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
                     });
-                    thread.Name = currentMove.toString(pos.board);
+                    thread.Name = currentMove.toString(pos);
                     thread.Start();
                     threadList.Add(thread);
 

@@ -22,6 +22,7 @@ namespace Blobfish_11
             if(gamePositions[0].getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
+                text += "[SetUp \"1\"]";
                 text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
             }
 
@@ -44,7 +45,7 @@ namespace Blobfish_11
             int i = 0;
             if (!gamePositions[0].whiteToMove)
             {
-                text += initialMoveNumber.ToString() + "... " + gameMoves[i].toString(gamePositions[i].board);
+                text += initialMoveNumber.ToString() + "... " + gameMoves[i].toString(gamePositions[i]);
                 i=1;
                 text += " " + (initialMoveNumber + 1).ToString() + ".";
             }
@@ -58,7 +59,7 @@ namespace Blobfish_11
                     }
                     text += ((i / 2) + initialMoveNumber).ToString() + ".";
                 }
-                text += " " + gameMoves[i].toString(gamePositions[i].board);
+                text += " " + gameMoves[i].toString(gamePositions[i]);
                 i++;
             }
             return text;

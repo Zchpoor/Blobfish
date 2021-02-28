@@ -22,7 +22,7 @@ namespace Blobfish_11
             newPos.board[to.rank, to.line] = pieceOnCurrentSquare;
             newPos.board[from.rank, from.line] = '\0';
             plyForward(newPos);
-            if(pieceOnCurrentSquare == 'p' || pieceOnCurrentSquare == 'P' ||
+            if (pieceOnCurrentSquare == 'p' || pieceOnCurrentSquare == 'P' ||
                 oldPos.board[to.rank, to.line] != '\0')
             {
                 //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas till 0.
@@ -30,12 +30,12 @@ namespace Blobfish_11
             }
             else
             {
-                newPos.halfMoveClock = (sbyte) (oldPos.halfMoveClock + 1);
+                newPos.halfMoveClock = (sbyte)(oldPos.halfMoveClock + 1);
             }
             if (pieceOnCurrentSquare == 'k')
             {
                 //Ta bort svarts rockadmöjligheter om kungen förflyttas.
-                newPos.castlingRights = new bool[] { oldPos.castlingRights[0], 
+                newPos.castlingRights = new bool[] { oldPos.castlingRights[0],
                     oldPos.castlingRights[1], false, false};
 
                 //Sparar om kungens placering.
@@ -44,12 +44,12 @@ namespace Blobfish_11
             else if (pieceOnCurrentSquare == 'K')
             {
                 //Ta bort vits rockadmöjligheter om kungen förflyttas.
-                newPos.castlingRights = new bool[] { false, false, 
+                newPos.castlingRights = new bool[] { false, false,
                     oldPos.castlingRights[2], oldPos.castlingRights[3]};
 
                 //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
-                
+
             }
             else if (pieceOnCurrentSquare == 'r')
             {
@@ -83,10 +83,10 @@ namespace Blobfish_11
             }
 
             //Beräkna en passant-fält
-            if(pieceOnCurrentSquare == 'P'
+            if (pieceOnCurrentSquare == 'P'
                 || pieceOnCurrentSquare == 'p') //Om den förflyttade pjäsen är en bonde
             {
-               if(Math.Abs(from.rank - to.rank) == 2) //Om förflyttningen är två steg.
+                if (Math.Abs(from.rank - to.rank) == 2) //Om förflyttningen är två steg.
                 {
                     newPos.enPassantSquare.rank = (sbyte)((from.rank + to.rank) / 2);
                     newPos.enPassantSquare.line = from.line;
@@ -107,35 +107,81 @@ namespace Blobfish_11
             }
             pos.whiteToMove = !pos.whiteToMove;
         }
-        public virtual bool isCapture(char [,] board)
+        public virtual bool isCapture(char[,] board)
         {
             return board[to.rank, to.line] != '\0';
         }
-        public virtual string toString(char[,] board)
+        public virtual string toString(Position pos)
         {
             //TODO: Checks etc.
+            char[,] board = pos.board;
             string ret = "";
-            if (board[from.rank, from.line] != 'p' && board[from.rank, from.line] != 'P')
+            char thisPiece = board[from.rank, from.line];
+            if (thisPiece != 'p' && thisPiece != 'P')
             {
-                char piece = board[from.rank, from.line];
-                if (piece > 'a')
+                if (thisPiece >= 'a')
                 {
-                    piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+                    thisPiece = (char)(thisPiece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
                 }
-                ret += piece;
+                ret += thisPiece;
             }
-            ret += ((Char)(from.line + 'a')).ToString();
-            ret += 8 - from.rank;
+            else if(isCapture(board))
+            {
+                ret += (Char)(from.line + 'a');
+            }
+            ret += extraDescription(pos);
+            //ret += ((Char)(from.line + 'a')).ToString();
+            //ret += 8 - from.rank;
             if (isCapture(board))
             {
                 ret += "x";
             }
-            else
-            {
-                ret += "-";
-            }
-            ret += ((Char)(to.line + 'a')).ToString();
+            ret += ((Char)(to.line + 'a')).ToString(); //?
             ret += 8 - to.rank;
+            return ret;
+        }
+        private string extraDescription(Position pos)
+        {
+            char[,] board = pos.board;
+            char thisPiece = board[from.rank, from.line];
+            bool onLine = false, onRank = false, otherPiece = false;
+            void determineExtras(Square square)
+            {
+                if (board[square.rank, square.line] == thisPiece)
+                {
+                    if (square.rank != from.rank || square.line != from.line)
+                        //För att inte räkna med den flyttade pjäsen.
+                    {
+                        otherPiece = true;
+                        onRank = onRank || (square.rank == from.rank);
+                        onLine = onLine || (square.line == from.line);
+                    }
+                }
+            }
+            Engine.functionByPiece dE = new Engine.functionByPiece(determineExtras);
+            char thisPieceToLower = thisPiece <= 'Z' ? (char)(thisPiece + ('a' - 'A')) : thisPiece;
+
+            switch (thisPieceToLower)
+            {
+                case 'r': Engine.foreachRookSquare(pos, to, dE); break;
+                case 'b': Engine.foreachBishopSquare(pos, to, dE); break;
+                case 'n': Engine.foreachKnightSquare(pos, to, dE); break;
+                case 'q': Engine.foreachRookSquare(pos, to, dE); Engine.foreachBishopSquare(pos, to, dE); break;
+            }
+            String ret = "";
+            if (onRank && onLine)
+            {
+                ret += (char)(from.line + 'a');
+                ret += 8 - from.rank;
+            }
+            else if (!onRank && onLine)
+            {
+                ret += 8 - from.rank;
+            }
+            else if (otherPiece)
+            {
+                ret += (char)(from.line + 'a');
+            }
             return ret;
         }
     }
@@ -179,7 +225,7 @@ namespace Blobfish_11
             newPos.halfMoveClock = 0;
             return newPos;
         }
-        public override string toString(char[,] board)
+        public override string toString(Position pos)
         {
             string ret = rookFrom.line == 7 ? "O-O" : "O-O-O";
             return ret;
@@ -231,9 +277,9 @@ namespace Blobfish_11
             newPos.halfMoveClock = 0;
             return newPos;
         }
-        public override string toString(char[,] board)
+        public override string toString(Position pos)
         {
-            string ret = base.toString(board);
+            string ret = base.toString(pos);
             if(ret[ret.Length-1] == '+' || ret[ret.Length-1] == '#')
             {
                 ret = ret.Insert(ret.Length - 1, "=" + promoteTo.ToString().ToUpper());
