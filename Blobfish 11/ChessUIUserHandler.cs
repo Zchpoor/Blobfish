@@ -47,7 +47,7 @@ namespace Blobfish_11
                 if (e.KeyCode == Keys.S)
                 {
                     PGNHandler handler = new PGNHandler();
-                    handler.save(gamePositions, gameMoves, this.latestResult);
+                    handler.save(gamePositions, gameMoves, this.latestResult, players);
                 }
                 if (e.KeyCode == Keys.F)
                 {
@@ -269,11 +269,32 @@ namespace Blobfish_11
         }
         private void radioButtons_CheckedChanged(object sender, EventArgs e)
         {
-            if ((sender as RadioButton).Checked) //Nödvändig för inte dubbla anrop ska ske.
+            RadioButton rb = (sender as RadioButton);
+            if (rb.Checked) //Nödvändig för inte dubbla anrop ska ske.
             {
+                if (computerRBBlack.Checked)
+                {
+                    players = new string[] { "Human player", "Blobfish 11" };
+                }
+                else if (computerRBWhite.Checked)
+                {
+                    players = new string[] { "Blobfish 11", "Human player" };
+                }
+                else if (computerRBBoth.Checked)
+                {
+                    players = new string[] { "Blobfish 11", "Blobfish 11" };
+                }
+                else if (computerRBNone.Checked)
+                {
+                    players = new string[] { "Human player", "Human player" };
+                }
                 if (engineIsToMove())
                     playBestEngineMove();
             }
+        }
+        private void moveNowButton_Click(object sender, EventArgs e)
+        {
+            blobFish.moveNowFlag.setValue(1);
         }
     }
 }

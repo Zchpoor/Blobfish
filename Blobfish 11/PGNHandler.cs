@@ -9,15 +9,15 @@ namespace Blobfish_11
 {
     class PGNHandler
     {
-        public void save(List<Position> gamePositions, List<Move> gameMoves, string result)
+        public void save(List<Position> gamePositions, List<Move> gameMoves, string result, string[] players)
         {
             string text = "";
             text += "[Event \"Blobfish game\"]\n";
             text += "[Site \"?\"]\n";
             text += "[Date \"" + DateTime.Now.ToString("yyyy.MM.dd") + "\"]\n";
             text += "[Round \"-\"]\n";
-            text += "[White \"?, ?\"]\n";
-            text += "[Black \"?, ?\"]\n";
+            text += "[White \""+ players[0]+"\"]\n";
+            text += "[Black \"" + players[1] + "\"]\n";
             text += "[Result \"" + result + "\"]\n";
             if(gamePositions[0].getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
@@ -26,7 +26,7 @@ namespace Blobfish_11
                 text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
             }
 
-            using (var fileStream = new FileStream("MyGame.txt", FileMode.Create))
+            using (var fileStream = new FileStream("MyGame.pgn", FileMode.Create))
             {
                 text += "\n" + moveText(gamePositions, gameMoves);
                 text += " " + result;

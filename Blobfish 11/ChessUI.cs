@@ -30,6 +30,7 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         string latestResult = "*";
+        string[] players = new string[] { "Human player", "Blobfish 11" };
         TimeSpan ponderingTime = new TimeSpan(0);
         Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
@@ -282,7 +283,9 @@ namespace Blobfish_11
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
                 latestResult = "1/2-1/2";
             }
+            string[] tempPlayers = players; //Kommer ihåg vad players var innan.
             computerRBNone.Checked = true;
+            players = tempPlayers;
         }
         private void takeback(int numberOfMoves)
         {
@@ -508,10 +511,6 @@ namespace Blobfish_11
                 return new Engine();
             }
         }
-        private void moveNowButton_Click(object sender, EventArgs e)
-        {
-            blobFish.moveNowFlag.setValue(1);
-        }
     }
 }
 
@@ -527,7 +526,6 @@ namespace Blobfish_11
  *  Få "dra nu" att fungera bättre.
  *  Förbättra validSquare()
  *  Träd för varianter.
- *  Hantera PGN
  *  Spela forcerande drag omedelbart?
  * 
  * Justera matriserna:
