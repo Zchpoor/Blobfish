@@ -285,7 +285,7 @@ namespace Blobfish_11
             }
             string[] tempPlayers = players; //Kommer ihåg vad players var innan.
             computerRBNone.Checked = true;
-            players = tempPlayers;
+            players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
         }
         private void takeback(int numberOfMoves)
         {
@@ -527,10 +527,13 @@ namespace Blobfish_11
  *  Förbättra validSquare()
  *  Träd för varianter.
  *  Spela forcerande drag omedelbart?
+ *  Läsa in PGN.
+ *  
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Föredra Sc3 före Sd2
+ *  Minska behov av terräng.
  * 
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
@@ -545,7 +548,7 @@ namespace Blobfish_11
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
- *  Avbryt inputi trådarna.
+ *  Avbryt inuti trådarna.
  *  
  *  Buggar:
  */

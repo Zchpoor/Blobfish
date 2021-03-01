@@ -22,7 +22,7 @@ namespace Blobfish_11
             if(gamePositions[0].getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
-                text += "[SetUp \"1\"]";
+                text += "[SetUp \"1\"]\n";
                 text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
             }
 
