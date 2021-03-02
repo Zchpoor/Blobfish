@@ -25,7 +25,7 @@ namespace Blobfish_11
                 text += "[SetUp \"1\"]\n";
                 text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
             }
-
+            //TODO: Välj plats att spara på.
             using (var fileStream = new FileStream("MyGame.pgn", FileMode.Create))
             {
                 text += "\n" + moveText(gamePositions, gameMoves);

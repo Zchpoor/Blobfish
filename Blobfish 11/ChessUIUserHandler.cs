@@ -295,6 +295,7 @@ namespace Blobfish_11
         private void moveNowButton_Click(object sender, EventArgs e)
         {
             blobFish.moveNowFlag.setValue(1);
+            moveNowButton.Enabled = false;
         }
     }
 }

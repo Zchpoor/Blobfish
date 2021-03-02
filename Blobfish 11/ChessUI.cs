@@ -436,6 +436,7 @@ namespace Blobfish_11
         {
             ponderingPanel.Visible = setTo;
             settingsPanel.Enabled = !setTo;
+            moveNowButton.Enabled = setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
             if (setTo)
