@@ -43,6 +43,7 @@
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
             this.ponderingPanel = new System.Windows.Forms.Panel();
+            this.moveNowButton = new System.Windows.Forms.Button();
             this.ponderingTimeLabel = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
             this.ponderingTimer = new System.Windows.Forms.Timer(this.components);
@@ -61,7 +62,6 @@
             this.playStyleRB0 = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.moveLabel = new System.Windows.Forms.Label();
-            this.moveNowButton = new System.Windows.Forms.Button();
             this.compColorBox.SuspendLayout();
             this.ponderingPanel.SuspendLayout();
             this.settingsPanel.SuspendLayout();
@@ -237,6 +237,16 @@
             this.ponderingPanel.Size = new System.Drawing.Size(227, 110);
             this.ponderingPanel.TabIndex = 11;
             this.ponderingPanel.Visible = false;
+            // 
+            // moveNowButton
+            // 
+            this.moveNowButton.Location = new System.Drawing.Point(125, 64);
+            this.moveNowButton.Name = "moveNowButton";
+            this.moveNowButton.Size = new System.Drawing.Size(95, 39);
+            this.moveNowButton.TabIndex = 13;
+            this.moveNowButton.Text = "Dra nu!";
+            this.moveNowButton.UseVisualStyleBackColor = true;
+            this.moveNowButton.Click += new System.EventHandler(this.moveNowButton_Click);
             // 
             // ponderingTimeLabel
             // 
@@ -441,16 +451,6 @@
             this.moveLabel.TabIndex = 6;
             this.moveLabel.Text = "(default text)";
             // 
-            // moveNowButton
-            // 
-            this.moveNowButton.Location = new System.Drawing.Point(125, 64);
-            this.moveNowButton.Name = "moveNowButton";
-            this.moveNowButton.Size = new System.Drawing.Size(95, 39);
-            this.moveNowButton.TabIndex = 13;
-            this.moveNowButton.Text = "Dra nu!";
-            this.moveNowButton.UseVisualStyleBackColor = true;
-            this.moveNowButton.Click += new System.EventHandler(this.moveNowButton_Click);
-            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -467,6 +467,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
             this.KeyPreview = true;
+            this.MaximizeBox = false;
             this.Name = "ChessUI";
             this.Text = "Blobfish 11";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChessUI_FormClosing);

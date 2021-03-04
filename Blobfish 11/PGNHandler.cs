@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Blobfish_11
 {
@@ -26,12 +27,21 @@ namespace Blobfish_11
                 text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
             }
             //TODO: Välj plats att spara på.
-            using (var fileStream = new FileStream("MyGame.pgn", FileMode.Create))
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "pgn files (*.pgn)|*.pgn|All files (*.*)|*.*";
+            sfd.FilterIndex = 1;
+            sfd.RestoreDirectory = true;
+            sfd.FileName = "MyGame.pgn";
+            if (sfd.ShowDialog() == DialogResult.OK)
             {
-                text += "\n" + moveText(gamePositions, gameMoves);
-                text += " " + result;
-                byte[] byteArray = Encoding.ASCII.GetBytes(text);
-                fileStream.Write(byteArray, 0, text.Length);
+
+                using (var fileStream = new FileStream(sfd.FileName, FileMode.Create))
+                {
+                    text += "\n" + moveText(gamePositions, gameMoves);
+                    text += " " + result;
+                    byte[] byteArray = Encoding.ASCII.GetBytes(text);
+                    fileStream.Write(byteArray, 0, text.Length);
+                }
             }
         }
         private string moveText(List<Position> gamePositions, List<Move> gameMoves)

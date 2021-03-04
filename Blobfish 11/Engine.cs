@@ -245,8 +245,8 @@ namespace Blobfish_11
         {
             /* 
              * [rank, line]
-             * rank==0       -> rad 8.
-             * rank==7       -> rad 1.
+             * rank==0    -> rad 8.
+             * rank==7    -> rad 1.
              * line==0    -> a-linjen.
              * line==7    -> h-linjen.
              */
@@ -316,15 +316,7 @@ namespace Blobfish_11
                             pieceValue += pieceValues[3] * rook[rank, line];
                             heavyMaterial[1] += 5;
                             break;
-
-                        case 'k':
-                            pos.kingPositions[0] = new Square(rank, line);
-                            break;
-
-                        case 'K':
-                            pos.kingPositions[1] = new Square(rank, line);
-                            break;
-
+                        
                         case 'q':
                             pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;
