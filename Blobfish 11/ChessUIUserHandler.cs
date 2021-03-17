@@ -47,7 +47,7 @@ namespace Blobfish_11
                 if (e.KeyCode == Keys.S)
                 {
                     PGNHandler handler = new PGNHandler();
-                    handler.save(game, this.latestResult, players);
+                    handler.save(game);
                 }
                 if (e.KeyCode == Keys.F)
                 {
@@ -274,19 +274,19 @@ namespace Blobfish_11
             {
                 if (computerRBBlack.Checked)
                 {
-                    players = new string[] { "Human player", "Blobfish 11" };
+                    game.players = new string[] { "Human player", "Blobfish 11" };
                 }
                 else if (computerRBWhite.Checked)
                 {
-                    players = new string[] { "Blobfish 11", "Human player" };
+                    game.players = new string[] { "Blobfish 11", "Human player" };
                 }
                 else if (computerRBBoth.Checked)
                 {
-                    players = new string[] { "Blobfish 11", "Blobfish 11" };
+                    game.players = new string[] { "Blobfish 11", "Blobfish 11" };
                 }
                 else if (computerRBNone.Checked)
                 {
-                    players = new string[] { "Human player", "Human player" };
+                    game.players = new string[] { "Human player", "Human player" };
                 }
                 if (engineIsToMove())
                     playBestEngineMove();

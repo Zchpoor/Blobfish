@@ -109,6 +109,7 @@ namespace Blobfish_11
             makeTest("8/8/8/8/8/8/6R1/1k2K2R w K - 0 1", 1); //Matt genom rockad
             makeTest("3r4/8/8/8/8/8/6R1/k3K2R w K - 0 1", 2); //Matt genom rockad
             makeTest("8/5P1k/5K2/8/8/8/8/8 w - - 0 1", 2); //Underpromotering
+            //5
             makeTest("8/6k1/R7/1R6/8/8/8/4K3 w - - 0 1", 2); //Trappstegsmatt
             makeTest("r7/ppp2kpp/2nb4/5K2/2PP1P1q/2N5/PP1Q2PP/R4BNR b - - 0 16", 2); //Portugisiskt
             makeTest("r4rk1/pp3Npp/1b6/8/2Q5/P6P/1q3PP1/R4RK1 w - - 0 1", 3); //Kvävmatt

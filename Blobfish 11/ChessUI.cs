@@ -21,8 +21,6 @@ namespace Blobfish_11
         Engine blobFish = new Engine();
         int minDepth = 4;
         int numberOfDots = 1;
-        string latestResult = "*";
-        string[] players = new string[] { "Human player", "Blobfish 11" };
         TimeSpan ponderingTime = new TimeSpan(0);
         Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
@@ -159,7 +157,7 @@ namespace Blobfish_11
         }
         private void reset()
         {
-            latestResult = "*";
+            game.result = "*";
             gameIsGoingOn = true;
             game = new Game();
             displayedPly = 0;
@@ -223,26 +221,26 @@ namespace Blobfish_11
             if (result > 1000)
             {
                 MessageBox.Show("Vit vann på schack matt!");
-                latestResult = "1-0";
+                game.result = "1-0";
             }
             else if (result < -1000)
             {
                 MessageBox.Show("Svart vann på schack matt!");
-                latestResult = "0-1";
+                game.result = "0-1";
             }
             else if (result == 0)
             {
                 MessageBox.Show("Partiet slutade remi!");
-                latestResult = "1/2-1/2";
+                game.result = "1/2-1/2";
             }
             else if (result == -1)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
-                latestResult = "1/2-1/2";
+                game.result = "1/2-1/2";
             }
-            string[] tempPlayers = players; //Kommer ihåg vad players var innan.
+            string[] tempPlayers = game.players; //Kommer ihåg vad players var innan.
             computerRBNone.Checked = true;
-            players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
+            game.players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
         }
         private void displayGamePosition(int ply)
         {

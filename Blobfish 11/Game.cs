@@ -14,6 +14,7 @@ namespace Blobfish_11
         List<Move> moves = new List<Move>();
         List<Position> positions = new List<Position>();
         private string[] playerNames;
+        private string resultString = "*";
 
         public Game()
         {
@@ -45,6 +46,14 @@ namespace Blobfish_11
                 }
             }
 
+        }
+        public string result
+        {
+            get { return resultString; }
+            set
+            {
+                resultString = value;
+            }
         }
         public Position getPosition(int posNumber)
         {

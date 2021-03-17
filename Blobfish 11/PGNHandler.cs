@@ -10,16 +10,16 @@ namespace Blobfish_11
 {
     public class PGNHandler
     {
-        public void save(Game game, string result, string[] players)
+        public void save(Game game)
         {
             string text = "";
             text += "[Event \"Blobfish game\"]\n";
             text += "[Site \"?\"]\n";
             text += "[Date \"" + DateTime.Now.ToString("yyyy.MM.dd") + "\"]\n";
             text += "[Round \"-\"]\n";
-            text += "[White \""+ players[0]+"\"]\n";
-            text += "[Black \"" + players[1] + "\"]\n";
-            text += "[Result \"" + result + "\"]\n";
+            text += "[White \""+ game.players[0]+"\"]\n";
+            text += "[Black \"" + game.players[1] + "\"]\n";
+            text += "[Result \"" + game.result + "\"]\n";
             if(game.getPosition(0).getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
@@ -38,7 +38,7 @@ namespace Blobfish_11
                 using (var fileStream = new FileStream(sfd.FileName, FileMode.Create))
                 {
                     text += "\n" + moveText(game);
-                    text += " " + result;
+                    text += " " + game.result;
                     byte[] byteArray = Encoding.ASCII.GetBytes(text);
                     fileStream.Write(byteArray, 0, text.Length);
                 }
