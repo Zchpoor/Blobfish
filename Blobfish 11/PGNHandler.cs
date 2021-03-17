@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    class PGNHandler
+    public class PGNHandler
     {
-        public void save(List<Position> gamePositions, List<Move> gameMoves, string result, string[] players)
+        public void save(Game game, string result, string[] players)
         {
             string text = "";
             text += "[Event \"Blobfish game\"]\n";
@@ -20,15 +20,15 @@ namespace Blobfish_11
             text += "[White \""+ players[0]+"\"]\n";
             text += "[Black \"" + players[1] + "\"]\n";
             text += "[Result \"" + result + "\"]\n";
-            if(gamePositions[0].getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+            if(game.getPosition(0).getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
                 text += "[SetUp \"1\"]\n";
-                text += "[FEN \"" + gamePositions[0].getFEN() + "\"]\n";
+                text += "[FEN \"" + game.getPosition(0).getFEN() + "\"]\n";
             }
-            //TODO: Välj plats att spara på.
+
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "pgn files (*.pgn)|*.pgn|All files (*.*)|*.*";
+            sfd.Filter = "pgn files (*.pgn)|*.pgn";
             sfd.FilterIndex = 1;
             sfd.RestoreDirectory = true;
             sfd.FileName = "MyGame.pgn";
@@ -37,29 +37,26 @@ namespace Blobfish_11
 
                 using (var fileStream = new FileStream(sfd.FileName, FileMode.Create))
                 {
-                    text += "\n" + moveText(gamePositions, gameMoves);
+                    text += "\n" + moveText(game);
                     text += " " + result;
                     byte[] byteArray = Encoding.ASCII.GetBytes(text);
                     fileStream.Write(byteArray, 0, text.Length);
                 }
             }
         }
-        private string moveText(List<Position> gamePositions, List<Move> gameMoves)
+
+        private string moveText(Game game)
         {
-            if (gamePositions.Count != gameMoves.Count + 1)
-            {
-                throw new Exception("Fel antal drag/ställningar har spelats!");
-            }
             string text = "";
-            int initialMoveNumber = gamePositions[0].moveCounter;
+            int initialMoveNumber = game.getPosition(0).moveCounter;
             int i = 0;
-            if (!gamePositions[0].whiteToMove)
+            if (!game.getPosition(0).whiteToMove)
             {
-                text += initialMoveNumber.ToString() + "... " + gameMoves[i].toString(gamePositions[i]);
+                text += initialMoveNumber.ToString() + "... " + game.getMove(i).toString(game.getPosition(i));
                 i=1;
                 text += " " + (initialMoveNumber + 1).ToString() + ".";
             }
-            while (i < gameMoves.Count)
+            while (i < game.length)
             {
                 if (i % 2 == 0)
                 {
@@ -69,7 +66,7 @@ namespace Blobfish_11
                     }
                     text += ((i / 2) + initialMoveNumber).ToString() + ".";
                 }
-                text += " " + gameMoves[i].toString(gamePositions[i]);
+                text += " " + game.getMove(i).toString(game.getPosition(i));
                 i++;
             }
             return text;

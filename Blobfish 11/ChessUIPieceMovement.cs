@@ -43,7 +43,7 @@ namespace Blobfish_11
         }
         private bool possibleToMove()
         {
-            return !ponderingWorker.IsBusy && gameIsGoingOn && displayedPly == gamePositions.Count - 1;
+            return !ponderingWorker.IsBusy && gameIsGoingOn && displayedPly == game.length;
         }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
@@ -91,7 +91,8 @@ namespace Blobfish_11
                     newSquare.rank == item.to.rank && newSquare.line == item.to.line)
                 {
                     (sender as PictureBox).Image = fromImage;
-                    playMove(item);
+                    this.playMove(item);
+                    display(game.lastPosition());
                     moveWasPlayed = true;
                     break;
                 }

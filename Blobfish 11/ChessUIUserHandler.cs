@@ -35,7 +35,7 @@ namespace Blobfish_11
                 }
                 else if (e.KeyCode == Keys.Down)
                 {
-                    displayGamePosition(gamePositions.Count - 1);
+                    displayGamePosition(game.length);
                 }
             }
             if (e.Modifiers == Keys.Control)
@@ -47,7 +47,7 @@ namespace Blobfish_11
                 if (e.KeyCode == Keys.S)
                 {
                     PGNHandler handler = new PGNHandler();
-                    handler.save(gamePositions, gameMoves, this.latestResult, players);
+                    handler.save(game, this.latestResult, players);
                 }
                 if (e.KeyCode == Keys.F)
                 {
@@ -78,7 +78,7 @@ namespace Blobfish_11
                     if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
-                        takeback(2);
+                        game.takeback(2);
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace Blobfish_11
                     if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
-                        takeback(1);
+                        game.takeback(1);
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace Blobfish_11
         {
             ponderingWorker.CancelAsync();
             if (!computerRBBoth.Checked)
-                takeback(1);
+                game.takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             ponderingTime = new TimeSpan(0);
             setPonderingMode(false);
@@ -164,25 +164,25 @@ namespace Blobfish_11
                         getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
                     break;
                 case "takeback":
-                    takeback(2);
+                    game.takeback(2);
                     break;
                 case "tb":
-                    takeback(2);
+                    game.takeback(2);
                     break;
                 case "undo":
-                    takeback(2);
+                    game.takeback(2);
                     break;
                 case "återta":
-                    takeback(2);
+                    game.takeback(2);
                     break;
                 case "stb":
-                    takeback(1);
+                    game.takeback(1);
                     break;
                 case "scoresheet":
-                    evalBox.Text = scoresheet();
+                    evalBox.Text = game.scoresheet();
                     break;
                 case "protokoll":
-                    evalBox.Text = scoresheet();
+                    evalBox.Text = game.scoresheet();
                     break;
                 case "reset":
                     reset();
@@ -255,9 +255,9 @@ namespace Blobfish_11
                     {
                         Position pos = new Position(inputText);
                         gameIsGoingOn = true;
-                        this.gamePositions.Clear();
-                        this.gameMoves.Clear();
-                        displayAndAddPosition(pos);
+                        game = new Game(pos);
+                        displayedPly = 0;
+                        display(pos);
                     }
                     catch
                     {

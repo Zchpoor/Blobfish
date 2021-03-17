@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Deployment.Application;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Threading;
-using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Blobfish_11
 {
     public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
-        List<Position> gamePositions = new List<Position>();
-        List<Move> gameMoves = new List<Move>();
+        Game game = new Game();
         Position currentPosition;
         int displayedPly = 0;
         bool gameIsGoingOn = true;
@@ -107,13 +99,7 @@ namespace Blobfish_11
                         picBox.BackColor = Color.SandyBrown;
                 }
             }
-            displayAndAddPosition(startingPosition);
-        }
-        private void displayAndAddPosition(Position pos)
-        {
-            gamePositions.Add(pos);
-            displayedPly = gamePositions.Count - 1;
-            display(pos);
+            display(startingPosition);
         }
         private void display(Position pos)
         {
@@ -162,12 +148,6 @@ namespace Blobfish_11
             }
             setPonderingMode(true);
         }
-        private void playMove(Move move)
-        {
-            Position newPosition = move.execute(currentPosition);
-            this.gameMoves.Add(move);
-            displayAndAddPosition(newPosition);
-        }
         private string getMovesString(List<Move> moves, Position pos)
         {
             string text = "";
@@ -181,43 +161,14 @@ namespace Blobfish_11
         {
             latestResult = "*";
             gameIsGoingOn = true;
-            gamePositions.Clear();
-            gameMoves.Clear();
-            displayAndAddPosition(startingPosition);
+            game = new Game();
+            displayedPly = 0;
+            display(startingPosition);
         }
         private void flipBoard()
         {
             flipped = !flipped;
             display(currentPosition);
-        }
-        private string scoresheet()
-        {
-            string scoresheet = "";
-            if (gamePositions.Count != gameMoves.Count + 1)
-            {
-                throw new Exception("Fel antal drag/ställningar har spelats!");
-            }
-            else if (gameMoves.Count == 0)
-            {
-                scoresheet = "Inga drag har spelats!";
-            }
-            else
-            {
-                int initialMoveNumber = gamePositions[0].moveCounter;
-                for (int i = 0; i < gameMoves.Count; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        if (i != 0)
-                        {
-                            scoresheet += Environment.NewLine;
-                        }
-                        scoresheet += ((i / 2) + initialMoveNumber).ToString() + ".";
-                    }
-                    scoresheet += " " + gameMoves[i].toString(gamePositions[i]);
-                }
-            }
-            return scoresheet;
         }
         private void printEval(EvalResult result)
         {
@@ -259,6 +210,12 @@ namespace Blobfish_11
                 throw new Exception("Odefinierat bästa drag.");
             }
         }
+        private void playMove(Move move)
+        {
+            game.playMove(move);
+            displayedPly = game.length;
+            display(game.lastPosition());
+        }
         private void resultPopUp(int result)
         {
             if (!gameIsGoingOn)
@@ -287,34 +244,14 @@ namespace Blobfish_11
             computerRBNone.Checked = true;
             players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
         }
-        private void takeback(int numberOfMoves)
-        {
-            if (gamePositions.Count > numberOfMoves)
-            {
-                for (int i = 0; i < numberOfMoves; i++)
-                {
-                    gamePositions.RemoveAt(gamePositions.Count - 1);
-                    gameMoves.RemoveAt(gameMoves.Count - 1);
-                }
-                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
-                gamePositions.RemoveAt(gamePositions.Count - 1);
-                evalBox.Text = "Ett drag har återtagits.";
-                displayAndAddPosition(newCurrentPosition);
-                gameIsGoingOn = true;
-            }
-            else
-            {
-                evalBox.Text = "För få drag har spelats!";
-            }
-        }
         private void displayGamePosition(int ply)
         {
             if (ply < 0) ply = 0;
-            if (ply > gamePositions.Count -1) ply = gamePositions.Count-1;
+            if (ply > game.length) ply = game.length;
             displayedPly = ply;
 
-            display(gamePositions[ply]);
-            if(ply == gamePositions.Count - 1)
+            display(game.getPosition(ply));
+            if(ply == game.length)
             {
                 setBoardDisabled(false);
             }
@@ -325,7 +262,7 @@ namespace Blobfish_11
         }
         private bool engineIsToMove()
         {
-            if (displayedPly != gamePositions.Count - 1)
+            if (displayedPly != game.length)
                 return false;
             return (computerRBBoth.Checked || computerRBWhite.Checked && currentPosition.whiteToMove) ||
                 (computerRBBlack.Checked && !currentPosition.whiteToMove);
@@ -391,7 +328,7 @@ namespace Blobfish_11
 
                         if (engineIsToMove())
                         {
-                            playMove(res.bestMove);
+                            this.playMove(res.bestMove);
                         }
                     }
                 }
@@ -399,7 +336,7 @@ namespace Blobfish_11
                 {
                     MessageBox.Show(exc.Message);
                     evalBox.Text = "Ett fel inträffade.";
-                    takeback(1);
+                    game.takeback(1);
                     setPonderingMode(false);
 
                 }
@@ -529,7 +466,7 @@ namespace Blobfish_11
  *  Träd för varianter.
  *  Spela forcerande drag omedelbart?
  *  Läsa in PGN.
- *  
+ *  Meny för inställningar
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
