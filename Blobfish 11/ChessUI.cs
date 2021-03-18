@@ -97,6 +97,15 @@ namespace Blobfish_11
                         picBox.BackColor = Color.SandyBrown;
                 }
             }
+            reset();
+        }
+        private void reset()
+        {
+            evalBox.Text = "Nytt parti";
+            game.result = "*";
+            gameIsGoingOn = true;
+            game = new Game();
+            displayedPly = 0;
             display(startingPosition);
         }
         private void display(Position pos)
@@ -155,14 +164,6 @@ namespace Blobfish_11
             }
             return text;
         }
-        private void reset()
-        {
-            game.result = "*";
-            gameIsGoingOn = true;
-            game = new Game();
-            displayedPly = 0;
-            display(startingPosition);
-        }
         private void flipBoard()
         {
             flipped = !flipped;
@@ -210,9 +211,22 @@ namespace Blobfish_11
         }
         private void playMove(Move move)
         {
-            game.playMove(move);
+            game.addMove(move);
             displayedPly = game.length;
             display(game.lastPosition());
+        }
+        public void takeback(int numberOfMoves)
+        {
+            try
+            {
+                game.takeback(numberOfMoves);
+                displayedPly = game.length;
+                display(game.lastPosition());
+            }
+            catch
+            {
+                
+            }
         }
         private void resultPopUp(int result)
         {
@@ -239,7 +253,7 @@ namespace Blobfish_11
                 game.result = "1/2-1/2";
             }
             string[] tempPlayers = game.players; //Kommer ihåg vad players var innan.
-            computerRBNone.Checked = true;
+            computerNoneToolStripMenuItem.Checked = true; //Stänger av datorn, för att underlätta om man vill backa i partiet.
             game.players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
         }
         private void displayGamePosition(int ply)
@@ -262,8 +276,8 @@ namespace Blobfish_11
         {
             if (displayedPly != game.length)
                 return false;
-            return (computerRBBoth.Checked || computerRBWhite.Checked && currentPosition.whiteToMove) ||
-                (computerRBBlack.Checked && !currentPosition.whiteToMove);
+            return (computerBothToolStripMenuItem.Checked || computerWhiteToolStripMenuItem.Checked && currentPosition.whiteToMove) ||
+                (computerBlackToolStripMenuItem.Checked && !currentPosition.whiteToMove);
         }
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -274,7 +288,7 @@ namespace Blobfish_11
             blobFish.cancelFlag.setValue(0);
             EvalResult resultPlace = new EvalResult();
             resultPlace.bestMove = null;
-            if (depthRBAuto.Checked)
+            if (depthAutoToolStripMenuItem.Checked)
             {
                 minDepth = -1;
             }
@@ -334,7 +348,7 @@ namespace Blobfish_11
                 {
                     MessageBox.Show(exc.Message);
                     evalBox.Text = "Ett fel inträffade.";
-                    game.takeback(1);
+                    takeback(1);
                     setPonderingMode(false);
 
                 }
@@ -370,7 +384,7 @@ namespace Blobfish_11
         private void setPonderingMode(bool setTo)
         {
             ponderingPanel.Visible = setTo;
-            settingsPanel.Enabled = !setTo;
+            menuStrip1.Enabled = !setTo;
             moveNowButton.Enabled = setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
@@ -406,47 +420,6 @@ namespace Blobfish_11
                 }
             }
         }
-        private Engine choosePlayingStyle()
-        {
-            //Byt namn på funktionen?
-            int[] MIL = { };
-            //if (depthRBAuto.Checked)
-            //{
-            //    MIL = new int[] {8};
-            //}
-
-            try
-            {
-                if (playStyleRB0.Checked) //Normal
-                {
-                    return new Engine(MIL);
-                }
-                else if (playStyleRB1.Checked) //Försiktig
-                {
-                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.8f, 
-                        new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, 5f, MIL, 0.15f);
-                }
-                else if (playStyleRB2.Checked) //Aggressiv
-                {
-                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f,
-                        new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, 2.5f, MIL, 0.4f);
-                }
-                else if (playStyleRB3.Checked) //Experimentell
-                {
-                    return new Engine(new float[] {1f, 3f, 3f, 4.5f, 9f }, 0.4f,
-                        new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 1f, 1f, MIL, 0.25f);
-                }
-                else
-                {
-                    return new Engine();
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
-                return new Engine();
-            }
-        }
     }
 }
 
@@ -460,11 +433,9 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Koordinater
  *  Få "dra nu" att fungera bättre.
- *  Förbättra validSquare()
  *  Träd för varianter.
  *  Spela forcerande drag omedelbart?
  *  Läsa in PGN.
- *  Meny för inställningar
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?

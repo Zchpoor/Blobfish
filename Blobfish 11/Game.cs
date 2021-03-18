@@ -67,7 +67,7 @@ namespace Blobfish_11
         {
             get { return moves.Count; }
         }
-        public void playMove(Move move)
+        public void addMove(Move move)
         {
             Position newPosition = move.execute(positions[positions.Count-1]);
             positions.Add(newPosition);
@@ -115,8 +115,7 @@ namespace Blobfish_11
                     positions.RemoveAt(positions.Count - 1);
                     moves.RemoveAt(moves.Count - 1);
                 }
-                Position newCurrentPosition = positions[positions.Count - 1];
-                positions.RemoveAt(positions.Count - 1);
+               
             }
             else
             {

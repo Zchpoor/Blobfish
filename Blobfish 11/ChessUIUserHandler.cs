@@ -78,7 +78,7 @@ namespace Blobfish_11
                     if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
-                        game.takeback(2);
+                        takeback(2);
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace Blobfish_11
                     if (e.KeyCode == Keys.Z)
                     {
                         e.SuppressKeyPress = true;
-                        game.takeback(1);
+                        takeback(1);
                     }
                 }
             }
@@ -108,31 +108,11 @@ namespace Blobfish_11
             if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
                 e.IsInputKey = true;
         }
-        private void depthRB_CheckedChanged(object sender, EventArgs e)
-        {
-            if ((sender as RadioButton).Checked)
-            {
-                if (depthRB2.Checked)
-                    minDepth = 2;
-                else if (depthRB3.Checked)
-                    minDepth = 3;
-                else if (depthRB4.Checked)
-                    minDepth = 4;
-                else if (depthRB5.Checked)
-                    minDepth = 5;
-                else if (depthRB6.Checked)
-                    minDepth = 6;
-                else if (depthRBAuto.Checked)
-                    minDepth = -1;
-                else
-                    throw new Exception("Fel på djupinställningen!");
-            }
-        }
         private void cancelButton_Click(object sender, EventArgs e)
         {
             ponderingWorker.CancelAsync();
-            if (!computerRBBoth.Checked)
-                game.takeback(1);
+            if (!computerBothToolStripMenuItem.Checked)
+                takeback(1);
             evalBox.Text = "Beräkningen avbröts.";
             ponderingTime = new TimeSpan(0);
             setPonderingMode(false);
@@ -164,19 +144,19 @@ namespace Blobfish_11
                         getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
                     break;
                 case "takeback":
-                    game.takeback(2);
+                    takeback(2);
                     break;
                 case "tb":
-                    game.takeback(2);
+                    takeback(2);
                     break;
                 case "undo":
-                    game.takeback(2);
+                    takeback(2);
                     break;
                 case "återta":
-                    game.takeback(2);
+                    takeback(2);
                     break;
                 case "stb":
-                    game.takeback(1);
+                    takeback(1);
                     break;
                 case "scoresheet":
                     evalBox.Text = game.scoresheet();
@@ -267,35 +247,122 @@ namespace Blobfish_11
                     break;
             }
         }
-        private void radioButtons_CheckedChanged(object sender, EventArgs e)
+        private void engineColor_CheckedChanged(object sender, EventArgs e)
         {
-            RadioButton rb = (sender as RadioButton);
-            if (rb.Checked) //Nödvändig för inte dubbla anrop ska ske.
+            if ((sender as ToolStripMenuItem).Checked == false)
             {
-                if (computerRBBlack.Checked)
-                {
-                    game.players = new string[] { "Human player", "Blobfish 11" };
-                }
-                else if (computerRBWhite.Checked)
-                {
-                    game.players = new string[] { "Blobfish 11", "Human player" };
-                }
-                else if (computerRBBoth.Checked)
-                {
-                    game.players = new string[] { "Blobfish 11", "Blobfish 11" };
-                }
-                else if (computerRBNone.Checked)
-                {
-                    game.players = new string[] { "Human player", "Human player" };
-                }
-                if (engineIsToMove())
-                    playBestEngineMove();
+                return;
             }
+            foreach (ToolStripMenuItem item in engineColorMenuItem.DropDownItems)
+            {
+                if (!item.Name.Equals((sender as ToolStripMenuItem).Name))
+                {
+                    item.Checked = false;
+                }
+            }
+            if (computerBothToolStripMenuItem.Checked)
+            {
+                game.players = new string[] { "Blobfish 11", "Blobfish 11" };
+            }
+            else if (computerWhiteToolStripMenuItem.Checked)
+            {
+                game.players = new string[] { "Blobfish 11", "Human player" };
+            }
+            else if (computerBlackToolStripMenuItem.Checked)
+            {
+                game.players = new string[] { "Human player", "Blobfish 11" };
+            }
+            else
+            {
+                game.players = new string[] { "Human player", "Human player" };
+            }
+            if (engineIsToMove())
+                playBestEngineMove();
+        }
+        private void styleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as ToolStripMenuItem).Checked == false)
+            {
+                return;
+            }
+            foreach (ToolStripMenuItem item in styleToolStripMenuItem.DropDownItems)
+            {
+                if (!item.Name.Equals((sender as ToolStripMenuItem).Name))
+                {
+                    item.Checked = false;
+                }
+            }
+        }
+        private void depthToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if ((sender as ToolStripMenuItem).Checked == false)
+            {
+                return;
+            }
+            foreach (ToolStripMenuItem item in depthToolStripMenuItem.DropDownItems)
+            {
+                if (!item.Name.Equals((sender as ToolStripMenuItem).Name))
+                {
+                    item.Checked = false;
+                }
+            }
+            if (depth2ToolStripMenuItem.Checked)
+                minDepth = 2;
+            else if (depth3ToolStripMenuItem.Checked)
+                minDepth = 3;
+            else if (depth4ToolStripMenuItem.Checked)
+                minDepth = 4;
+            else if (depth5ToolStripMenuItem.Checked)
+                minDepth = 5;
+            else if (depth6ToolStripMenuItem.Checked)
+                minDepth = 6;
+            else if (depthAutoToolStripMenuItem.Checked)
+                minDepth = -1;
+            else
+                throw new Exception("Fel på djupinställningen!");
         }
         private void moveNowButton_Click(object sender, EventArgs e)
         {
             blobFish.moveNowFlag.setValue(1);
             moveNowButton.Enabled = false;
+        }
+
+        private Engine choosePlayingStyle()
+        {
+            //Byt namn på funktionen?
+            int[] MIL = { };
+
+            try
+            {
+                if (style0ToolStripMenuItem.Checked) //Normal
+                {
+                    return new Engine(MIL);
+                }
+                else if (style1ToolStripMenuItem.Checked) //Försiktig
+                {
+                    return new Engine(new float[] { 1f, 3f, 3f, 5f, 9f }, 0.8f,
+                        new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, 5f, MIL, 0.15f);
+                }
+                else if (style2ToolStripMenuItem.Checked) //Aggressiv
+                {
+                    return new Engine(new float[] { 1.2f, 4f, 4f, 6.5f, 12f }, 0.4f,
+                        new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, 2.5f, MIL, 0.4f);
+                }
+                else if (style3ToolStripMenuItem.Checked) //Experimentell
+                {
+                    return new Engine(new float[] { 1f, 3f, 3f, 4.5f, 9f }, 0.4f,
+                        new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 1f, 1f, MIL, 0.25f);
+                }
+                else
+                {
+                    return new Engine();
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
+                return new Engine();
+            }
         }
     }
 }
