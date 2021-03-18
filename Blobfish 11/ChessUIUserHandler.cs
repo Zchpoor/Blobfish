@@ -38,50 +38,6 @@ namespace Blobfish_11
                     displayGamePosition(game.length);
                 }
             }
-            if (e.Modifiers == Keys.Control)
-            {
-                if(e.KeyCode == Keys.T)
-                {
-                    evalBox.Text = Tests.runTests();
-                }
-                if (e.KeyCode == Keys.S)
-                {
-                    PGNHandler handler = new PGNHandler();
-                    handler.save(game);
-                }
-                if (e.KeyCode == Keys.F)
-                {
-                    e.SuppressKeyPress = true;
-                    flipBoard();
-                }
-                if (e.KeyCode == Keys.W)
-                {
-                    e.SuppressKeyPress = true;
-                    DialogResult result = MessageBox.Show("Vill du stänga ned programmet?", "Avsluta", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
-                    {
-                        this.Close();
-                    }
-                }
-                if (!ponderingWorker.IsBusy)
-                {
-                    //Kortkommandon som endast tillåts om motorn inte är igång.
-                    if (e.KeyCode == Keys.R)
-                    {
-                        e.SuppressKeyPress = true;
-                        DialogResult result = MessageBox.Show("Vill du starta ett nytt parti?", "Återställning av partiet", MessageBoxButtons.YesNo);
-                        if (result == DialogResult.Yes)
-                        {
-                            reset();
-                        }
-                    }
-                    if (e.KeyCode == Keys.Z)
-                    {
-                        e.SuppressKeyPress = true;
-                        takeback(2);
-                    }
-                }
-            }
             if (e.Modifiers == (Keys.Control | Keys.Shift))
             {
                 if (!ponderingWorker.IsBusy)
@@ -325,6 +281,53 @@ namespace Blobfish_11
         {
             blobFish.moveNowFlag.setValue(1);
             moveNowButton.Enabled = false;
+        }
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PGNHandler handler = new PGNHandler();
+            handler.save(game);
+        }
+        private void startaOmToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!ponderingWorker.IsBusy)
+            {
+                //Kortkommando som endast tillåts om motorn inte är igång.
+                DialogResult result = MessageBox.Show("Vill du starta ett nytt parti?", "Återställning av partiet", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    reset();
+                }
+            }
+        }
+        private void filpBoardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            flipBoard();
+        }
+        private void taTillbakaDragToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!ponderingWorker.IsBusy)
+            {
+                takeback(2);
+            }
+        }
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Vill du stänga ned programmet?", "Avsluta", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
+        }
+        private void testsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!ponderingWorker.IsBusy)
+            {
+                evalBox.Text = Tests.runTests();
+            }
+        }
+        private void protokollToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            evalBox.Text = game.scoresheet();
         }
 
         private Engine choosePlayingStyle()
