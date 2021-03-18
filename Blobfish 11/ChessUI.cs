@@ -28,8 +28,8 @@ namespace Blobfish_11
         {
             InitializeComponent();
             this.MinimumSize = this.Size;
-            //this.MaximumSize = this.Size;
-            int squareSize = 56;
+            this.MaximumSize = this.Size;
+            int squareSize = 60;
             boardPanel.AutoSize = true;
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";

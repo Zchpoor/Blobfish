@@ -46,7 +46,9 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.partiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.testsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.partiToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.filpBoardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,8 +75,6 @@
             this.style1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.style2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.style3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.ponderingPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -83,7 +83,7 @@
             // 
             this.fenBox.Location = new System.Drawing.Point(95, 35);
             this.fenBox.Name = "fenBox";
-            this.fenBox.Size = new System.Drawing.Size(685, 22);
+            this.fenBox.Size = new System.Drawing.Size(733, 22);
             this.fenBox.TabIndex = 0;
             this.fenBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.fenBox_KeyDown);
             // 
@@ -98,7 +98,7 @@
             // 
             // fenButton
             // 
-            this.fenButton.Location = new System.Drawing.Point(786, 33);
+            this.fenButton.Location = new System.Drawing.Point(834, 34);
             this.fenButton.Name = "fenButton";
             this.fenButton.Size = new System.Drawing.Size(75, 24);
             this.fenButton.TabIndex = 2;
@@ -130,19 +130,19 @@
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.boardPanel.Size = new System.Drawing.Size(600, 550);
+            this.boardPanel.Size = new System.Drawing.Size(640, 590);
             this.boardPanel.TabIndex = 5;
             // 
             // evalBox
             // 
             this.evalBox.AcceptsReturn = true;
             this.evalBox.AcceptsTab = true;
-            this.evalBox.Location = new System.Drawing.Point(622, 199);
+            this.evalBox.Location = new System.Drawing.Point(670, 202);
             this.evalBox.Multiline = true;
             this.evalBox.Name = "evalBox";
             this.evalBox.ReadOnly = true;
             this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(239, 411);
+            this.evalBox.Size = new System.Drawing.Size(239, 448);
             this.evalBox.TabIndex = 7;
             this.evalBox.TabStop = false;
             // 
@@ -150,7 +150,7 @@
             // 
             this.toMoveLabel.AutoSize = true;
             this.toMoveLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.toMoveLabel.Location = new System.Drawing.Point(618, 60);
+            this.toMoveLabel.Location = new System.Drawing.Point(666, 63);
             this.toMoveLabel.Name = "toMoveLabel";
             this.toMoveLabel.Size = new System.Drawing.Size(103, 20);
             this.toMoveLabel.TabIndex = 8;
@@ -179,7 +179,7 @@
             this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
-            this.ponderingPanel.Location = new System.Drawing.Point(621, 83);
+            this.ponderingPanel.Location = new System.Drawing.Point(669, 86);
             this.ponderingPanel.Name = "ponderingPanel";
             this.ponderingPanel.Size = new System.Drawing.Size(240, 110);
             this.ponderingPanel.TabIndex = 11;
@@ -223,7 +223,7 @@
             // moveLabel
             // 
             this.moveLabel.AutoSize = true;
-            this.moveLabel.Location = new System.Drawing.Point(775, 60);
+            this.moveLabel.Location = new System.Drawing.Point(823, 63);
             this.moveLabel.Name = "moveLabel";
             this.moveLabel.Size = new System.Drawing.Size(87, 17);
             this.moveLabel.TabIndex = 6;
@@ -240,7 +240,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.ShowItemToolTips = true;
-            this.menuStrip1.Size = new System.Drawing.Size(871, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(925, 28);
             this.menuStrip1.TabIndex = 14;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -264,6 +264,11 @@
             this.saveToolStripMenuItem.Text = "Spara parti";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(212, 6);
+            // 
             // testsToolStripMenuItem
             // 
             this.testsToolStripMenuItem.Name = "testsToolStripMenuItem";
@@ -271,6 +276,11 @@
             this.testsToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
             this.testsToolStripMenuItem.Text = "Kör tester";
             this.testsToolStripMenuItem.Click += new System.EventHandler(this.testsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(212, 6);
             // 
             // closeToolStripMenuItem
             // 
@@ -500,21 +510,11 @@
             this.style3ToolStripMenuItem.Text = "Experimentell";
             this.style3ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
             // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
-            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(871, 617);
+            this.ClientSize = new System.Drawing.Size(925, 663);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
             this.Controls.Add(this.evalBox);
