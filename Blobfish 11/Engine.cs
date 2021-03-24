@@ -38,6 +38,7 @@ namespace Blobfish_11
 
                 if (moves.Count == 1)
                 {
+                    //Spela forcerande drag omedelbart?
                     EvalResult res = eval(moves[0].execute(pos), minDepth-1);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;

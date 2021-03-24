@@ -8,7 +8,7 @@ namespace Blobfish_11
 {
     public class Game
     {
-        private static readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        public static readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         private static readonly Exception playerVectorException = new Exception("Spelarvektorn måste innehålla exakt 2 element.");
 
         List<Move> moves = new List<Move>();

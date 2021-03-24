@@ -24,7 +24,7 @@ namespace Blobfish_11
         TimeSpan ponderingTime = new TimeSpan(0);
         Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
-        public ChessUI()
+        public ChessUI() 
         {
             InitializeComponent();
             this.MinimumSize = this.Size;
@@ -98,6 +98,7 @@ namespace Blobfish_11
                 }
             }
             reset();
+            testGameTree();
         }
         private void reset()
         {
@@ -420,6 +421,19 @@ namespace Blobfish_11
                 }
             }
         }
+
+
+
+
+
+        private void testGameTree()
+        {
+            GameTree gt = new GameTree();
+            GameTree original = gt;
+            gt = gt.addContinuation(new Move(new Square(6, 3), new Square(4, 3)));
+            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3)));
+            evalBox.Text = original.toString();
+        }
     }
 }
 
@@ -434,7 +448,6 @@ namespace Blobfish_11
  *  Koordinater
  *  Få "dra nu" att fungera bättre.
  *  Träd för varianter.
- *  Spela forcerande drag omedelbart?
  *  Läsa in PGN.
  * 
  * Justera matriserna:

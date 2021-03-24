@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blobfish_11
 {
-    public class Move
+    public class Move : IEquatable<Move>
     {
         public Square from;
         public Square to;
@@ -183,6 +183,10 @@ namespace Blobfish_11
                 ret += (char)(from.line + 'a');
             }
             return ret;
+        }
+        public bool Equals(Move other)
+        {
+            return this.from.Equals(other.from) && this.to.Equals(other.to);
         }
     }
     public class Castle : Move
