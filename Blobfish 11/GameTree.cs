@@ -73,19 +73,44 @@ namespace Blobfish_11
             string ret = "";
             if (continuations.Count > 0)
             {
-                ret += getMove(0).toString(pos);
+                if (pos.whiteToMove)
+                {
+                    ret += pos.moveCounter + ".";
+                }
+                ret += getMove(0).toString(pos) + " ";
                 if (continuations.Count > 1)
                 {
-                    ret += "( ";
+                    ret += " (";
                     for (int i = 1; i < continuations.Count; i++)
                     {
-                        ret += continuation(i).toString();
+                        ret += pos.moveCounter;
+                        if (pos.whiteToMove)
+                            ret += ".";
+                        else
+                            ret += "...";
+                        ret += getMove(i).toString(pos);
+                        string cont = continuation(i).toString();
+                        if (cont != "")
+                            ret += " " + cont;
                         if (i < continuations.Count - 1)
-                            ret += ";";
+                            ret += "; ";
                     }
                     ret += ") ";
+                    string mainLine = continuation(0).toString();
+                    if(mainLine != "")
+                    {
+                        if (pos.whiteToMove)
+                        {
+                            ret += pos.moveCounter;
+                            ret += "...";
+                        }
+                        ret += mainLine;
+                    }
                 }
-                ret += continuation(0).toString();
+                else
+                {
+                    ret += continuation(0).toString();
+                }
             }
             return ret;
         }

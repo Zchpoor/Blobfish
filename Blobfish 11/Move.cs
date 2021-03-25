@@ -184,7 +184,7 @@ namespace Blobfish_11
             }
             return ret;
         }
-        public bool Equals(Move other)
+        public virtual bool Equals(Move other)
         {
             return this.from.Equals(other.from) && this.to.Equals(other.to);
         }
@@ -292,6 +292,14 @@ namespace Blobfish_11
                 ret += "=" + promoteTo.ToString().ToUpper();
             return ret;
 
+        }
+        public override bool Equals(Move other)
+        {
+            if (other is Promotion)
+            {
+                return this.from.Equals(other.from) && this.to.Equals(other.to) && this.promoteTo == (other as Promotion).promoteTo;
+            }
+            else return false;
         }
     }
 }

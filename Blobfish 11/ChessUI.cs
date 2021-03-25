@@ -430,8 +430,27 @@ namespace Blobfish_11
         {
             GameTree gt = new GameTree();
             GameTree original = gt;
-            gt = gt.addContinuation(new Move(new Square(6, 3), new Square(4, 3)));
-            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3)));
+            gt = gt.addContinuation(new Move(new Square(6, 3), new Square(4, 3))); //d4
+            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3))); //d5
+            gt = gt.addContinuation(new Move(new Square(6, 2), new Square(4, 2))); //c4
+            GameTree deviation = gt;
+            gt = gt.addContinuation(new Move(new Square(1, 4), new Square(2, 4))); //e6
+            gt = gt.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
+            gt = gt.addContinuation(new Move(new Square(0, 6), new Square(2, 5))); //Sf6
+
+            deviation = deviation.addContinuation(new Move(new Square(1, 2), new Square(2, 2))); //c6
+            deviation.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
+
+            deviation.addContinuation(new Move(new Square(7, 1), new Square(5, 2))); //Sc3
+
+            original.addContinuation(new Move(new Square(6, 4), new Square(4, 4))); // e4
+
+            original.addContinuation(new Move(new Square(6, 2), new Square(4, 2))); //c4
+            gt = original.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
+            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3))); //d5
+            gt = gt.addContinuation(new Move(new Square(6, 6), new Square(5, 6))); //g3
+            gt = gt.addContinuation(new Move(new Square(1, 2), new Square(3, 2))); //c5
+
             evalBox.Text = original.toString();
         }
     }
