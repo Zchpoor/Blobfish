@@ -14,7 +14,6 @@ namespace Blobfish_11
         Game game = new Game();
         bool retrospectMode = false;
         bool gameIsGoingOn = true;
-        readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
         Engine blobFish = new Engine();
@@ -417,7 +416,6 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Koordinater
  *  Få "dra nu" att fungera bättre.
- *  Träd för varianter.
  *  Läsa in PGN.
  * 
  * Justera matriserna:

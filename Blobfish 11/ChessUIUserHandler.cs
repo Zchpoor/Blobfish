@@ -163,9 +163,6 @@ namespace Blobfish_11
                 case "tid":
                     evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
                     break;
-                case "gt":
-                    testGameTree();
-                    break;
                 case "spec":
                     string posToEvaluate = "r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13";
                     Stopwatch sw = new Stopwatch();
