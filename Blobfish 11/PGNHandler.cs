@@ -20,11 +20,11 @@ namespace Blobfish_11
             text += "[White \""+ game.players[0]+"\"]\n";
             text += "[Black \"" + game.players[1] + "\"]\n";
             text += "[Result \"" + game.result + "\"]\n";
-            if(game.getPosition(0).getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+            if(game.firstPosition.getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
                 text += "[SetUp \"1\"]\n";
-                text += "[FEN \"" + game.getPosition(0).getFEN() + "\"]\n";
+                text += "[FEN \"" + game.firstPosition.getFEN() + "\"]\n";
             }
 
             SaveFileDialog sfd = new SaveFileDialog();
@@ -37,8 +37,9 @@ namespace Blobfish_11
 
                 using (var fileStream = new FileStream(sfd.FileName, FileMode.Create))
                 {
-                    text += "\n" + moveText(game);
-                    text += " " + game.result;
+                    //TODO: Hantera undantag
+                    text += "\n" + game.scoresheet();
+                    text += game.result;
                     byte[] byteArray = Encoding.ASCII.GetBytes(text);
                     fileStream.Write(byteArray, 0, text.Length);
                 }
@@ -47,6 +48,8 @@ namespace Blobfish_11
 
         private string moveText(Game game)
         {
+            return game.ToString();
+            /*
             string text = "";
             int initialMoveNumber = game.getPosition(0).moveCounter;
             int i = 0;
@@ -69,7 +72,7 @@ namespace Blobfish_11
                 text += " " + game.getMove(i).toString(game.getPosition(i));
                 i++;
             }
-            return text;
+            return text;*/
         }
     }
 }

@@ -12,8 +12,7 @@ namespace Blobfish_11
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
         Game game = new Game();
-        Position currentPosition;
-        int displayedPly = 0;
+        bool retrospectMode = false;
         bool gameIsGoingOn = true;
         readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         List<Move> currentMoves = new List<Move>();
@@ -98,20 +97,19 @@ namespace Blobfish_11
                 }
             }
             reset();
-            testGameTree();
+            //testGameTree();
         }
         private void reset()
         {
             evalBox.Text = "Nytt parti";
             game.result = "*";
             gameIsGoingOn = true;
+            computerBlackToolStripMenuItem.Checked = true;
             game = new Game();
-            displayedPly = 0;
-            display(startingPosition);
+            display(game.currentPosition);
         }
         private void display(Position pos)
         {
-            currentPosition = pos;
             currentMoves = blobFish.allValidMoves(pos, false);
 
             for (int i = 0; i < 8; i++)
@@ -134,7 +132,7 @@ namespace Blobfish_11
                 resultPopUp(res);
                 gameIsGoingOn = false;
             }
-            else if (!blobFish.mateableMaterial(currentPosition.board))
+            else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
                 gameIsGoingOn = false;
@@ -168,17 +166,17 @@ namespace Blobfish_11
         private void flipBoard()
         {
             flipped = !flipped;
-            display(currentPosition);
+            display(game.currentPosition);
         }
         private void printEval(EvalResult result)
         {
-            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
+            int decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
             if (decisiveResult != -2)
             {
                 resultPopUp(decisiveResult);
                 gameIsGoingOn = false;
             }
-            else if (!blobFish.mateableMaterial(currentPosition.board))
+            else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
                 gameIsGoingOn = false;
@@ -201,7 +199,7 @@ namespace Blobfish_11
                 {
                     textEval = Math.Round(eval, 2).ToString();
                 }
-                String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition) +
+                String completeString = "Bästa drag: " + result.bestMove.toString(game.currentPosition) +
                     Environment.NewLine + "Datorns evaluering: " + textEval;
                 evalBox.Text = completeString;
             }
@@ -213,16 +211,15 @@ namespace Blobfish_11
         private void playMove(Move move)
         {
             game.addMove(move);
-            displayedPly = game.length;
-            display(game.lastPosition());
+            retrospectMode = false;
+            display(game.currentPosition);
         }
         public void takeback(int numberOfMoves)
         {
             try
             {
                 game.takeback(numberOfMoves);
-                displayedPly = game.length;
-                display(game.lastPosition());
+                display(game.currentPosition);
             }
             catch
             {
@@ -257,28 +254,14 @@ namespace Blobfish_11
             computerNoneToolStripMenuItem.Checked = true; //Stänger av datorn, för att underlätta om man vill backa i partiet.
             game.players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
         }
-        private void displayGamePosition(int ply)
-        {
-            if (ply < 0) ply = 0;
-            if (ply > game.length) ply = game.length;
-            displayedPly = ply;
-
-            display(game.getPosition(ply));
-            if(ply == game.length)
-            {
-                setBoardDisabled(false);
-            }
-            else
-            {
-                setBoardDisabled(true);
-            }
-        }
         private bool engineIsToMove()
         {
-            if (displayedPly != game.length)
+            if (retrospectMode)
+            {
                 return false;
-            return (computerBothToolStripMenuItem.Checked || computerWhiteToolStripMenuItem.Checked && currentPosition.whiteToMove) ||
-                (computerBlackToolStripMenuItem.Checked && !currentPosition.whiteToMove);
+            }
+            return (computerBothToolStripMenuItem.Checked || computerWhiteToolStripMenuItem.Checked && game.currentPosition.whiteToMove) ||
+                (computerBlackToolStripMenuItem.Checked && !game.currentPosition.whiteToMove);
         }
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -295,7 +278,7 @@ namespace Blobfish_11
             }
             Thread thread = new Thread(delegate ()
             {
-                engineStart(minDepth, currentPosition.boardCopy(), resultPlace);
+                engineStart(minDepth, game.currentPosition.boardCopy(), resultPlace);
             });
             thread.Name = "engineThread";
             thread.Start();
@@ -407,7 +390,7 @@ namespace Blobfish_11
                     }
                     else
                     {
-                        char pieceOnSquare = currentPosition.board[rank, line];
+                        char pieceOnSquare = game.currentPosition.board[rank, line];
                         Cursor cursor = moveablePiece(pieceOnSquare) ? dragCursor : Cursors.Default;
                         if (flipped)
                         {
@@ -420,38 +403,6 @@ namespace Blobfish_11
                     }
                 }
             }
-        }
-
-
-
-
-
-        private void testGameTree()
-        {
-            GameTree gt = new GameTree();
-            GameTree original = gt;
-            gt = gt.addContinuation(new Move(new Square(6, 3), new Square(4, 3))); //d4
-            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3))); //d5
-            gt = gt.addContinuation(new Move(new Square(6, 2), new Square(4, 2))); //c4
-            GameTree deviation = gt;
-            gt = gt.addContinuation(new Move(new Square(1, 4), new Square(2, 4))); //e6
-            gt = gt.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
-            gt = gt.addContinuation(new Move(new Square(0, 6), new Square(2, 5))); //Sf6
-
-            deviation = deviation.addContinuation(new Move(new Square(1, 2), new Square(2, 2))); //c6
-            deviation.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
-
-            deviation.addContinuation(new Move(new Square(7, 1), new Square(5, 2))); //Sc3
-
-            original.addContinuation(new Move(new Square(6, 4), new Square(4, 4))); // e4
-
-            original.addContinuation(new Move(new Square(6, 2), new Square(4, 2))); //c4
-            gt = original.addContinuation(new Move(new Square(7, 6), new Square(5, 5))); //Sf3
-            gt = gt.addContinuation(new Move(new Square(1, 3), new Square(3, 3))); //d5
-            gt = gt.addContinuation(new Move(new Square(6, 6), new Square(5, 6))); //g3
-            gt = gt.addContinuation(new Move(new Square(1, 2), new Square(3, 2))); //c5
-
-            evalBox.Text = original.toString();
         }
     }
 }

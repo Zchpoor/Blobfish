@@ -23,19 +23,27 @@ namespace Blobfish_11
             {
                 if (e.KeyCode == Keys.Left)
                 {
-                    displayGamePosition(displayedPly - 1);
+                    game.goBack();
+                    retrospectMode = true;
+                    display(game.currentPosition);
                 }
                 else if (e.KeyCode == Keys.Right)
                 {
-                    displayGamePosition(displayedPly + 1);
+                    game.mainContinuation();
+                    retrospectMode = true;
+                    display(game.currentPosition);
                 }
                 else if (e.KeyCode == Keys.Up)
                 {
-                    displayGamePosition(0);
+                    game.goToFirstPosition();
+                    retrospectMode = true;
+                    display(game.currentPosition);
                 }
                 else if (e.KeyCode == Keys.Down)
                 {
-                    displayGamePosition(game.length);
+                    game.goToLastPosition();
+                    retrospectMode = true;
+                    display(game.currentPosition);
                 }
             }
             if (e.Modifiers == (Keys.Control | Keys.Shift))
@@ -85,19 +93,19 @@ namespace Blobfish_11
                     break;
                 case "moves":
                     evalBox.Text = "Alla drag:\n" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition);
+                        getMovesString(blobFish.allValidMoves(game.currentPosition, false), game.currentPosition);
                     break;
                 case "drag":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, false), currentPosition);
+                        getMovesString(blobFish.allValidMoves(game.currentPosition, false), game.currentPosition);
                     break;
                 case "sorted":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
+                        getMovesString(blobFish.allValidMoves(game.currentPosition, true), game.currentPosition);
                     break;
                 case "sorterade":
                     evalBox.Text = "Alla drag:" + Environment.NewLine +
-                        getMovesString(blobFish.allValidMoves(currentPosition, true), currentPosition);
+                        getMovesString(blobFish.allValidMoves(game.currentPosition, true), game.currentPosition);
                     break;
                 case "takeback":
                     takeback(2);
@@ -127,7 +135,7 @@ namespace Blobfish_11
                     reset();
                     break;
                 case "fen":
-                    fenBox.Text = currentPosition.getFEN();
+                    fenBox.Text = game.currentPosition.getFEN();
                     fenBox.SelectAll();
                     break;
                 case "flip":
@@ -137,16 +145,16 @@ namespace Blobfish_11
                     flipBoard();
                     break;
                 case "eval":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
                     break;
                 case "evaluate":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
                     break;
                 case "bedöm":
-                    printEval(choosePlayingStyle().eval(currentPosition, minDepth));
+                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
                     break;
                 case "num":
-                    float res = choosePlayingStyle().numericEval(currentPosition);
+                    float res = choosePlayingStyle().numericEval(game.currentPosition);
                     evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res, 2).ToString();
                     break;
                 case "time":
@@ -195,7 +203,6 @@ namespace Blobfish_11
                         Position pos = new Position(inputText);
                         gameIsGoingOn = true;
                         game = new Game(pos);
-                        displayedPly = 0;
                         display(pos);
                     }
                     catch

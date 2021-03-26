@@ -28,11 +28,11 @@ namespace Blobfish_11
             {
                 return false;
             }
-            else if (currentPosition.whiteToMove && piece < 'a')
+            else if (game.currentPosition.whiteToMove && piece < 'a')
             {
                 return true;
             }
-            else if (!currentPosition.whiteToMove && piece >= 'a')
+            else if (!game.currentPosition.whiteToMove && piece >= 'a')
             {
                 return true;
             }
@@ -43,7 +43,7 @@ namespace Blobfish_11
         }
         private bool possibleToMove()
         {
-            return !ponderingWorker.IsBusy && gameIsGoingOn && displayedPly == game.length;
+            return !ponderingWorker.IsBusy && gameIsGoingOn;
         }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
@@ -52,7 +52,7 @@ namespace Blobfish_11
 
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);
-            char piece = currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
+            char piece = game.currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
             if (!moveablePiece(piece))
                 return;
 
@@ -92,7 +92,7 @@ namespace Blobfish_11
                 {
                     (sender as PictureBox).Image = fromImage;
                     this.playMove(item);
-                    display(game.lastPosition());
+                    display(game.currentPosition);
                     moveWasPlayed = true;
                     break;
                 }

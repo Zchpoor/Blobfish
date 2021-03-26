@@ -11,24 +11,26 @@ namespace Blobfish_11
         public static readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         private static readonly Exception playerVectorException = new Exception("Spelarvektorn måste innehålla exakt 2 element.");
 
-        List<Move> moves = new List<Move>();
-        List<Position> positions = new List<Position>();
+        private GameTree firstGameTreeNode;
+        private GameTree gameTree;
         private string[] playerNames;
-        private string resultString = "*";
 
         public Game()
         {
-            positions.Add(startingPosition);
+            gameTree = new GameTree();
+            firstGameTreeNode = gameTree;
             players = new string[] { "Human player", "Blobfish 11" };
         }
         public Game(Position customStartingPosition)
         {
-            positions.Add(customStartingPosition);
+            gameTree = new GameTree(customStartingPosition);
+            firstGameTreeNode = gameTree;
             players = new string[] { "Human player", "Blobfish 11" };
         }
         public Game(Position customStartingPosition, string[] players)
         {
-            positions.Add(customStartingPosition);
+            gameTree = new GameTree(customStartingPosition);
+            firstGameTreeNode = gameTree;
             this.players = players;
         }
         public string[] players
@@ -47,80 +49,59 @@ namespace Blobfish_11
             }
 
         }
-        public string result
-        {
-            get { return resultString; }
-            set
-            {
-                resultString = value;
-            }
-        }
-        public Position getPosition(int posNumber)
-        {
-            return positions[posNumber];
-        }
-        public Move getMove(int moveNumber)
-        {
-            return moves[moveNumber];
-        }
-        public int length
-        {
-            get { return moves.Count; }
-        }
+        public string result { get; set; } = "*";
+        public Position currentPosition { get { return gameTree.position; } }
+        public Position firstPosition { get { return firstGameTreeNode.position; } }
         public void addMove(Move move)
         {
-            Position newPosition = move.execute(positions[positions.Count-1]);
-            positions.Add(newPosition);
-            this.moves.Add(move);
+            GameTree gt = gameTree.continuation(move);
+            if (gt != null)
+            {
+                gameTree = gt;
+            }
+            else
+            {
+                gameTree = gameTree.addContinuation(move);
+            }
         }
         public string scoresheet()
         {
-            string scoresheet = "";
-            if (positions.Count != moves.Count + 1)
-            {
-                throw new Exception("Fel antal drag/ställningar har spelats!");
-            }
-            else if (moves.Count == 0)
-            {
-                scoresheet = "Inga drag har spelats!";
-            }
-            else
-            {
-                int initialMoveNumber = positions[0].moveCounter;
-                for (int i = 0; i < moves.Count; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        if (i != 0)
-                        {
-                            scoresheet += Environment.NewLine;
-                        }
-                        scoresheet += ((i / 2) + initialMoveNumber).ToString() + ".";
-                    }
-                    scoresheet += " " + moves[i].toString(positions[i]);
-                }
-            }
-            return scoresheet;
+            return firstGameTreeNode.ToString();
         }
-        public Position lastPosition()
+        public void mainContinuation()
         {
-            return positions[positions.Count - 1];
+            if (gameTree.continuations.Count > 0)
+                gameTree = gameTree.continuations[0].Item2;
+        }
+        public void goBack()
+        {
+            if (gameTree.parent != null)
+                gameTree = gameTree.parent;
+        }
+        public void goToLastPosition()
+        {
+            while (gameTree.continuations.Count != 0)
+            {
+                mainContinuation();
+            }
+        }
+        public void goToFirstPosition()
+        {
+            gameTree = firstGameTreeNode;
         }
         public void takeback(int numberOfMoves)
         {
-            if (positions.Count > numberOfMoves)
+            if(gameTree.parent == null || numberOfMoves <= 0)
             {
-                for (int i = 0; i < numberOfMoves; i++)
-                {
-                    positions.RemoveAt(positions.Count - 1);
-                    moves.RemoveAt(moves.Count - 1);
-                }
-               
+                return;
             }
             else
             {
-                throw new Exception("För få drag har spelats!");
+                gameTree.parent.removeContinuation(gameTree);
+                gameTree = gameTree.parent;
+                takeback(numberOfMoves - 1);
             }
+
         }
     }
 }

@@ -11,10 +11,10 @@ namespace Blobfish_11
     using Variation = Tuple<Move, GameTree>;
     public class GameTree
     {
-        Position pos;
+        readonly Position pos;
         //Kommentarer?
-        GameTree parent;
-        List<Variation> continuations = new List<Variation>();
+        public GameTree parent { get; }
+        public List<Variation> continuations = new List<Variation>();
         public GameTree()
         {
             this.pos = Game.startingPosition;
@@ -36,22 +36,20 @@ namespace Blobfish_11
             this.parent = parent;
             this.continuations = continuations;
         }
+
+        public Position position { get { return pos; } }
+
         public GameTree addContinuation(Move move)
         {
             GameTree newTree = new GameTree(move.execute(pos), this);
             continuations.Add(new Variation(move, newTree));
             return newTree;
         }
-        public GameTree goBack()
-        {
-            if(parent == null)
-                return this;
-            else
-                return parent;
-        }
         public GameTree continuation(int i)
         {
-            return (continuations[i]).Item2;
+            if (continuations.Count > i)
+                return (continuations[i]).Item2;
+            else return null;
         }
         public GameTree continuation(Move move)
         {
@@ -64,11 +62,22 @@ namespace Blobfish_11
             }
             return null;
         }
-        public Move getMove(int i)
+        public void removeContinuation(GameTree continuation)
         {
+            for (int i = 0; i < continuations.Count; i++)
+            {
+                if(continuations[i].Item2 == continuation)
+                {
+                    continuations.RemoveAt(i);
+                }
+            }
+        }
+        private Move getMove(int i)
+        {
+            //TODO: behövs denna?
             return continuations[i].Item1;
         }
-        public string toString()
+        public override string ToString()
         {
             string ret = "";
             if (continuations.Count > 0)
@@ -89,14 +98,14 @@ namespace Blobfish_11
                         else
                             ret += "...";
                         ret += getMove(i).toString(pos);
-                        string cont = continuation(i).toString();
+                        string cont = continuation(i).ToString();
                         if (cont != "")
                             ret += " " + cont;
                         if (i < continuations.Count - 1)
                             ret += "; ";
                     }
                     ret += ") ";
-                    string mainLine = continuation(0).toString();
+                    string mainLine = continuation(0).ToString();
                     if(mainLine != "")
                     {
                         if (pos.whiteToMove)
@@ -109,7 +118,7 @@ namespace Blobfish_11
                 }
                 else
                 {
-                    ret += continuation(0).toString();
+                    ret += continuation(0).ToString();
                 }
             }
             return ret;
