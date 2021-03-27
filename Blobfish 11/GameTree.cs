@@ -89,9 +89,9 @@ namespace Blobfish_11
                 ret += getMove(0).toString(pos) + " ";
                 if (continuations.Count > 1)
                 {
-                    ret += " (";
                     for (int i = 1; i < continuations.Count; i++)
                     {
+                        ret += " (";
                         ret += pos.moveCounter;
                         if (pos.whiteToMove)
                             ret += ".";
@@ -101,10 +101,8 @@ namespace Blobfish_11
                         string cont = continuation(i).ToString();
                         if (cont != "")
                             ret += " " + cont;
-                        if (i < continuations.Count - 1)
-                            ret += "; ";
+                        ret += ") ";
                     }
-                    ret += ") ";
                     string mainLine = continuation(0).ToString();
                     if(mainLine != "")
                     {

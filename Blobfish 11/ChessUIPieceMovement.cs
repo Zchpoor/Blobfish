@@ -43,7 +43,7 @@ namespace Blobfish_11
         }
         private bool possibleToMove()
         {
-            return !ponderingWorker.IsBusy && gameIsGoingOn;
+            return !ponderingWorker.IsBusy;
         }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {

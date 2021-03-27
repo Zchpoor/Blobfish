@@ -13,7 +13,6 @@ namespace Blobfish_11
         PictureBox[,] Falt = new PictureBox[8, 8];
         Game game = new Game();
         bool retrospectMode = false;
-        bool gameIsGoingOn = true;
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
         Engine blobFish = new Engine();
@@ -96,13 +95,11 @@ namespace Blobfish_11
                 }
             }
             reset();
-            //testGameTree();
         }
         private void reset()
         {
             evalBox.Text = "Nytt parti";
             game.result = "*";
-            gameIsGoingOn = true;
             computerBlackToolStripMenuItem.Checked = true;
             game = new Game();
             display(game.currentPosition);
@@ -129,12 +126,10 @@ namespace Blobfish_11
             if (res != -2)
             {
                 resultPopUp(res);
-                gameIsGoingOn = false;
             }
             else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
-                gameIsGoingOn = false;
             }
             else if (engineIsToMove())
             {
@@ -143,10 +138,9 @@ namespace Blobfish_11
         }
         private void playBestEngineMove()
         {
-            if (!ponderingWorker.IsBusy && gameIsGoingOn)
+            if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
-                //evalBox.Text = "";
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 ponderingWorker.RunWorkerAsync();
@@ -173,12 +167,10 @@ namespace Blobfish_11
             if (decisiveResult != -2)
             {
                 resultPopUp(decisiveResult);
-                gameIsGoingOn = false;
             }
             else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
-                gameIsGoingOn = false;
             }
             else if (result.bestMove != null)
             {
@@ -227,7 +219,7 @@ namespace Blobfish_11
         }
         private void resultPopUp(int result)
         {
-            if (!gameIsGoingOn)
+            if (retrospectMode)
                 return;
             if (result > 1000)
             {
@@ -249,9 +241,7 @@ namespace Blobfish_11
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
                 game.result = "1/2-1/2";
             }
-            string[] tempPlayers = game.players; //Kommer ihåg vad players var innan.
-            computerNoneToolStripMenuItem.Checked = true; //Stänger av datorn, för att underlätta om man vill backa i partiet.
-            game.players = tempPlayers;          // Återställer player. Troligen detta man är intresserad av att spara.
+            retrospectMode = true;
         }
         private bool engineIsToMove()
         {
@@ -318,8 +308,7 @@ namespace Blobfish_11
                     else
                     {
                         setPonderingMode(false);
-                        if(gameIsGoingOn)
-                            printEval(res);
+                        printEval(res);
 
                         if (engineIsToMove())
                         {
@@ -437,6 +426,7 @@ namespace Blobfish_11
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  Avbryt inuti trådarna.
+ *  Minska behov av terräng i slutspel.
  *  
  *  Buggar:
  */

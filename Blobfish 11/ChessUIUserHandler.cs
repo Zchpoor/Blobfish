@@ -198,7 +198,6 @@ namespace Blobfish_11
                     try
                     {
                         Position pos = new Position(inputText);
-                        gameIsGoingOn = true;
                         game = new Game(pos);
                         display(pos);
                     }
