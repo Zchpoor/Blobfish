@@ -39,7 +39,7 @@ namespace Blobfish_11
 
                     using (var fileStream = new FileStream(sfd.FileName, FileMode.Create))
                     {
-                        //TODO: Hantera undantag
+                        //TODO: Färre än 80 tecken per rad.
                         text += "\n" + game.scoresheet();
                         text += game.result;
                         byte[] byteArray = Encoding.ASCII.GetBytes(text);
@@ -55,6 +55,26 @@ namespace Blobfish_11
             {
                 MessageBox.Show("Ett okänt inträffade.\nFelmeddelande:\n" + e.Message);
             }
+        }
+        public Game load()
+        {
+            return new Game();
+            string test = "a  (b (c  ))  d";
+            test = test.Replace("(", " ( ");
+            test = test.Replace(")", " ) ");
+            List<string> tokens = test.Split(' ').ToList();
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (tokens[i] == "")
+                {
+                    tokens.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+        private void parse(GameTree startingNode, string game)
+        {
+            
         }
     }
 }

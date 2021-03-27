@@ -91,7 +91,7 @@ namespace Blobfish_11
                 {
                     for (int i = 1; i < continuations.Count; i++)
                     {
-                        ret += " (";
+                        ret += "(";
                         ret += pos.moveCounter;
                         if (pos.whiteToMove)
                             ret += ".";

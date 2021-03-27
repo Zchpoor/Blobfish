@@ -77,7 +77,7 @@ namespace Blobfish_11
             ponderingWorker.CancelAsync();
             if (!computerBothToolStripMenuItem.Checked)
                 takeback(1);
-            evalBox.Text = "Beräkningen avbröts.";
+            scoresheetBox.Text = "Beräkningen avbröts.";
             ponderingTime = new TimeSpan(0);
             setPonderingMode(false);
         }
@@ -89,22 +89,22 @@ namespace Blobfish_11
             switch (lowerInput)
             {
                 case "test":
-                    evalBox.Text = Tests.runTests();
+                    scoresheetBox.Text = Tests.runTests();
                     break;
                 case "moves":
-                    evalBox.Text = "Alla drag:\n" + Environment.NewLine +
+                    scoresheetBox.Text = "Alla drag:\n" + Environment.NewLine +
                         getMovesString(blobFish.allValidMoves(game.currentPosition, false), game.currentPosition);
                     break;
                 case "drag":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine +
+                    scoresheetBox.Text = "Alla drag:" + Environment.NewLine +
                         getMovesString(blobFish.allValidMoves(game.currentPosition, false), game.currentPosition);
                     break;
                 case "sorted":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine +
+                    scoresheetBox.Text = "Alla drag:" + Environment.NewLine +
                         getMovesString(blobFish.allValidMoves(game.currentPosition, true), game.currentPosition);
                     break;
                 case "sorterade":
-                    evalBox.Text = "Alla drag:" + Environment.NewLine +
+                    scoresheetBox.Text = "Alla drag:" + Environment.NewLine +
                         getMovesString(blobFish.allValidMoves(game.currentPosition, true), game.currentPosition);
                     break;
                 case "takeback":
@@ -123,10 +123,10 @@ namespace Blobfish_11
                     takeback(1);
                     break;
                 case "scoresheet":
-                    evalBox.Text = game.scoresheet();
+                    scoresheetBox.Text = game.scoresheet();
                     break;
                 case "protokoll":
-                    evalBox.Text = game.scoresheet();
+                    scoresheetBox.Text = game.scoresheet();
                     break;
                 case "reset":
                     reset();
@@ -155,13 +155,7 @@ namespace Blobfish_11
                     break;
                 case "num":
                     float res = choosePlayingStyle().numericEval(game.currentPosition);
-                    evalBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res, 2).ToString();
-                    break;
-                case "time":
-                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
-                    break;
-                case "tid":
-                    evalBox.Text = "Tid som förbrukades förra draget: " + ponderingTime.ToString(@"mm\:ss");
+                    scoresheetBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res, 2).ToString();
                     break;
                 case "spec":
                     string posToEvaluate = "r1bq1rk1/pppnn1bp/3p4/3Pp1p1/2P1Pp2/2N2P2/PP2BBPP/R2QNRK1 w - - 0 13";
@@ -188,7 +182,7 @@ namespace Blobfish_11
                     }
                     sw.Stop();
                     t2 = sw.ElapsedMilliseconds;
-                    evalBox.Text = "Tider för 10000 iterationer (ms): "
+                    scoresheetBox.Text = "Tider för 10000 iterationer (ms): "
                         + "\r\n  Evaluering av ställning: " + t0.ToString()
                         + "\r\n  Alla drag (osorterade): " + t1.ToString()
                         + "\r\n  Alla drag (sorterade): " + t2.ToString()
@@ -203,7 +197,7 @@ namespace Blobfish_11
                     }
                     catch
                     {
-                        evalBox.Text = "Felaktig FEN!";
+                        scoresheetBox.Text = "Felaktig FEN!";
                         return;
                     }
                     break;
@@ -328,12 +322,8 @@ namespace Blobfish_11
         {
             if (!ponderingWorker.IsBusy)
             {
-                evalBox.Text = Tests.runTests();
+                scoresheetBox.Text = Tests.runTests();
             }
-        }
-        private void protokollToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            evalBox.Text = game.scoresheet();
         }
 
         private Engine choosePlayingStyle()

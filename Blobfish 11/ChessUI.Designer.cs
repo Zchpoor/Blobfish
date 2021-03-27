@@ -33,7 +33,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.fenButton = new System.Windows.Forms.Button();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.evalBox = new System.Windows.Forms.TextBox();
+            this.scoresheetBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
@@ -52,7 +52,6 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.partiToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.filpBoardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.protokollToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.taTillbakaDragToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -75,8 +74,13 @@
             this.style1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.style2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.style3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.computerMoveStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.evalStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timeSpentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ponderingPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
@@ -133,18 +137,18 @@
             this.boardPanel.Size = new System.Drawing.Size(640, 590);
             this.boardPanel.TabIndex = 5;
             // 
-            // evalBox
+            // scoresheetBox
             // 
-            this.evalBox.AcceptsReturn = true;
-            this.evalBox.AcceptsTab = true;
-            this.evalBox.Location = new System.Drawing.Point(670, 202);
-            this.evalBox.Multiline = true;
-            this.evalBox.Name = "evalBox";
-            this.evalBox.ReadOnly = true;
-            this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(239, 448);
-            this.evalBox.TabIndex = 7;
-            this.evalBox.TabStop = false;
+            this.scoresheetBox.AcceptsReturn = true;
+            this.scoresheetBox.AcceptsTab = true;
+            this.scoresheetBox.Location = new System.Drawing.Point(670, 86);
+            this.scoresheetBox.Multiline = true;
+            this.scoresheetBox.Name = "scoresheetBox";
+            this.scoresheetBox.ReadOnly = true;
+            this.scoresheetBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.scoresheetBox.Size = new System.Drawing.Size(298, 448);
+            this.scoresheetBox.TabIndex = 7;
+            this.scoresheetBox.TabStop = false;
             // 
             // toMoveLabel
             // 
@@ -179,17 +183,17 @@
             this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
-            this.ponderingPanel.Location = new System.Drawing.Point(669, 86);
+            this.ponderingPanel.Location = new System.Drawing.Point(670, 540);
             this.ponderingPanel.Name = "ponderingPanel";
-            this.ponderingPanel.Size = new System.Drawing.Size(240, 110);
+            this.ponderingPanel.Size = new System.Drawing.Size(299, 110);
             this.ponderingPanel.TabIndex = 11;
             this.ponderingPanel.Visible = false;
             // 
             // moveNowButton
             // 
-            this.moveNowButton.Location = new System.Drawing.Point(135, 63);
+            this.moveNowButton.Location = new System.Drawing.Point(177, 63);
             this.moveNowButton.Name = "moveNowButton";
-            this.moveNowButton.Size = new System.Drawing.Size(95, 39);
+            this.moveNowButton.Size = new System.Drawing.Size(115, 39);
             this.moveNowButton.TabIndex = 13;
             this.moveNowButton.Text = "Dra nu!";
             this.moveNowButton.UseVisualStyleBackColor = true;
@@ -209,7 +213,7 @@
             // 
             this.cancelButton.Location = new System.Drawing.Point(8, 63);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(95, 39);
+            this.cancelButton.Size = new System.Drawing.Size(115, 39);
             this.cancelButton.TabIndex = 11;
             this.cancelButton.Text = "Avbryt";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -240,7 +244,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.ShowItemToolTips = true;
-            this.menuStrip1.Size = new System.Drawing.Size(925, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(980, 28);
             this.menuStrip1.TabIndex = 14;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -294,7 +298,6 @@
             // 
             this.partiToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filpBoardToolStripMenuItem,
-            this.protokollToolStripMenuItem,
             this.toolStripSeparator1,
             this.taTillbakaDragToolStripMenuItem,
             this.toolStripSeparator2,
@@ -312,14 +315,6 @@
             this.filpBoardToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.filpBoardToolStripMenuItem.Text = "Vänd på brädet";
             this.filpBoardToolStripMenuItem.Click += new System.EventHandler(this.filpBoardToolStripMenuItem_Click);
-            // 
-            // protokollToolStripMenuItem
-            // 
-            this.protokollToolStripMenuItem.Name = "protokollToolStripMenuItem";
-            this.protokollToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.protokollToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
-            this.protokollToolStripMenuItem.Text = "Protokoll";
-            this.protokollToolStripMenuItem.Click += new System.EventHandler(this.protokollToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -365,7 +360,7 @@
             this.computerBlackToolStripMenuItem,
             this.computerBothToolStripMenuItem});
             this.engineColorMenuItem.Name = "engineColorMenuItem";
-            this.engineColorMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.engineColorMenuItem.Size = new System.Drawing.Size(224, 26);
             this.engineColorMenuItem.Text = "Färg";
             // 
             // computerNoneToolStripMenuItem
@@ -412,7 +407,7 @@
             this.depth5ToolStripMenuItem,
             this.depth6ToolStripMenuItem});
             this.depthToolStripMenuItem.Name = "depthToolStripMenuItem";
-            this.depthToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.depthToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.depthToolStripMenuItem.Text = "Djup";
             // 
             // depthAutoToolStripMenuItem
@@ -473,7 +468,7 @@
             this.style2ToolStripMenuItem,
             this.style3ToolStripMenuItem});
             this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
-            this.styleToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.styleToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.styleToolStripMenuItem.Text = "Spelstil";
             // 
             // style0ToolStripMenuItem
@@ -510,14 +505,66 @@
             this.style3ToolStripMenuItem.Text = "Experimentell";
             this.style3ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.computerMoveStatusLabel,
+            this.evalStatusLabel,
+            this.timeSpentStatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 654);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(980, 35);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 15;
+            // 
+            // computerMoveStatusLabel
+            // 
+            this.computerMoveStatusLabel.AutoSize = false;
+            this.computerMoveStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.computerMoveStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.computerMoveStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.computerMoveStatusLabel.Name = "computerMoveStatusLabel";
+            this.computerMoveStatusLabel.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.computerMoveStatusLabel.Size = new System.Drawing.Size(150, 29);
+            this.computerMoveStatusLabel.Text = "(default text)";
+            // 
+            // evalStatusLabel
+            // 
+            this.evalStatusLabel.AutoSize = false;
+            this.evalStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.evalStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.evalStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.evalStatusLabel.Name = "evalStatusLabel";
+            this.evalStatusLabel.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.evalStatusLabel.Size = new System.Drawing.Size(180, 29);
+            this.evalStatusLabel.Text = "(default text)";
+            // 
+            // timeSpentStatusLabel
+            // 
+            this.timeSpentStatusLabel.AutoSize = false;
+            this.timeSpentStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.timeSpentStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.timeSpentStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.timeSpentStatusLabel.Name = "timeSpentStatusLabel";
+            this.timeSpentStatusLabel.Size = new System.Drawing.Size(150, 29);
+            this.timeSpentStatusLabel.Text = "(default text)";
+            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(925, 663);
+            this.ClientSize = new System.Drawing.Size(980, 689);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
-            this.Controls.Add(this.evalBox);
+            this.Controls.Add(this.scoresheetBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
             this.Controls.Add(this.fenButton);
@@ -535,6 +582,8 @@
             this.ponderingPanel.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -546,7 +595,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button fenButton;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
-        private System.Windows.Forms.TextBox evalBox;
+        private System.Windows.Forms.TextBox scoresheetBox;
         private System.Windows.Forms.Label toMoveLabel;
         private System.ComponentModel.BackgroundWorker ponderingWorker;
         private System.Windows.Forms.Label ponderingLabel;
@@ -585,9 +634,12 @@
         private System.Windows.Forms.ToolStripMenuItem filpBoardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem testsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem protokollToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel computerMoveStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel evalStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel timeSpentStatusLabel;
     }
 }
 

@@ -100,7 +100,7 @@ namespace Blobfish_11
             if (!moveWasPlayed)
             {
                 if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
-                    evalBox.Text = "Felaktigt drag!";
+                    scoresheetBox.Text = "Felaktigt drag!";
                 (sender as PictureBox).Image = toOldImage;
                 if (!flipped)
                     Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;

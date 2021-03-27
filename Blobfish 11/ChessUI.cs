@@ -98,7 +98,10 @@ namespace Blobfish_11
         }
         private void reset()
         {
-            evalBox.Text = "Nytt parti";
+            scoresheetBox.Text = "Nytt parti.";
+            evalStatusLabel.Text = "";
+            computerMoveStatusLabel.Text = "";
+            timeSpentStatusLabel.Text = "";
             game.result = "*";
             computerBlackToolStripMenuItem.Checked = true;
             game = new Game();
@@ -106,6 +109,12 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
+            string sc = game.scoresheet();
+            sc = sc.Replace("(", "\r\n("); //Visar upp varianter på nya rader.
+            sc = sc.Replace(") ", ")\r\n");
+            scoresheetBox.Text = sc; //Uppdaterar protokollet.
+            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
+
             currentMoves = blobFish.allValidMoves(pos, false);
 
             for (int i = 0; i < 8; i++)
@@ -119,7 +128,6 @@ namespace Blobfish_11
                 }
             }
 
-            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             //TODO: Faktorisera ut med liknande kod nedan.
             int res = blobFish.decisiveResult(pos, currentMoves);
@@ -143,6 +151,9 @@ namespace Blobfish_11
                 blobFish = choosePlayingStyle();
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
+                computerMoveStatusLabel.Text = "";
+                evalStatusLabel.Text = "";
+                timeSpentStatusLabel.Text = "";
                 ponderingWorker.RunWorkerAsync();
             }
             setPonderingMode(true);
@@ -190,9 +201,9 @@ namespace Blobfish_11
                 {
                     textEval = Math.Round(eval, 2).ToString();
                 }
-                String completeString = "Bästa drag: " + result.bestMove.toString(game.currentPosition) +
-                    Environment.NewLine + "Datorns evaluering: " + textEval;
-                evalBox.Text = completeString;
+                computerMoveStatusLabel.Text = "Datorn spelade: " + result.bestMove.toString(game.currentPosition);
+                evalStatusLabel.Text = "Datorns evaluering: " + textEval;
+                timeSpentStatusLabel.Text = "Förbrukad tid: " + ponderingTime.ToString(@"mm\:ss");
             }
             else
             {
@@ -205,7 +216,7 @@ namespace Blobfish_11
             retrospectMode = false;
             display(game.currentPosition);
         }
-        public void takeback(int numberOfMoves)
+        private void takeback(int numberOfMoves)
         {
             try
             {
@@ -319,7 +330,7 @@ namespace Blobfish_11
                 catch (Exception exc)
                 {
                     MessageBox.Show(exc.Message);
-                    evalBox.Text = "Ett fel inträffade.";
+                    scoresheetBox.Text = "Ett fel inträffade.";
                     takeback(1);
                     setPonderingMode(false);
 
