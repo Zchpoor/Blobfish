@@ -33,7 +33,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.fenButton = new System.Windows.Forms.Button();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.scoresheetBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
@@ -78,6 +77,7 @@
             this.computerMoveStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.evalStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.timeSpentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.scoresheetBox = new System.Windows.Forms.RichTextBox();
             this.ponderingPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -136,19 +136,6 @@
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.Size = new System.Drawing.Size(640, 590);
             this.boardPanel.TabIndex = 5;
-            // 
-            // scoresheetBox
-            // 
-            this.scoresheetBox.AcceptsReturn = true;
-            this.scoresheetBox.AcceptsTab = true;
-            this.scoresheetBox.Location = new System.Drawing.Point(670, 86);
-            this.scoresheetBox.Multiline = true;
-            this.scoresheetBox.Name = "scoresheetBox";
-            this.scoresheetBox.ReadOnly = true;
-            this.scoresheetBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.scoresheetBox.Size = new System.Drawing.Size(298, 448);
-            this.scoresheetBox.TabIndex = 7;
-            this.scoresheetBox.TabStop = false;
             // 
             // toMoveLabel
             // 
@@ -360,7 +347,7 @@
             this.computerBlackToolStripMenuItem,
             this.computerBothToolStripMenuItem});
             this.engineColorMenuItem.Name = "engineColorMenuItem";
-            this.engineColorMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.engineColorMenuItem.Size = new System.Drawing.Size(140, 26);
             this.engineColorMenuItem.Text = "Färg";
             // 
             // computerNoneToolStripMenuItem
@@ -407,7 +394,7 @@
             this.depth5ToolStripMenuItem,
             this.depth6ToolStripMenuItem});
             this.depthToolStripMenuItem.Name = "depthToolStripMenuItem";
-            this.depthToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.depthToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
             this.depthToolStripMenuItem.Text = "Djup";
             // 
             // depthAutoToolStripMenuItem
@@ -468,7 +455,7 @@
             this.style2ToolStripMenuItem,
             this.style3ToolStripMenuItem});
             this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
-            this.styleToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.styleToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
             this.styleToolStripMenuItem.Text = "Spelstil";
             // 
             // style0ToolStripMenuItem
@@ -556,15 +543,25 @@
             this.timeSpentStatusLabel.Size = new System.Drawing.Size(150, 29);
             this.timeSpentStatusLabel.Text = "(default text)";
             // 
+            // scoresheetBox
+            // 
+            this.scoresheetBox.DetectUrls = false;
+            this.scoresheetBox.Location = new System.Drawing.Point(670, 86);
+            this.scoresheetBox.Name = "scoresheetBox";
+            this.scoresheetBox.ReadOnly = true;
+            this.scoresheetBox.Size = new System.Drawing.Size(299, 448);
+            this.scoresheetBox.TabIndex = 16;
+            this.scoresheetBox.Text = "";
+            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(980, 689);
+            this.Controls.Add(this.scoresheetBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
-            this.Controls.Add(this.scoresheetBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
             this.Controls.Add(this.fenButton);
@@ -595,7 +592,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button fenButton;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
-        private System.Windows.Forms.TextBox scoresheetBox;
         private System.Windows.Forms.Label toMoveLabel;
         private System.ComponentModel.BackgroundWorker ponderingWorker;
         private System.Windows.Forms.Label ponderingLabel;
@@ -640,6 +636,7 @@
         private System.Windows.Forms.ToolStripStatusLabel computerMoveStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel evalStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel timeSpentStatusLabel;
+        private System.Windows.Forms.RichTextBox scoresheetBox;
     }
 }
 

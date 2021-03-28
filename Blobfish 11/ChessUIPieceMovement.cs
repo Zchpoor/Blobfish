@@ -92,7 +92,6 @@ namespace Blobfish_11
                 {
                     (sender as PictureBox).Image = fromImage;
                     this.playMove(item);
-                    display(game.currentPosition);
                     moveWasPlayed = true;
                     break;
                 }

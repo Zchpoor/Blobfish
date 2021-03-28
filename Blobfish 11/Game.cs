@@ -66,7 +66,20 @@ namespace Blobfish_11
         }
         public string scoresheet()
         {
-            return firstGameTreeNode.ToString();
+            return firstGameTreeNode.toString(null);
+        }
+        public string RTFScoresheet()
+        {
+            string sc = firstGameTreeNode.toString(gameTree);
+            sc = sc.Replace("(", @"\line ("); //Visar upp varianter på nya rader.
+            sc = sc.Replace(") ", @")\line ");
+            sc = sc.Replace(@"\line \line", @"\line"); //Tar bort dubbla nyrader.
+            var sb2 = new StringBuilder();
+            sb2.Append(@"{\rtf1\ansi ");
+            sb2.Append(sc);
+            sb2.Append(@" \line }");
+            string tmp2 = sb2.ToString();
+            return @"{\rtf1\ansi " + sc + @" }";
         }
         public void mainContinuation()
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -109,10 +110,9 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
-            string sc = game.scoresheet();
-            sc = sc.Replace("(", "\r\n("); //Visar upp varianter på nya rader.
-            sc = sc.Replace(") ", ")\r\n");
-            scoresheetBox.Text = sc; //Uppdaterar protokollet.
+            string rtfs = game.RTFScoresheet();
+            scoresheetBox.Clear();
+            scoresheetBox.Rtf = rtfs; //Uppdaterar protokollet.
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             currentMoves = blobFish.allValidMoves(pos, false);
@@ -152,7 +152,7 @@ namespace Blobfish_11
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 computerMoveStatusLabel.Text = "";
-                evalStatusLabel.Text = "";
+                //evalStatusLabel.Text = "";
                 timeSpentStatusLabel.Text = "";
                 ponderingWorker.RunWorkerAsync();
             }

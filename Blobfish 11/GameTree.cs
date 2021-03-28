@@ -77,33 +77,49 @@ namespace Blobfish_11
             //TODO: behövs denna?
             return continuations[i].Item1;
         }
-        public override string ToString()
+        public string toString(GameTree nodeToBeBald)
         {
             string ret = "";
             if (continuations.Count > 0)
             {
+                if(continuation(0) == nodeToBeBald)
+                {
+                    ret += @"\b ";
+                }
                 if (pos.whiteToMove)
                 {
                     ret += pos.moveCounter + ".";
                 }
                 ret += getMove(0).toString(pos) + " ";
+                if (continuation(0) == nodeToBeBald)
+                {
+                    ret += @"\b0 ";
+                }
                 if (continuations.Count > 1)
                 {
                     for (int i = 1; i < continuations.Count; i++)
                     {
                         ret += "(";
+                        if (continuation(i) == nodeToBeBald)
+                        {
+                            ret += @"\b ";
+                        }
                         ret += pos.moveCounter;
                         if (pos.whiteToMove)
                             ret += ".";
                         else
                             ret += "...";
                         ret += getMove(i).toString(pos);
-                        string cont = continuation(i).ToString();
+                        if (continuation(i) == nodeToBeBald)
+                        {
+                            ret += @"\b0 ";
+                        }
+                        string cont = continuation(i).toString(nodeToBeBald);
                         if (cont != "")
                             ret += " " + cont;
                         ret += ") ";
                     }
-                    string mainLine = continuation(0).ToString();
+                    string mainLine = continuation(0).toString(nodeToBeBald);
                     if(mainLine != "")
                     {
                         if (pos.whiteToMove)
@@ -116,7 +132,7 @@ namespace Blobfish_11
                 }
                 else
                 {
-                    ret += continuation(0).ToString();
+                    ret += continuation(0).toString(nodeToBeBald);
                 }
             }
             return ret;
