@@ -74,7 +74,6 @@ namespace Blobfish_11
         }
         private Move getMove(int i)
         {
-            //TODO: behövs denna?
             return continuations[i].Item1;
         }
         public string toString(GameTree nodeToBeBald)

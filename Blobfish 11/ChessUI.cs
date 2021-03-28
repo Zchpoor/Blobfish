@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -99,7 +98,6 @@ namespace Blobfish_11
         }
         private void reset()
         {
-            scoresheetBox.Text = "Nytt parti.";
             evalStatusLabel.Text = "";
             computerMoveStatusLabel.Text = "";
             timeSpentStatusLabel.Text = "";
@@ -110,9 +108,7 @@ namespace Blobfish_11
         }
         private void display(Position pos)
         {
-            string rtfs = game.RTFScoresheet();
-            scoresheetBox.Clear();
-            scoresheetBox.Rtf = rtfs; //Uppdaterar protokollet.
+            updateScoresheetBox();
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             currentMoves = blobFish.allValidMoves(pos, false);
@@ -142,6 +138,19 @@ namespace Blobfish_11
             else if (engineIsToMove())
             {
                 playBestEngineMove();
+            }
+        }
+        private void updateScoresheetBox()
+        {
+            string rtfs = game.RTFScoresheet();
+            scoresheetBox.Clear();
+            if (rtfs.Equals(""))
+            {
+                scoresheetBox.Text = "Nytt parti.";
+            }
+            else
+            {
+                scoresheetBox.Rtf = game.RTFScoresheet(); //Uppdaterar protokollet.
             }
         }
         private void playBestEngineMove()

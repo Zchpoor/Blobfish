@@ -549,6 +549,7 @@
             this.scoresheetBox.Location = new System.Drawing.Point(670, 86);
             this.scoresheetBox.Name = "scoresheetBox";
             this.scoresheetBox.ReadOnly = true;
+            this.scoresheetBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.scoresheetBox.Size = new System.Drawing.Size(299, 448);
             this.scoresheetBox.TabIndex = 16;
             this.scoresheetBox.Text = "";
