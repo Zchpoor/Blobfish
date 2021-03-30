@@ -14,8 +14,9 @@ namespace Blobfish_11
         public SecureFloat moveNowFlag = new SecureFloat(0f);
         public EvalResult eval(Position pos, int minDepth)
         {
+
             //Om minDepth är -1, skall datorn själv bestämma djup.
-            if(minDepth == -1)
+            if (minDepth == -1)
             {
                 minDepth = automaticDepth(pos);
             }
@@ -37,6 +38,7 @@ namespace Blobfish_11
 
                 if (moves.Count == 1)
                 {
+                    //Spela forcerande drag omedelbart?
                     EvalResult res = eval(moves[0].execute(pos), minDepth-1);
                     result.evaluation = evaluationStep(res.evaluation);
                     result.allMoves = moves;
@@ -76,7 +78,7 @@ namespace Blobfish_11
                     {
                         threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
                     });
-                    thread.Name = currentMove.toString(pos.board);
+                    thread.Name = currentMove.toString(pos);
                     thread.Start();
                     threadList.Add(thread);
 
@@ -244,8 +246,8 @@ namespace Blobfish_11
         {
             /* 
              * [rank, line]
-             * rank==0       -> rad 8.
-             * rank==7       -> rad 1.
+             * rank==0    -> rad 8.
+             * rank==7    -> rad 1.
              * line==0    -> a-linjen.
              * line==7    -> h-linjen.
              */
@@ -315,15 +317,7 @@ namespace Blobfish_11
                             pieceValue += pieceValues[3] * rook[rank, line];
                             heavyMaterial[1] += 5;
                             break;
-
-                        case 'k':
-                            pos.kingPositions[0] = new Square(rank, line);
-                            break;
-
-                        case 'K':
-                            pos.kingPositions[1] = new Square(rank, line);
-                            break;
-
+                        
                         case 'q':
                             pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;

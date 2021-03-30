@@ -33,54 +33,68 @@
             this.label1 = new System.Windows.Forms.Label();
             this.fenButton = new System.Windows.Forms.Button();
             this.boardPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.evalBox = new System.Windows.Forms.TextBox();
             this.toMoveLabel = new System.Windows.Forms.Label();
-            this.compColorBox = new System.Windows.Forms.GroupBox();
-            this.computerRBBoth = new System.Windows.Forms.RadioButton();
-            this.computerRBBlack = new System.Windows.Forms.RadioButton();
-            this.computerRBWhite = new System.Windows.Forms.RadioButton();
-            this.computerRBNone = new System.Windows.Forms.RadioButton();
             this.ponderingWorker = new System.ComponentModel.BackgroundWorker();
             this.ponderingLabel = new System.Windows.Forms.Label();
             this.ponderingPanel = new System.Windows.Forms.Panel();
+            this.moveNowButton = new System.Windows.Forms.Button();
             this.ponderingTimeLabel = new System.Windows.Forms.Label();
             this.cancelButton = new System.Windows.Forms.Button();
             this.ponderingTimer = new System.Windows.Forms.Timer(this.components);
-            this.settingsPanel = new System.Windows.Forms.Panel();
-            this.depthBox = new System.Windows.Forms.GroupBox();
-            this.depthRB5 = new System.Windows.Forms.RadioButton();
-            this.depthRB6 = new System.Windows.Forms.RadioButton();
-            this.depthRBAuto = new System.Windows.Forms.RadioButton();
-            this.depthRB4 = new System.Windows.Forms.RadioButton();
-            this.depthRB3 = new System.Windows.Forms.RadioButton();
-            this.depthRB2 = new System.Windows.Forms.RadioButton();
-            this.playStyleBox = new System.Windows.Forms.GroupBox();
-            this.playStyleRB3 = new System.Windows.Forms.RadioButton();
-            this.playStyleRB2 = new System.Windows.Forms.RadioButton();
-            this.playStyleRB1 = new System.Windows.Forms.RadioButton();
-            this.playStyleRB0 = new System.Windows.Forms.RadioButton();
-            this.label2 = new System.Windows.Forms.Label();
             this.moveLabel = new System.Windows.Forms.Label();
-            this.moveNowButton = new System.Windows.Forms.Button();
-            this.compColorBox.SuspendLayout();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.partiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.testsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.partiToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.filpBoardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.taTillbakaDragToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.startaOmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.motorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.engineColorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.computerNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.computerWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.computerBlackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.computerBothToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depthToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depthAutoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depth2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depth3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depth4ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depth5ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.depth6ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.styleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.style0ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.style1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.style2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.style3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.computerMoveStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.evalStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timeSpentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.scoresheetBox = new System.Windows.Forms.RichTextBox();
             this.ponderingPanel.SuspendLayout();
-            this.settingsPanel.SuspendLayout();
-            this.depthBox.SuspendLayout();
-            this.playStyleBox.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // fenBox
             // 
-            this.fenBox.Location = new System.Drawing.Point(95, 6);
+            this.fenBox.Location = new System.Drawing.Point(95, 35);
             this.fenBox.Name = "fenBox";
-            this.fenBox.Size = new System.Drawing.Size(609, 22);
+            this.fenBox.Size = new System.Drawing.Size(733, 22);
             this.fenBox.TabIndex = 0;
             this.fenBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.fenBox_KeyDown);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(12, 38);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(76, 17);
             this.label1.TabIndex = 1;
@@ -88,7 +102,7 @@
             // 
             // fenButton
             // 
-            this.fenButton.Location = new System.Drawing.Point(710, 5);
+            this.fenButton.Location = new System.Drawing.Point(834, 34);
             this.fenButton.Name = "fenButton";
             this.fenButton.Size = new System.Drawing.Size(75, 24);
             this.fenButton.TabIndex = 2;
@@ -108,7 +122,7 @@
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.boardPanel.Location = new System.Drawing.Point(15, 31);
+            this.boardPanel.Location = new System.Drawing.Point(15, 60);
             this.boardPanel.Margin = new System.Windows.Forms.Padding(0);
             this.boardPanel.Name = "boardPanel";
             this.boardPanel.RowCount = 8;
@@ -120,94 +134,18 @@
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.boardPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.boardPanel.Size = new System.Drawing.Size(480, 480);
+            this.boardPanel.Size = new System.Drawing.Size(640, 590);
             this.boardPanel.TabIndex = 5;
-            // 
-            // evalBox
-            // 
-            this.evalBox.AcceptsReturn = true;
-            this.evalBox.AcceptsTab = true;
-            this.evalBox.Location = new System.Drawing.Point(844, 6);
-            this.evalBox.Multiline = true;
-            this.evalBox.Name = "evalBox";
-            this.evalBox.ReadOnly = true;
-            this.evalBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.evalBox.Size = new System.Drawing.Size(254, 518);
-            this.evalBox.TabIndex = 7;
-            this.evalBox.TabStop = false;
             // 
             // toMoveLabel
             // 
             this.toMoveLabel.AutoSize = true;
             this.toMoveLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.toMoveLabel.Location = new System.Drawing.Point(550, 31);
+            this.toMoveLabel.Location = new System.Drawing.Point(666, 63);
             this.toMoveLabel.Name = "toMoveLabel";
             this.toMoveLabel.Size = new System.Drawing.Size(103, 20);
             this.toMoveLabel.TabIndex = 8;
             this.toMoveLabel.Text = "(default text)";
-            // 
-            // compColorBox
-            // 
-            this.compColorBox.Controls.Add(this.computerRBBoth);
-            this.compColorBox.Controls.Add(this.computerRBBlack);
-            this.compColorBox.Controls.Add(this.computerRBWhite);
-            this.compColorBox.Controls.Add(this.computerRBNone);
-            this.compColorBox.Location = new System.Drawing.Point(9, 3);
-            this.compColorBox.Name = "compColorBox";
-            this.compColorBox.Size = new System.Drawing.Size(130, 132);
-            this.compColorBox.TabIndex = 9;
-            this.compColorBox.TabStop = false;
-            this.compColorBox.Text = "Färg";
-            // 
-            // computerRBBoth
-            // 
-            this.computerRBBoth.AutoSize = true;
-            this.computerRBBoth.Location = new System.Drawing.Point(6, 102);
-            this.computerRBBoth.Name = "computerRBBoth";
-            this.computerRBBoth.Size = new System.Drawing.Size(70, 21);
-            this.computerRBBoth.TabIndex = 6;
-            this.computerRBBoth.Text = "Bägge";
-            this.computerRBBoth.UseVisualStyleBackColor = true;
-            this.computerRBBoth.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.computerRBBoth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // computerRBBlack
-            // 
-            this.computerRBBlack.AutoSize = true;
-            this.computerRBBlack.Checked = true;
-            this.computerRBBlack.Location = new System.Drawing.Point(6, 75);
-            this.computerRBBlack.Name = "computerRBBlack";
-            this.computerRBBlack.Size = new System.Drawing.Size(62, 21);
-            this.computerRBBlack.TabIndex = 5;
-            this.computerRBBlack.TabStop = true;
-            this.computerRBBlack.Text = "Svart";
-            this.computerRBBlack.UseVisualStyleBackColor = true;
-            this.computerRBBlack.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.computerRBBlack.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // computerRBWhite
-            // 
-            this.computerRBWhite.AutoSize = true;
-            this.computerRBWhite.Location = new System.Drawing.Point(6, 48);
-            this.computerRBWhite.Name = "computerRBWhite";
-            this.computerRBWhite.Size = new System.Drawing.Size(45, 21);
-            this.computerRBWhite.TabIndex = 4;
-            this.computerRBWhite.Text = "Vit";
-            this.computerRBWhite.UseVisualStyleBackColor = true;
-            this.computerRBWhite.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.computerRBWhite.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // computerRBNone
-            // 
-            this.computerRBNone.AutoSize = true;
-            this.computerRBNone.Location = new System.Drawing.Point(6, 21);
-            this.computerRBNone.Name = "computerRBNone";
-            this.computerRBNone.Size = new System.Drawing.Size(101, 21);
-            this.computerRBNone.TabIndex = 3;
-            this.computerRBNone.Text = "Ingen dator";
-            this.computerRBNone.UseVisualStyleBackColor = true;
-            this.computerRBNone.CheckedChanged += new System.EventHandler(this.radioButtons_CheckedChanged);
-            this.computerRBNone.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
             // 
             // ponderingWorker
             // 
@@ -232,11 +170,21 @@
             this.ponderingPanel.Controls.Add(this.ponderingTimeLabel);
             this.ponderingPanel.Controls.Add(this.cancelButton);
             this.ponderingPanel.Controls.Add(this.ponderingLabel);
-            this.ponderingPanel.Location = new System.Drawing.Point(553, 54);
+            this.ponderingPanel.Location = new System.Drawing.Point(670, 540);
             this.ponderingPanel.Name = "ponderingPanel";
-            this.ponderingPanel.Size = new System.Drawing.Size(227, 110);
+            this.ponderingPanel.Size = new System.Drawing.Size(299, 110);
             this.ponderingPanel.TabIndex = 11;
             this.ponderingPanel.Visible = false;
+            // 
+            // moveNowButton
+            // 
+            this.moveNowButton.Location = new System.Drawing.Point(177, 63);
+            this.moveNowButton.Name = "moveNowButton";
+            this.moveNowButton.Size = new System.Drawing.Size(115, 39);
+            this.moveNowButton.TabIndex = 13;
+            this.moveNowButton.Text = "Dra nu!";
+            this.moveNowButton.UseVisualStyleBackColor = true;
+            this.moveNowButton.Click += new System.EventHandler(this.moveNowButton_Click);
             // 
             // ponderingTimeLabel
             // 
@@ -252,7 +200,7 @@
             // 
             this.cancelButton.Location = new System.Drawing.Point(8, 63);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(95, 39);
+            this.cancelButton.Size = new System.Drawing.Size(115, 39);
             this.cancelButton.TabIndex = 11;
             this.cancelButton.Text = "Avbryt";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -263,223 +211,377 @@
             this.ponderingTimer.Interval = 500;
             this.ponderingTimer.Tick += new System.EventHandler(this.ponderingTimer_Tick);
             // 
-            // settingsPanel
-            // 
-            this.settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.settingsPanel.Controls.Add(this.depthBox);
-            this.settingsPanel.Controls.Add(this.playStyleBox);
-            this.settingsPanel.Controls.Add(this.compColorBox);
-            this.settingsPanel.Location = new System.Drawing.Point(554, 187);
-            this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(285, 337);
-            this.settingsPanel.TabIndex = 12;
-            // 
-            // depthBox
-            // 
-            this.depthBox.Controls.Add(this.depthRB5);
-            this.depthBox.Controls.Add(this.depthRB6);
-            this.depthBox.Controls.Add(this.depthRBAuto);
-            this.depthBox.Controls.Add(this.depthRB4);
-            this.depthBox.Controls.Add(this.depthRB3);
-            this.depthBox.Controls.Add(this.depthRB2);
-            this.depthBox.Location = new System.Drawing.Point(9, 141);
-            this.depthBox.Name = "depthBox";
-            this.depthBox.Size = new System.Drawing.Size(271, 188);
-            this.depthBox.TabIndex = 10;
-            this.depthBox.TabStop = false;
-            this.depthBox.Text = "Djup";
-            // 
-            // depthRB5
-            // 
-            this.depthRB5.AutoSize = true;
-            this.depthRB5.Location = new System.Drawing.Point(6, 129);
-            this.depthRB5.Name = "depthRB5";
-            this.depthRB5.Size = new System.Drawing.Size(117, 21);
-            this.depthRB5.TabIndex = 8;
-            this.depthRB5.Text = "5   (Långsam)";
-            this.depthRB5.UseVisualStyleBackColor = true;
-            this.depthRB5.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRB5.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // depthRB6
-            // 
-            this.depthRB6.AutoSize = true;
-            this.depthRB6.Location = new System.Drawing.Point(6, 156);
-            this.depthRB6.Name = "depthRB6";
-            this.depthRB6.Size = new System.Drawing.Size(160, 21);
-            this.depthRB6.TabIndex = 7;
-            this.depthRB6.Text = "6   (Mycket långsam)";
-            this.depthRB6.UseVisualStyleBackColor = true;
-            this.depthRB6.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRB6.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // depthRBAuto
-            // 
-            this.depthRBAuto.AutoSize = true;
-            this.depthRBAuto.Checked = true;
-            this.depthRBAuto.Location = new System.Drawing.Point(6, 21);
-            this.depthRBAuto.Name = "depthRBAuto";
-            this.depthRBAuto.Size = new System.Drawing.Size(98, 21);
-            this.depthRBAuto.TabIndex = 6;
-            this.depthRBAuto.TabStop = true;
-            this.depthRBAuto.Text = "Automatisk";
-            this.depthRBAuto.UseVisualStyleBackColor = true;
-            this.depthRBAuto.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRBAuto.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // depthRB4
-            // 
-            this.depthRB4.AutoSize = true;
-            this.depthRB4.Location = new System.Drawing.Point(6, 102);
-            this.depthRB4.Name = "depthRB4";
-            this.depthRB4.Size = new System.Drawing.Size(104, 21);
-            this.depthRB4.TabIndex = 5;
-            this.depthRB4.Text = "4   (Normal)";
-            this.depthRB4.UseVisualStyleBackColor = true;
-            this.depthRB4.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRB4.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // depthRB3
-            // 
-            this.depthRB3.AutoSize = true;
-            this.depthRB3.Location = new System.Drawing.Point(6, 75);
-            this.depthRB3.Name = "depthRB3";
-            this.depthRB3.Size = new System.Drawing.Size(100, 21);
-            this.depthRB3.TabIndex = 4;
-            this.depthRB3.Text = "3   (Snabb)";
-            this.depthRB3.UseVisualStyleBackColor = true;
-            this.depthRB3.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRB3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // depthRB2
-            // 
-            this.depthRB2.AutoSize = true;
-            this.depthRB2.Location = new System.Drawing.Point(6, 48);
-            this.depthRB2.Name = "depthRB2";
-            this.depthRB2.Size = new System.Drawing.Size(146, 21);
-            this.depthRB2.TabIndex = 3;
-            this.depthRB2.Text = "2   (Mycket snabb)";
-            this.depthRB2.UseVisualStyleBackColor = true;
-            this.depthRB2.CheckedChanged += new System.EventHandler(this.depthRB_CheckedChanged);
-            this.depthRB2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // playStyleBox
-            // 
-            this.playStyleBox.Controls.Add(this.playStyleRB3);
-            this.playStyleBox.Controls.Add(this.playStyleRB2);
-            this.playStyleBox.Controls.Add(this.playStyleRB1);
-            this.playStyleBox.Controls.Add(this.playStyleRB0);
-            this.playStyleBox.Location = new System.Drawing.Point(145, 3);
-            this.playStyleBox.Name = "playStyleBox";
-            this.playStyleBox.Size = new System.Drawing.Size(135, 132);
-            this.playStyleBox.TabIndex = 10;
-            this.playStyleBox.TabStop = false;
-            this.playStyleBox.Text = "Spelstil";
-            // 
-            // playStyleRB3
-            // 
-            this.playStyleRB3.AutoSize = true;
-            this.playStyleRB3.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.playStyleRB3.Location = new System.Drawing.Point(6, 102);
-            this.playStyleRB3.Name = "playStyleRB3";
-            this.playStyleRB3.Size = new System.Drawing.Size(113, 21);
-            this.playStyleRB3.TabIndex = 6;
-            this.playStyleRB3.Text = "Experimentell";
-            this.playStyleRB3.UseVisualStyleBackColor = true;
-            this.playStyleRB3.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // playStyleRB2
-            // 
-            this.playStyleRB2.AutoSize = true;
-            this.playStyleRB2.Location = new System.Drawing.Point(6, 75);
-            this.playStyleRB2.Name = "playStyleRB2";
-            this.playStyleRB2.Size = new System.Drawing.Size(91, 21);
-            this.playStyleRB2.TabIndex = 5;
-            this.playStyleRB2.Text = "Aggressiv";
-            this.playStyleRB2.UseVisualStyleBackColor = true;
-            this.playStyleRB2.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // playStyleRB1
-            // 
-            this.playStyleRB1.AutoSize = true;
-            this.playStyleRB1.Location = new System.Drawing.Point(6, 48);
-            this.playStyleRB1.Name = "playStyleRB1";
-            this.playStyleRB1.Size = new System.Drawing.Size(82, 21);
-            this.playStyleRB1.TabIndex = 4;
-            this.playStyleRB1.Text = "Försiktig";
-            this.playStyleRB1.UseVisualStyleBackColor = true;
-            this.playStyleRB1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // playStyleRB0
-            // 
-            this.playStyleRB0.AutoSize = true;
-            this.playStyleRB0.Checked = true;
-            this.playStyleRB0.Location = new System.Drawing.Point(6, 21);
-            this.playStyleRB0.Name = "playStyleRB0";
-            this.playStyleRB0.Size = new System.Drawing.Size(74, 21);
-            this.playStyleRB0.TabIndex = 3;
-            this.playStyleRB0.TabStop = true;
-            this.playStyleRB0.Text = "Normal";
-            this.playStyleRB0.UseVisualStyleBackColor = true;
-            this.playStyleRB0.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.radioButton_PreviewKeyDown);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(551, 167);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(88, 17);
-            this.label2.TabIndex = 13;
-            this.label2.Text = "Inställningar:";
-            // 
             // moveLabel
             // 
             this.moveLabel.AutoSize = true;
-            this.moveLabel.Location = new System.Drawing.Point(704, 31);
+            this.moveLabel.Location = new System.Drawing.Point(823, 63);
             this.moveLabel.Name = "moveLabel";
             this.moveLabel.Size = new System.Drawing.Size(87, 17);
             this.moveLabel.TabIndex = 6;
             this.moveLabel.Text = "(default text)";
             // 
-            // moveNowButton
+            // menuStrip1
             // 
-            this.moveNowButton.Location = new System.Drawing.Point(125, 64);
-            this.moveNowButton.Name = "moveNowButton";
-            this.moveNowButton.Size = new System.Drawing.Size(95, 39);
-            this.moveNowButton.TabIndex = 13;
-            this.moveNowButton.Text = "Dra nu!";
-            this.moveNowButton.UseVisualStyleBackColor = true;
-            this.moveNowButton.Click += new System.EventHandler(this.moveNowButton_Click);
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.partiToolStripMenuItem,
+            this.partiToolStripMenuItem1,
+            this.motorToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.ShowItemToolTips = true;
+            this.menuStrip1.Size = new System.Drawing.Size(980, 28);
+            this.menuStrip1.TabIndex = 14;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // partiToolStripMenuItem
+            // 
+            this.partiToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.testsToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.closeToolStripMenuItem});
+            this.partiToolStripMenuItem.Name = "partiToolStripMenuItem";
+            this.partiToolStripMenuItem.Size = new System.Drawing.Size(80, 24);
+            this.partiToolStripMenuItem.Text = "Program";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.saveToolStripMenuItem.Text = "Spara parti";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(212, 6);
+            // 
+            // testsToolStripMenuItem
+            // 
+            this.testsToolStripMenuItem.Name = "testsToolStripMenuItem";
+            this.testsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
+            this.testsToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.testsToolStripMenuItem.Text = "Kör tester";
+            this.testsToolStripMenuItem.Click += new System.EventHandler(this.testsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(212, 6);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.closeToolStripMenuItem.Text = "Stäng";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
+            // 
+            // partiToolStripMenuItem1
+            // 
+            this.partiToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.filpBoardToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.taTillbakaDragToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.startaOmToolStripMenuItem});
+            this.partiToolStripMenuItem1.Name = "partiToolStripMenuItem1";
+            this.partiToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Z)));
+            this.partiToolStripMenuItem1.Size = new System.Drawing.Size(52, 24);
+            this.partiToolStripMenuItem1.Text = "Parti";
+            // 
+            // filpBoardToolStripMenuItem
+            // 
+            this.filpBoardToolStripMenuItem.Name = "filpBoardToolStripMenuItem";
+            this.filpBoardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.filpBoardToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
+            this.filpBoardToolStripMenuItem.Text = "Vänd på brädet";
+            this.filpBoardToolStripMenuItem.Click += new System.EventHandler(this.filpBoardToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(242, 6);
+            // 
+            // taTillbakaDragToolStripMenuItem
+            // 
+            this.taTillbakaDragToolStripMenuItem.Name = "taTillbakaDragToolStripMenuItem";
+            this.taTillbakaDragToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this.taTillbakaDragToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
+            this.taTillbakaDragToolStripMenuItem.Text = "Ta tillbaka drag";
+            this.taTillbakaDragToolStripMenuItem.Click += new System.EventHandler(this.taTillbakaDragToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(242, 6);
+            // 
+            // startaOmToolStripMenuItem
+            // 
+            this.startaOmToolStripMenuItem.Name = "startaOmToolStripMenuItem";
+            this.startaOmToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.startaOmToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
+            this.startaOmToolStripMenuItem.Text = "Starta nytt";
+            this.startaOmToolStripMenuItem.Click += new System.EventHandler(this.startaOmToolStripMenuItem_Click);
+            // 
+            // motorToolStripMenuItem
+            // 
+            this.motorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.engineColorMenuItem,
+            this.depthToolStripMenuItem,
+            this.styleToolStripMenuItem});
+            this.motorToolStripMenuItem.Name = "motorToolStripMenuItem";
+            this.motorToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
+            this.motorToolStripMenuItem.Text = "Motor";
+            // 
+            // engineColorMenuItem
+            // 
+            this.engineColorMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.computerNoneToolStripMenuItem,
+            this.computerWhiteToolStripMenuItem,
+            this.computerBlackToolStripMenuItem,
+            this.computerBothToolStripMenuItem});
+            this.engineColorMenuItem.Name = "engineColorMenuItem";
+            this.engineColorMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.engineColorMenuItem.Text = "Färg";
+            // 
+            // computerNoneToolStripMenuItem
+            // 
+            this.computerNoneToolStripMenuItem.CheckOnClick = true;
+            this.computerNoneToolStripMenuItem.Name = "computerNoneToolStripMenuItem";
+            this.computerNoneToolStripMenuItem.Size = new System.Drawing.Size(174, 26);
+            this.computerNoneToolStripMenuItem.Text = "Ingen motor";
+            this.computerNoneToolStripMenuItem.CheckedChanged += new System.EventHandler(this.engineColor_CheckedChanged);
+            // 
+            // computerWhiteToolStripMenuItem
+            // 
+            this.computerWhiteToolStripMenuItem.CheckOnClick = true;
+            this.computerWhiteToolStripMenuItem.Name = "computerWhiteToolStripMenuItem";
+            this.computerWhiteToolStripMenuItem.Size = new System.Drawing.Size(174, 26);
+            this.computerWhiteToolStripMenuItem.Text = "Vit";
+            this.computerWhiteToolStripMenuItem.CheckedChanged += new System.EventHandler(this.engineColor_CheckedChanged);
+            // 
+            // computerBlackToolStripMenuItem
+            // 
+            this.computerBlackToolStripMenuItem.Checked = true;
+            this.computerBlackToolStripMenuItem.CheckOnClick = true;
+            this.computerBlackToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.computerBlackToolStripMenuItem.Name = "computerBlackToolStripMenuItem";
+            this.computerBlackToolStripMenuItem.Size = new System.Drawing.Size(174, 26);
+            this.computerBlackToolStripMenuItem.Text = "Svart";
+            this.computerBlackToolStripMenuItem.CheckedChanged += new System.EventHandler(this.engineColor_CheckedChanged);
+            // 
+            // computerBothToolStripMenuItem
+            // 
+            this.computerBothToolStripMenuItem.CheckOnClick = true;
+            this.computerBothToolStripMenuItem.Name = "computerBothToolStripMenuItem";
+            this.computerBothToolStripMenuItem.Size = new System.Drawing.Size(174, 26);
+            this.computerBothToolStripMenuItem.Text = "Bägge";
+            this.computerBothToolStripMenuItem.CheckedChanged += new System.EventHandler(this.engineColor_CheckedChanged);
+            // 
+            // depthToolStripMenuItem
+            // 
+            this.depthToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.depthAutoToolStripMenuItem,
+            this.depth2ToolStripMenuItem,
+            this.depth3ToolStripMenuItem,
+            this.depth4ToolStripMenuItem,
+            this.depth5ToolStripMenuItem,
+            this.depth6ToolStripMenuItem});
+            this.depthToolStripMenuItem.Name = "depthToolStripMenuItem";
+            this.depthToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.depthToolStripMenuItem.Text = "Djup";
+            // 
+            // depthAutoToolStripMenuItem
+            // 
+            this.depthAutoToolStripMenuItem.Checked = true;
+            this.depthAutoToolStripMenuItem.CheckOnClick = true;
+            this.depthAutoToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.depthAutoToolStripMenuItem.Name = "depthAutoToolStripMenuItem";
+            this.depthAutoToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depthAutoToolStripMenuItem.Text = "Automatisk";
+            this.depthAutoToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // depth2ToolStripMenuItem
+            // 
+            this.depth2ToolStripMenuItem.CheckOnClick = true;
+            this.depth2ToolStripMenuItem.Name = "depth2ToolStripMenuItem";
+            this.depth2ToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depth2ToolStripMenuItem.Text = "2";
+            this.depth2ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // depth3ToolStripMenuItem
+            // 
+            this.depth3ToolStripMenuItem.CheckOnClick = true;
+            this.depth3ToolStripMenuItem.Name = "depth3ToolStripMenuItem";
+            this.depth3ToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depth3ToolStripMenuItem.Text = "3";
+            this.depth3ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // depth4ToolStripMenuItem
+            // 
+            this.depth4ToolStripMenuItem.CheckOnClick = true;
+            this.depth4ToolStripMenuItem.Name = "depth4ToolStripMenuItem";
+            this.depth4ToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depth4ToolStripMenuItem.Text = "4";
+            this.depth4ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // depth5ToolStripMenuItem
+            // 
+            this.depth5ToolStripMenuItem.CheckOnClick = true;
+            this.depth5ToolStripMenuItem.Name = "depth5ToolStripMenuItem";
+            this.depth5ToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depth5ToolStripMenuItem.Text = "5";
+            this.depth5ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // depth6ToolStripMenuItem
+            // 
+            this.depth6ToolStripMenuItem.CheckOnClick = true;
+            this.depth6ToolStripMenuItem.Name = "depth6ToolStripMenuItem";
+            this.depth6ToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
+            this.depth6ToolStripMenuItem.Text = "6";
+            this.depth6ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.depthToolStripMenuItem_CheckedChanged);
+            // 
+            // styleToolStripMenuItem
+            // 
+            this.styleToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.style0ToolStripMenuItem,
+            this.style1ToolStripMenuItem,
+            this.style2ToolStripMenuItem,
+            this.style3ToolStripMenuItem});
+            this.styleToolStripMenuItem.Name = "styleToolStripMenuItem";
+            this.styleToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.styleToolStripMenuItem.Text = "Spelstil";
+            // 
+            // style0ToolStripMenuItem
+            // 
+            this.style0ToolStripMenuItem.Checked = true;
+            this.style0ToolStripMenuItem.CheckOnClick = true;
+            this.style0ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.style0ToolStripMenuItem.Name = "style0ToolStripMenuItem";
+            this.style0ToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            this.style0ToolStripMenuItem.Text = "Normal";
+            this.style0ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
+            // 
+            // style1ToolStripMenuItem
+            // 
+            this.style1ToolStripMenuItem.CheckOnClick = true;
+            this.style1ToolStripMenuItem.Name = "style1ToolStripMenuItem";
+            this.style1ToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            this.style1ToolStripMenuItem.Text = "Försiktig";
+            this.style1ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
+            // 
+            // style2ToolStripMenuItem
+            // 
+            this.style2ToolStripMenuItem.CheckOnClick = true;
+            this.style2ToolStripMenuItem.Name = "style2ToolStripMenuItem";
+            this.style2ToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            this.style2ToolStripMenuItem.Text = "Aggressiv";
+            this.style2ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
+            // 
+            // style3ToolStripMenuItem
+            // 
+            this.style3ToolStripMenuItem.CheckOnClick = true;
+            this.style3ToolStripMenuItem.Name = "style3ToolStripMenuItem";
+            this.style3ToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            this.style3ToolStripMenuItem.Text = "Experimentell";
+            this.style3ToolStripMenuItem.CheckedChanged += new System.EventHandler(this.styleToolStripMenuItem_CheckedChanged);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.computerMoveStatusLabel,
+            this.evalStatusLabel,
+            this.timeSpentStatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 654);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(980, 35);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 15;
+            // 
+            // computerMoveStatusLabel
+            // 
+            this.computerMoveStatusLabel.AutoSize = false;
+            this.computerMoveStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.computerMoveStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.computerMoveStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.computerMoveStatusLabel.Name = "computerMoveStatusLabel";
+            this.computerMoveStatusLabel.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.computerMoveStatusLabel.Size = new System.Drawing.Size(150, 29);
+            this.computerMoveStatusLabel.Text = "(default text)";
+            // 
+            // evalStatusLabel
+            // 
+            this.evalStatusLabel.AutoSize = false;
+            this.evalStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.evalStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.evalStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.evalStatusLabel.Name = "evalStatusLabel";
+            this.evalStatusLabel.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.evalStatusLabel.Size = new System.Drawing.Size(180, 29);
+            this.evalStatusLabel.Text = "(default text)";
+            // 
+            // timeSpentStatusLabel
+            // 
+            this.timeSpentStatusLabel.AutoSize = false;
+            this.timeSpentStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.timeSpentStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.timeSpentStatusLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.timeSpentStatusLabel.Name = "timeSpentStatusLabel";
+            this.timeSpentStatusLabel.Size = new System.Drawing.Size(150, 29);
+            this.timeSpentStatusLabel.Text = "(default text)";
+            // 
+            // scoresheetBox
+            // 
+            this.scoresheetBox.DetectUrls = false;
+            this.scoresheetBox.Location = new System.Drawing.Point(670, 86);
+            this.scoresheetBox.Name = "scoresheetBox";
+            this.scoresheetBox.ReadOnly = true;
+            this.scoresheetBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.scoresheetBox.Size = new System.Drawing.Size(299, 448);
+            this.scoresheetBox.TabIndex = 16;
+            this.scoresheetBox.Text = "";
             // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1110, 530);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.settingsPanel);
+            this.ClientSize = new System.Drawing.Size(980, 689);
+            this.Controls.Add(this.scoresheetBox);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.ponderingPanel);
             this.Controls.Add(this.toMoveLabel);
-            this.Controls.Add(this.evalBox);
             this.Controls.Add(this.moveLabel);
             this.Controls.Add(this.boardPanel);
             this.Controls.Add(this.fenButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.fenBox);
+            this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
+            this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "ChessUI";
             this.Text = "Blobfish 11";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChessUI_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChessUI_KeyDown);
-            this.compColorBox.ResumeLayout(false);
-            this.compColorBox.PerformLayout();
             this.ponderingPanel.ResumeLayout(false);
             this.ponderingPanel.PerformLayout();
-            this.settingsPanel.ResumeLayout(false);
-            this.depthBox.ResumeLayout(false);
-            this.depthBox.PerformLayout();
-            this.playStyleBox.ResumeLayout(false);
-            this.playStyleBox.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -491,35 +593,51 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button fenButton;
         private System.Windows.Forms.TableLayoutPanel boardPanel;
-        private System.Windows.Forms.TextBox evalBox;
         private System.Windows.Forms.Label toMoveLabel;
-        private System.Windows.Forms.GroupBox compColorBox;
-        private System.Windows.Forms.RadioButton computerRBBlack;
-        private System.Windows.Forms.RadioButton computerRBWhite;
-        private System.Windows.Forms.RadioButton computerRBNone;
         private System.ComponentModel.BackgroundWorker ponderingWorker;
         private System.Windows.Forms.Label ponderingLabel;
         private System.Windows.Forms.Panel ponderingPanel;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Timer ponderingTimer;
         private System.Windows.Forms.Label ponderingTimeLabel;
-        private System.Windows.Forms.Panel settingsPanel;
-        private System.Windows.Forms.GroupBox playStyleBox;
-        private System.Windows.Forms.RadioButton playStyleRB2;
-        private System.Windows.Forms.RadioButton playStyleRB1;
-        private System.Windows.Forms.RadioButton playStyleRB0;
-        private System.Windows.Forms.RadioButton playStyleRB3;
-        private System.Windows.Forms.GroupBox depthBox;
-        private System.Windows.Forms.RadioButton depthRBAuto;
-        private System.Windows.Forms.RadioButton depthRB4;
-        private System.Windows.Forms.RadioButton depthRB3;
-        private System.Windows.Forms.RadioButton depthRB2;
-        private System.Windows.Forms.RadioButton computerRBBoth;
-        private System.Windows.Forms.RadioButton depthRB6;
-        private System.Windows.Forms.RadioButton depthRB5;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label moveLabel;
         private System.Windows.Forms.Button moveNowButton;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem partiToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem motorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depthToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem engineColorMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem computerNoneToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem computerWhiteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem computerBlackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem computerBothToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depthAutoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depth2ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depth3ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depth4ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depth5ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem depth6ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem styleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem style0ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem style1ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem style2ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem style3ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem partiToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem startaOmToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem taTillbakaDragToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem filpBoardToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem testsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel computerMoveStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel evalStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel timeSpentStatusLabel;
+        private System.Windows.Forms.RichTextBox scoresheetBox;
     }
 }
 

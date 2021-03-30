@@ -15,7 +15,7 @@ namespace Blobfish_11
         public List<SecureFloat> allEvals;
         public Move bestMove;
     }
-    public struct Square
+    public struct Square : IEquatable<Square>
     {
         public sbyte rank;
         public sbyte line;
@@ -28,6 +28,11 @@ namespace Blobfish_11
         {
             this.rank = (sbyte)rank;
             this.line = (sbyte)line;
+        }
+
+        public bool Equals(Square other)
+        {
+            return this.rank == other.rank && this.line == other.line;
         }
     }
     public abstract class FloatContainer

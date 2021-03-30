@@ -18,15 +18,6 @@ namespace Blobfish_11
         public char[,] board; //[0] är rader (siffror), [1] är kolumner (bokstäver)
         public Square[] kingPositions; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
-        public Position()
-        {
-            this.halfMoveClock = 0;
-            this.moveCounter = 0;
-            this.enPassantSquare = new Square();
-            this.castlingRights = new bool[4];
-            this.board = new char[8, 8];
-            this.kingPositions = new Square[2];
-        }
         public Position(string FEN)
         {
             this.board = new char[8, 8];
@@ -171,7 +162,7 @@ namespace Blobfish_11
             this.enPassantSquare = enPassantSquare;
             this.kingPositions = kingPositions;
         }
-        public Position deepCopy()
+        public Position boardCopy()
         {
             char[,] newBoard = new char[8, 8];
             for (int i = 0; i < 8; i++)
@@ -181,9 +172,8 @@ namespace Blobfish_11
                     newBoard[i, j] = this.board[i, j];
                 }
             }
-            //castlingRights och kingPositions går av oklar anledning snabbare att klona automatiskt.
-            return new Position(newBoard, whiteToMove, (bool[])castlingRights.Clone(),
-                new Square(-1, -1), halfMoveClock, moveCounter, (Square[])kingPositions.Clone());
+            return new Position(newBoard, whiteToMove, castlingRights,
+                new Square(-1, -1), halfMoveClock, moveCounter, kingPositions);
         }
         public string getFEN()
         {

@@ -28,11 +28,11 @@ namespace Blobfish_11
             {
                 return false;
             }
-            else if (currentPosition.whiteToMove && piece < 'a')
+            else if (game.currentPosition.whiteToMove && piece < 'a')
             {
                 return true;
             }
-            else if (!currentPosition.whiteToMove && piece >= 'a')
+            else if (!game.currentPosition.whiteToMove && piece >= 'a')
             {
                 return true;
             }
@@ -43,7 +43,7 @@ namespace Blobfish_11
         }
         private bool possibleToMove()
         {
-            return !ponderingWorker.IsBusy && gameIsGoingOn && displayedPly == gamePositions.Count - 1;
+            return !ponderingWorker.IsBusy;
         }
         private void squareMouseDown(object sender, MouseEventArgs e)
         {
@@ -52,7 +52,7 @@ namespace Blobfish_11
 
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);
-            char piece = currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
+            char piece = game.currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
             if (!moveablePiece(piece))
                 return;
 
@@ -91,7 +91,7 @@ namespace Blobfish_11
                     newSquare.rank == item.to.rank && newSquare.line == item.to.line)
                 {
                     (sender as PictureBox).Image = fromImage;
-                    playMove(item);
+                    this.playMove(item);
                     moveWasPlayed = true;
                     break;
                 }
@@ -99,7 +99,7 @@ namespace Blobfish_11
             if (!moveWasPlayed)
             {
                 if (!(dragFromSquare.line == newSquare.line && dragFromSquare.rank == newSquare.rank))
-                    evalBox.Text = "Felaktigt drag!";
+                    scoresheetBox.Text = "Felaktigt drag!";
                 (sender as PictureBox).Image = toOldImage;
                 if (!flipped)
                     Falt[dragFromSquare.rank, dragFromSquare.line].Image = fromImage;

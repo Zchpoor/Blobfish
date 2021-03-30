@@ -1,29 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Deployment.Application;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Threading;
-using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Blobfish_11
 {
     public partial class ChessUI : Form
     {
         PictureBox[,] Falt = new PictureBox[8, 8];
-        List<Position> gamePositions = new List<Position>();
-        List<Move> gameMoves = new List<Move>();
-        Position currentPosition;
-        int displayedPly = 0;
-        bool gameIsGoingOn = true;
-        readonly Position startingPosition = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        Game game = new Game();
+        bool retrospectMode = false;
         List<Move> currentMoves = new List<Move>();
         bool flipped = false;
         Engine blobFish = new Engine();
@@ -32,12 +21,12 @@ namespace Blobfish_11
         TimeSpan ponderingTime = new TimeSpan(0);
         Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
 
-        public ChessUI()
+        public ChessUI() 
         {
             InitializeComponent();
             this.MinimumSize = this.Size;
             this.MaximumSize = this.Size;
-            int squareSize = 50;
+            int squareSize = 60;
             boardPanel.AutoSize = true;
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";
@@ -105,17 +94,23 @@ namespace Blobfish_11
                         picBox.BackColor = Color.SandyBrown;
                 }
             }
-            displayAndAddPosition(startingPosition);
+            reset();
         }
-        private void displayAndAddPosition(Position pos)
+        private void reset()
         {
-            gamePositions.Add(pos);
-            displayedPly = gamePositions.Count - 1;
-            display(pos);
+            evalStatusLabel.Text = "";
+            computerMoveStatusLabel.Text = "";
+            timeSpentStatusLabel.Text = "";
+            game.result = "*";
+            computerBlackToolStripMenuItem.Checked = true;
+            game = new Game();
+            display(game.currentPosition);
         }
         private void display(Position pos)
         {
-            currentPosition = pos;
+            updateScoresheetBox();
+            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
+
             currentMoves = blobFish.allValidMoves(pos, false);
 
             for (int i = 0; i < 8; i++)
@@ -129,105 +124,73 @@ namespace Blobfish_11
                 }
             }
 
-            toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             //TODO: Faktorisera ut med liknande kod nedan.
             int res = blobFish.decisiveResult(pos, currentMoves);
             if (res != -2)
             {
                 resultPopUp(res);
-                gameIsGoingOn = false;
             }
-            else if (!blobFish.mateableMaterial(currentPosition.board))
+            else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
-                gameIsGoingOn = false;
             }
             else if (engineIsToMove())
             {
                 playBestEngineMove();
             }
         }
+        private void updateScoresheetBox()
+        {
+            string rtfs = game.RTFScoresheet();
+            scoresheetBox.Clear();
+            if (rtfs.Equals(""))
+            {
+                scoresheetBox.Text = "Nytt parti.";
+            }
+            else
+            {
+                scoresheetBox.Rtf = game.RTFScoresheet(); //Uppdaterar protokollet.
+            }
+        }
         private void playBestEngineMove()
         {
-            if (!ponderingWorker.IsBusy && gameIsGoingOn)
+            if (!ponderingWorker.IsBusy)
             {
                 blobFish = choosePlayingStyle();
-                //evalBox.Text = "";
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
+                computerMoveStatusLabel.Text = "";
+                //evalStatusLabel.Text = "";
+                timeSpentStatusLabel.Text = "";
                 ponderingWorker.RunWorkerAsync();
             }
             setPonderingMode(true);
         }
-        private void playMove(Move move)
-        {
-            Position newPosition = move.execute(currentPosition);
-            this.gameMoves.Add(move);
-            displayAndAddPosition(newPosition);
-        }
-        private string getMovesString(List<Move> moves, char[,] board)
+        private string getMovesString(List<Move> moves, Position pos)
         {
             string text = "";
             foreach (Move item in moves)
             {
-                text += item.toString(board) + Environment.NewLine;
+                text += item.toString(pos) + Environment.NewLine;
             }
             return text;
-        }
-        private void reset()
-        {
-            gameIsGoingOn = true;
-            gamePositions.Clear();
-            gameMoves.Clear();
-            displayAndAddPosition(startingPosition);
         }
         private void flipBoard()
         {
             flipped = !flipped;
-            display(currentPosition);
-        }
-        private string scoresheet()
-        {
-            string scoresheet = "";
-            if (gamePositions.Count != gameMoves.Count + 1)
-            {
-                throw new Exception("Fel antal drag/ställningar har spelats!");
-            }
-            else if (gameMoves.Count == 0)
-            {
-                scoresheet = "Inga drag har spelats!";
-            }
-            else
-            {
-                int initialMoveNumber = gamePositions[0].moveCounter;
-                for (int i = 0; i < gameMoves.Count; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        if (i != 0)
-                        {
-                            scoresheet += Environment.NewLine;
-                        }
-                        scoresheet += ((i / 2) + initialMoveNumber).ToString() + ".";
-                    }
-                    scoresheet += " " + gameMoves[i].toString(gamePositions[i].board);
-                }
-            }
-            return scoresheet;
+            display(game.currentPosition);
         }
         private void printEval(EvalResult result)
         {
-            int decisiveResult = blobFish.decisiveResult(currentPosition, currentMoves);
+            int decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
             if (decisiveResult != -2)
             {
                 resultPopUp(decisiveResult);
-                gameIsGoingOn = false;
             }
-            else if (!blobFish.mateableMaterial(currentPosition.board))
+            else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
                 resultPopUp(-1);
-                gameIsGoingOn = false;
             }
             else if (result.bestMove != null)
             {
@@ -247,79 +210,67 @@ namespace Blobfish_11
                 {
                     textEval = Math.Round(eval, 2).ToString();
                 }
-                String completeString = "Bästa drag: " + result.bestMove.toString(currentPosition.board) +
-                    Environment.NewLine + "Datorns evaluering: " + textEval;
-                evalBox.Text = completeString;
+                computerMoveStatusLabel.Text = "Datorn spelade: " + result.bestMove.toString(game.currentPosition);
+                evalStatusLabel.Text = "Datorns evaluering: " + textEval;
+                timeSpentStatusLabel.Text = "Förbrukad tid: " + ponderingTime.ToString(@"mm\:ss");
             }
             else
             {
                 throw new Exception("Odefinierat bästa drag.");
             }
         }
+        private void playMove(Move move)
+        {
+            game.addMove(move);
+            retrospectMode = false;
+            display(game.currentPosition);
+        }
+        private void takeback(int numberOfMoves)
+        {
+            try
+            {
+                game.takeback(numberOfMoves);
+                display(game.currentPosition);
+            }
+            catch
+            {
+                
+            }
+        }
         private void resultPopUp(int result)
         {
-            if (!gameIsGoingOn)
+            if (retrospectMode)
                 return;
             if (result > 1000)
             {
                 MessageBox.Show("Vit vann på schack matt!");
+                game.result = "1-0";
             }
             else if (result < -1000)
             {
                 MessageBox.Show("Svart vann på schack matt!");
+                game.result = "0-1";
             }
             else if (result == 0)
             {
                 MessageBox.Show("Partiet slutade remi!");
+                game.result = "1/2-1/2";
             }
             else if (result == -1)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
+                game.result = "1/2-1/2";
             }
-            computerRBNone.Checked = true;
-        }
-        private void takeback(int numberOfMoves)
-        {
-            if (gamePositions.Count > numberOfMoves)
-            {
-                for (int i = 0; i < numberOfMoves; i++)
-                {
-                    gamePositions.RemoveAt(gamePositions.Count - 1);
-                    gameMoves.RemoveAt(gameMoves.Count - 1);
-                }
-                Position newCurrentPosition = gamePositions[gamePositions.Count - 1];
-                gamePositions.RemoveAt(gamePositions.Count - 1);
-                evalBox.Text = "Ett drag har återtagits.";
-                displayAndAddPosition(newCurrentPosition);
-                gameIsGoingOn = true;
-            }
-            else
-            {
-                evalBox.Text = "För få drag har spelats!";
-            }
-        }
-        private void displayGamePosition(int ply)
-        {
-            if (ply < 0) ply = 0;
-            if (ply > gamePositions.Count -1) ply = gamePositions.Count-1;
-            displayedPly = ply;
-
-            display(gamePositions[ply]);
-            if(ply == gamePositions.Count - 1)
-            {
-                setBoardDisabled(false);
-            }
-            else
-            {
-                setBoardDisabled(true);
-            }
+            retrospectMode = true;
         }
         private bool engineIsToMove()
         {
-            if (displayedPly != gamePositions.Count - 1)
+            if (retrospectMode)
+            {
                 return false;
-            return (computerRBBoth.Checked || computerRBWhite.Checked && currentPosition.whiteToMove) ||
-                (computerRBBlack.Checked && !currentPosition.whiteToMove);
+            }
+            return (computerBothToolStripMenuItem.Checked || computerWhiteToolStripMenuItem.Checked && game.currentPosition.whiteToMove) ||
+                (computerBlackToolStripMenuItem.Checked && !game.currentPosition.whiteToMove);
         }
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -330,13 +281,13 @@ namespace Blobfish_11
             blobFish.cancelFlag.setValue(0);
             EvalResult resultPlace = new EvalResult();
             resultPlace.bestMove = null;
-            if (depthRBAuto.Checked)
+            if (depthAutoToolStripMenuItem.Checked)
             {
                 minDepth = -1;
             }
             Thread thread = new Thread(delegate ()
             {
-                engineStart(minDepth, currentPosition.deepCopy(), resultPlace);
+                engineStart(minDepth, game.currentPosition.boardCopy(), resultPlace);
             });
             thread.Name = "engineThread";
             thread.Start();
@@ -377,19 +328,18 @@ namespace Blobfish_11
                     else
                     {
                         setPonderingMode(false);
-                        if(gameIsGoingOn)
-                            printEval(res);
+                        printEval(res);
 
                         if (engineIsToMove())
                         {
-                            playMove(res.bestMove);
+                            this.playMove(res.bestMove);
                         }
                     }
                 }
                 catch (Exception exc)
                 {
                     MessageBox.Show(exc.Message);
-                    evalBox.Text = "Ett fel inträffade.";
+                    scoresheetBox.Text = "Ett fel inträffade.";
                     takeback(1);
                     setPonderingMode(false);
 
@@ -426,7 +376,8 @@ namespace Blobfish_11
         private void setPonderingMode(bool setTo)
         {
             ponderingPanel.Visible = setTo;
-            settingsPanel.Enabled = !setTo;
+            menuStrip1.Enabled = !setTo;
+            moveNowButton.Enabled = setTo;
             fenBox.Enabled = !setTo;
             fenButton.Enabled = !setTo;
             if (setTo)
@@ -447,7 +398,7 @@ namespace Blobfish_11
                     }
                     else
                     {
-                        char pieceOnSquare = currentPosition.board[rank, line];
+                        char pieceOnSquare = game.currentPosition.board[rank, line];
                         Cursor cursor = moveablePiece(pieceOnSquare) ? dragCursor : Cursors.Default;
                         if (flipped)
                         {
@@ -460,51 +411,6 @@ namespace Blobfish_11
                     }
                 }
             }
-        }
-        private Engine choosePlayingStyle()
-        {
-            //Byt namn på funktionen?
-            int[] MIL = { };
-            //if (depthRBAuto.Checked)
-            //{
-            //    MIL = new int[] {8};
-            //}
-
-            try
-            {
-                if (playStyleRB0.Checked) //Normal
-                {
-                    return new Engine(MIL);
-                }
-                else if (playStyleRB1.Checked) //Försiktig
-                {
-                    return new Engine(new float[] {1f, 3f, 3f, 5f, 9f }, 0.8f, 
-                        new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, 5f, MIL, 0.15f);
-                }
-                else if (playStyleRB2.Checked) //Aggressiv
-                {
-                    return new Engine(new float[] {1.2f, 4f, 4f, 6.5f, 12f }, 0.4f,
-                        new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, 2.5f, MIL, 0.4f);
-                }
-                else if (playStyleRB3.Checked) //Experimentell
-                {
-                    return new Engine(new float[] {1f, 3f, 3f, 4.5f, 9f }, 0.4f,
-                        new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 1f, 1f, MIL, 0.25f);
-                }
-                else
-                {
-                    return new Engine();
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
-                return new Engine();
-            }
-        }
-        private void moveNowButton_Click(object sender, EventArgs e)
-        {
-            blobFish.moveNowFlag.setValue(1);
         }
     }
 }
@@ -519,25 +425,28 @@ namespace Blobfish_11
  *  Se bästa variant
  *  Koordinater
  *  Få "dra nu" att fungera bättre.
- *  Förbättra validSquare()
- *  Träd för varianter.
- *  Hantera PGN
- *  Spela forcerande drag omedelbart?
+ *  Läsa in PGN.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
  *  Föredra Sc3 före Sd2
+ *  Minska behov av terräng.
  * 
  * Effektiviseringar:
  *  Effektivisera algoritmer för dragberäkning.
  *  Tråd-pool?
  *  Beräkna nästa lager av drag tidigare.
+ *  Gemensamt bräde i tråd?
+ *  Klass med värden åt tråd.
+ *  Bli av med delegates?
  *  
  * Förbättringar:
  *  Ta öppna linjer med torn.
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
+ *  Avbryt inuti trådarna.
+ *  Minska behov av terräng i slutspel.
  *  
  *  Buggar:
  */
