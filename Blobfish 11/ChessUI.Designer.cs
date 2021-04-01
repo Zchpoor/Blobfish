@@ -52,7 +52,7 @@
             this.partiToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.filpBoardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.taTillbakaDragToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.takebackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.startaOmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.motorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -251,33 +251,33 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.saveToolStripMenuItem.Text = "Spara parti";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(212, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
             // 
             // testsToolStripMenuItem
             // 
             this.testsToolStripMenuItem.Name = "testsToolStripMenuItem";
             this.testsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.testsToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.testsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.testsToolStripMenuItem.Text = "Kör tester";
             this.testsToolStripMenuItem.Click += new System.EventHandler(this.testsToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(212, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
             this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.closeToolStripMenuItem.Text = "Stäng";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -286,7 +286,7 @@
             this.partiToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filpBoardToolStripMenuItem,
             this.toolStripSeparator1,
-            this.taTillbakaDragToolStripMenuItem,
+            this.takebackToolStripMenuItem,
             this.toolStripSeparator2,
             this.startaOmToolStripMenuItem});
             this.partiToolStripMenuItem1.Name = "partiToolStripMenuItem1";
@@ -308,13 +308,13 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(242, 6);
             // 
-            // taTillbakaDragToolStripMenuItem
+            // takebackToolStripMenuItem
             // 
-            this.taTillbakaDragToolStripMenuItem.Name = "taTillbakaDragToolStripMenuItem";
-            this.taTillbakaDragToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.taTillbakaDragToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
-            this.taTillbakaDragToolStripMenuItem.Text = "Ta tillbaka drag";
-            this.taTillbakaDragToolStripMenuItem.Click += new System.EventHandler(this.taTillbakaDragToolStripMenuItem_Click);
+            this.takebackToolStripMenuItem.Name = "takebackToolStripMenuItem";
+            this.takebackToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this.takebackToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
+            this.takebackToolStripMenuItem.Text = "Ta tillbaka drag";
+            this.takebackToolStripMenuItem.Click += new System.EventHandler(this.takebackToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -626,7 +626,7 @@
         private System.Windows.Forms.ToolStripMenuItem partiToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem startaOmToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem taTillbakaDragToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem takebackToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem filpBoardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;

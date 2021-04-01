@@ -251,18 +251,13 @@ namespace Blobfish_11
              * line==0    -> a-linjen.
              * line==7    -> h-linjen.
              */
+
             int[] numberOfPawns = new int[2];
             float[] pawnPosFactor = { 1f, 1f };
-
-            //Grov uppskattning av moståndarens tunga pjäser.
-            //0 = svart, 1 = vit.
-            int[] heavyMaterial = new int[] { 0, 0 };
-
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
-            //bool whiteSquare = true; //TODO: ordna med färgkomplex.
-            bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
-            float pieceValue = 0;
+            //TODO: ordna med färgkomplex.
             char[,] board = pos.board;
+
             for (sbyte rank = 0; rank < 8; rank++)
             {
                 for (sbyte line = 0; line < 8; line++)
@@ -280,12 +275,26 @@ namespace Blobfish_11
                             pawns[1, line]++;
                             pawnPosFactor[1] += pawn[1, rank, line];
                             break;
+                    }
+                }
+            }
 
+            //Grov uppskattning av moståndarens tunga pjäser.
+            //0 = svart, 1 = vit.
+            int[] heavyMaterial = new int[] { 0, 0 };
+
+            bool[] bishopColors = new bool[4] { false, false, false, false }; //WS, DS, ws, ds
+            float pieceValue = 0;
+            for (sbyte rank = 0; rank < 8; rank++)
+            {
+                for (sbyte line = 0; line < 8; line++)
+                {
+                    switch (board[rank, line])
+                    {
                         case 'n':
                             pieceValue -= pieceValues[1] * knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
-
                         case 'N':
                             pieceValue += pieceValues[1] * knight[rank, line];
                             heavyMaterial[1] += 3;
@@ -299,7 +308,6 @@ namespace Blobfish_11
                             else
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
-
                         case 'B':
                             pieceValue += pieceValues[2] * bishop[rank, line];
                             heavyMaterial[1] += 3;
@@ -310,11 +318,35 @@ namespace Blobfish_11
                             break;
 
                         case 'r':
-                            pieceValue -= pieceValues[3] * rook[rank, line];
+                            float val = pieceValues[3] * rook[rank, line];
+                            if(pawns[0, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
+                            {
+                                if(pawns[1, line] == 0)
+                                {
+                                    val *= rookOnOpenLineCoefficient;
+                                }
+                                else
+                                {
+                                    val *= rookOnSemiOpenLineCoefficient;
+                                }
+                            }
+                            pieceValue -= val;
                             heavyMaterial[0] += 5;
                             break;
                         case 'R':
-                            pieceValue += pieceValues[3] * rook[rank, line];
+                            val = pieceValues[3] * rook[rank, line];
+                            if (pawns[1, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
+                            {
+                                if (pawns[0, line] == 0)
+                                {
+                                    val *= rookOnOpenLineCoefficient;
+                                }
+                                else
+                                {
+                                    val *= rookOnSemiOpenLineCoefficient;
+                                }
+                            }
+                            pieceValue += val;
                             heavyMaterial[1] += 5;
                             break;
                         
@@ -322,7 +354,6 @@ namespace Blobfish_11
                             pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;
                             break;
-
                         case 'Q':
                             pieceValue += pieceValues[4] * queen[rank, line];
                             heavyMaterial[1] += 9;

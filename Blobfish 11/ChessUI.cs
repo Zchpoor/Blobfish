@@ -447,6 +447,7 @@ namespace Blobfish_11
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
  *  Avbryt inuti trådarna.
  *  Minska behov av terräng i slutspel.
+ *  Bra/dåliga löpare.
  *  
  *  Buggar:
  */

@@ -59,28 +59,6 @@ namespace Blobfish_11
                 }
             }
         }
-        private void fenBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                fenButton_Click(null, null);
-            }
-        }
-        private void radioButton_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
-                e.IsInputKey = true;
-        }
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            ponderingWorker.CancelAsync();
-            if (!computerBothToolStripMenuItem.Checked)
-                takeback(1);
-            scoresheetBox.Text = "Beräkningen avbröts.";
-            ponderingTime = new TimeSpan(0);
-            setPonderingMode(false);
-        }
         private void fenButton_Click(object sender, EventArgs e)
         {
             string inputText = fenBox.Text;
@@ -203,6 +181,28 @@ namespace Blobfish_11
                     break;
             }
         }
+        private void fenBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                fenButton_Click(null, null);
+            }
+        }
+        private void radioButton_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
+                e.IsInputKey = true;
+        }
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            ponderingWorker.CancelAsync();
+            if (!computerBothToolStripMenuItem.Checked)
+                takeback(1);
+            scoresheetBox.Text = "Beräkningen avbröts.";
+            ponderingTime = new TimeSpan(0);
+            setPonderingMode(false);
+        }
         private void engineColor_CheckedChanged(object sender, EventArgs e)
         {
             if ((sender as ToolStripMenuItem).Checked == false)
@@ -303,7 +303,7 @@ namespace Blobfish_11
         {
             flipBoard();
         }
-        private void taTillbakaDragToolStripMenuItem_Click(object sender, EventArgs e)
+        private void takebackToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!ponderingWorker.IsBusy)
             {
@@ -325,7 +325,6 @@ namespace Blobfish_11
                 scoresheetBox.Text = Tests.runTests();
             }
         }
-
         private Engine choosePlayingStyle()
         {
             //Byt namn på funktionen?
