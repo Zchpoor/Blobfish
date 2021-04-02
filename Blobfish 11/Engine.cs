@@ -99,18 +99,9 @@ namespace Blobfish_11
                         //Om resultatet inte hunnit beräknas.
                         if(cancelFlag.getValue() != 0)
                         {
-                            abortAll(threadList);
                             result.bestMove = null;
                             result.evaluation = float.NaN;
                             result.allEvals = null;
-                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
-                            return result;
-                        }
-                        else if(this.moveNowFlag.getValue() != 0)
-                        {
-                            abortAll(threadList);
-                            Thread.Sleep(10); //För att ge övriga trådar chans att stanna.
-                            result.bestMove = moves[(int)bestMove.getValue()];
                             return result;
                         }
                         Thread.Sleep(sleepTime);
@@ -161,11 +152,13 @@ namespace Blobfish_11
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
         {
+            if (cancelFlag.getValue() != 0)
+                return 0f;
             //string moveName = ""; //Endast i debug-syfte
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -maximumDepth) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth <= -maximumDepth || moveNowFlag.getValue() != 0) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
@@ -384,7 +377,7 @@ namespace Blobfish_11
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
             float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
-            float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
+            float toMoveAdvantage = pos.whiteToMove ? toMoveValue : -toMoveValue;
             // TODO: Variera värdet av att vara vid draget?
             return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }

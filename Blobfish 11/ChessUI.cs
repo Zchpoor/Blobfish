@@ -424,8 +424,8 @@ namespace Blobfish_11
  *  Se material.
  *  Se bästa variant
  *  Koordinater
- *  Få "dra nu" att fungera bättre.
  *  Läsa in PGN.
+ *  Befodra/skriva över varianter.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?
@@ -441,13 +441,12 @@ namespace Blobfish_11
  *  Bli av med delegates?
  *  
  * Förbättringar:
- *  Ta öppna linjer med torn.
  *  Dragupprepningar
  *  Gör kraftiga hot forcerande.
  *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
- *  Avbryt inuti trådarna.
  *  Minska behov av terräng i slutspel.
  *  Bra/dåliga löpare.
  *  
  *  Buggar:
+ *  Försvinnande pjäser.
  */
