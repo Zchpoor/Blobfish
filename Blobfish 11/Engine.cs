@@ -20,6 +20,9 @@ namespace Blobfish_11
             {
                 minDepth = automaticDepth(pos);
             }
+            minimumDepth = minDepth;
+            maximumDepth = minDepth + depthExtend;
+
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
@@ -61,13 +64,8 @@ namespace Blobfish_11
                 globalBeta.setValue(float.PositiveInfinity);
                 List<Thread> threadList = new List<Thread>();
 
-                //bool success = ThreadPool.SetMinThreads(2, 1);
-                //bool success2 = ThreadPool.SetMaxThreads(2, 1);
-                //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
-
                 SecureFloat bestMove = new SecureFloat(0);
                 for(int i = 0;i<moves.Count;i++)
-                //foreach (Move currentMove in moves)
                 {
                     Move currentMove = moves[i];
                     SecureFloat newFloat = new SecureFloat();
@@ -76,17 +74,13 @@ namespace Blobfish_11
 
                     Thread thread = new Thread(delegate ()
                     {
-                        threadStart(currentMove.execute(pos), (sbyte)(minDepth - 1), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
+                        threadStart(currentMove.execute(pos), iCopy, bestMove, newFloat, globalAlpha, globalBeta);
                     });
                     thread.Name = currentMove.toString(pos);
                     thread.Start();
                     threadList.Add(thread);
 
-
-                    //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
-                    //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
                 }
-                //result.bestMove = moves[0];
                 Thread.Sleep(sleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
@@ -123,15 +117,10 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStartStarter(Object t)
-        {
-            ThreadStartArguments tsa = (ThreadStartArguments)t;
-            //threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
-        }
-        public void threadStart(Position pos, sbyte depth, int moveIndex, SecureFloat bestMove,
+        public void threadStart(Position pos, int moveIndex, SecureFloat bestMove,
             SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
-            float value = alphaBeta(pos, depth, globalAlpha, globalBeta, false);
+            float value = alphaBeta(pos, 1, globalAlpha, globalBeta, false);
             ansPlace.setValue(value);
                 if (!pos.whiteToMove)
             {
@@ -155,10 +144,10 @@ namespace Blobfish_11
             if (cancelFlag.getValue() != 0)
                 return 0f;
             //string moveName = ""; //Endast i debug-syfte
-            if (depth <= 0 && !forceBranching)
+            if (depth >= minimumDepth && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -maximumDepth || moveNowFlag.getValue() != 0) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth >= maximumDepth || moveNowFlag.getValue() != 0) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
@@ -184,11 +173,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth + 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                        value = Math.Max(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth + 1), alpha, beta, false));
                     }
                     alpha.setValue(Math.Max(alpha.getValue(), value));
                     if (alpha.getValue() >= beta.getValue())
@@ -216,11 +205,11 @@ namespace Blobfish_11
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, true));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth + 1), alpha, beta, true));
                     }
                     else
                     {
-                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth - 1), alpha, beta, false));
+                        value = Math.Min(value, alphaBeta(currentMove.execute(pos), (sbyte)(depth + 1), alpha, beta, false));
                     }
                     beta.setValue(Math.Min(beta.getValue(), value));
                     if (beta.getValue() <= alpha.getValue())
@@ -493,7 +482,7 @@ namespace Blobfish_11
         }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
-            if (currentDepth >= 2)
+            if (currentDepth <= minimumDepth - 2)
                 return false;
             else if (numberOfAvailableMoves == 1)
             {
@@ -524,14 +513,6 @@ namespace Blobfish_11
             else if (value < -1000)
                 return value + 1;
             else return value;
-        }
-        private void abortAll(List<Thread> threadList)
-        {
-            foreach (Thread item in threadList)
-            {
-                if (item.IsAlive)
-                    item.Abort();
-            }
         }
         public bool mateableMaterial(char[,] board)
         {
