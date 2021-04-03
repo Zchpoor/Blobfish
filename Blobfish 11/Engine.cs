@@ -20,8 +20,8 @@ namespace Blobfish_11
             {
                 minDepth = automaticDepth(pos);
             }
-            minimumDepth = minDepth;
-            maximumDepth = minDepth + depthExtend;
+            minimumDepth = (sbyte)minDepth;
+            maximumDepth = (sbyte)(minDepth + depthExtend);
 
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
@@ -43,7 +43,7 @@ namespace Blobfish_11
                 {
                     //Spela forcerande drag omedelbart?
                     EvalResult res = eval(moves[0].execute(pos), minDepth-1);
-                    result.evaluation = evaluationStep(res.evaluation);
+                    result.evaluation = adjustCheckmateEval(res.evaluation, 1);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
                     return result;
@@ -143,11 +143,11 @@ namespace Blobfish_11
         {
             if (cancelFlag.getValue() != 0)
                 return 0f;
-            //string moveName = ""; //Endast i debug-syfte
+
             if (depth >= minimumDepth && !forceBranching)
                 return numericEval(pos);
 
-            if (depth >= maximumDepth || moveNowFlag.getValue() != 0) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth >= maximumDepth || moveNowFlag.getValue() != 0)
             {
                 return numericEval(pos);
             }
@@ -167,9 +167,6 @@ namespace Blobfish_11
                     if (betaContainer is SecureFloat && betaContainer.getValue() < beta.getValue())
                         beta.setValue(betaContainer.getValue());
 
-                    //Endast i debug-syfte
-                    //moveName = currentMove.toString(pos.board);
-
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
                     {
@@ -186,10 +183,9 @@ namespace Blobfish_11
                             return float.PositiveInfinity;
                         else
                             break; //Pruning
-
                     }
                 }
-                value = evaluationStep(value);
+                value = adjustCheckmateEval(value, depth);
                 return value;
             }
             else
@@ -199,8 +195,6 @@ namespace Blobfish_11
                 {
                     if (alphaContainer is SecureFloat && alphaContainer.getValue() > alpha.getValue())
                         alpha.setValue(alphaContainer.getValue());
-                    //Endast i debug-syfte
-                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -220,7 +214,7 @@ namespace Blobfish_11
                             break; //Pruning
                     }
                 }
-                value = evaluationStep(value);
+                value = adjustCheckmateEval(value, depth);
                 return value;
             }
         }
@@ -505,14 +499,13 @@ namespace Blobfish_11
             bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
             return isCheck;
         }
-        private float evaluationStep(float value)
+        private float adjustCheckmateEval(float evaluation, sbyte movesToMate)
         {
-            //Ökar antal drag till matt, ifall evalueringen är forcerad matt.
-            if (value > 1000)
-                return value - 1;
-            else if (value < -1000)
-                return value + 1;
-            else return value;
+            if (evaluation >= 2000)
+                return evaluation - movesToMate;
+            else if (evaluation <= -2000)
+                return evaluation + movesToMate;
+            else return evaluation;
         }
         public bool mateableMaterial(char[,] board)
         {

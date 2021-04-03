@@ -43,9 +43,9 @@ namespace Blobfish_11
         readonly int[] moveIncreaseLimits = {};
 
         //Maximalt djup en variant kan beräknas efter minDepth uppnåtts.
-        readonly int depthExtend = 8;
+        readonly sbyte depthExtend = 8;
 
-        int maximumDepth, minimumDepth;
+        sbyte maximumDepth, minimumDepth;
 
         public Engine() {}
         public Engine(int[] moveIncreaseLimits)
