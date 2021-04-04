@@ -198,12 +198,12 @@ namespace Blobfish_11
                 string textEval;
                 if (eval > 1000)
                 {
-                    int plysToMate = (int)(2002 - eval);
+                    int plysToMate = (int)(2001 - eval);
                     textEval = "M" + (plysToMate / 2).ToString();
                 }
                 else if (eval < -1000)
                 {
-                    int plysToMate = (int)(2002 + eval);
+                    int plysToMate = (int)(2001 + eval);
                     textEval = "m-" + (plysToMate / 2).ToString();
                 }
                 else
@@ -296,6 +296,7 @@ namespace Blobfish_11
                 if (ponderingWorker.CancellationPending)
                 {
                     blobFish.cancelFlag.setValue(1);
+                    blobFish.moveNowFlag.setValue(1);
                     e.Cancel = true;
                     break;
                 }
@@ -426,6 +427,7 @@ namespace Blobfish_11
  *  Koordinater
  *  Läsa in PGN.
  *  Befodra/skriva över varianter.
+ *  Bryt ut datorklassen.
  * 
  * Justera matriserna:
  *  Gör torn assymmetriska?

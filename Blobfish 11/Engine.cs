@@ -12,17 +12,32 @@ namespace Blobfish_11
     {
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public SecureFloat moveNowFlag = new SecureFloat(0f);
+        public EvalResult eval(Position pos, int minDepth, int maxDepth)
+        {
+            if (minDepth > maxDepth)
+            {
+                throw new Exception("Minsta djup får inte vara större än högsta djup!");
+            }
+            minimumDepth = (sbyte)minDepth;
+            maximumDepth = (sbyte)maxDepth;
+            return eval(pos);
+        }
         public EvalResult eval(Position pos, int minDepth)
         {
-
             //Om minDepth är -1, skall datorn själv bestämma djup.
             if (minDepth == -1)
             {
-                minDepth = automaticDepth(pos);
+                setAutomaticDepths(pos);
             }
-            minimumDepth = (sbyte)minDepth;
-            maximumDepth = (sbyte)(minDepth + depthExtend);
-
+            else
+            {
+                minimumDepth = (sbyte)minDepth;
+                maximumDepth = (sbyte)(minDepth + defaultDepthExtend);
+            }
+            return eval(pos);
+        }
+        private EvalResult eval(Position pos)
+        {
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
@@ -42,7 +57,7 @@ namespace Blobfish_11
                 if (moves.Count == 1)
                 {
                     //Spela forcerande drag omedelbart?
-                    EvalResult res = eval(moves[0].execute(pos), minDepth-1);
+                    EvalResult res = eval(moves[0].execute(pos), minimumDepth-1);
                     result.evaluation = adjustCheckmateEval(res.evaluation, 1);
                     result.allMoves = moves;
                     result.bestMove = moves[0];
@@ -53,7 +68,7 @@ namespace Blobfish_11
                 // i moveIncreaseLimits, vilka återfinns i EngineData.
                 foreach (int item in moveIncreaseLimits)
                 {
-                    if (moves.Count <= item) minDepth++;
+                    if (moves.Count <= item) minimumDepth++;
                     else break;
                 }
 
@@ -141,9 +156,6 @@ namespace Blobfish_11
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
         {
-            if (cancelFlag.getValue() != 0)
-                return 0f;
-
             if (depth >= minimumDepth && !forceBranching)
                 return numericEval(pos);
 
@@ -153,11 +165,10 @@ namespace Blobfish_11
             }
             List<Move> moves = allValidMoves(pos, true);
             if (moves.Count == 0)
-                return decisiveResult(pos, moves);
+                return adjustCheckmateEval(decisiveResult(pos, moves), depth);
 
             OrdinaryFloat alpha = new OrdinaryFloat(alphaContainer.getValue());
             OrdinaryFloat beta = new OrdinaryFloat(betaContainer.getValue());
-
 
             if (pos.whiteToMove)
             {
@@ -185,7 +196,6 @@ namespace Blobfish_11
                             break; //Pruning
                     }
                 }
-                value = adjustCheckmateEval(value, depth);
                 return value;
             }
             else
@@ -214,7 +224,6 @@ namespace Blobfish_11
                             break; //Pruning
                     }
                 }
-                value = adjustCheckmateEval(value, depth);
                 return value;
             }
         }
@@ -501,6 +510,13 @@ namespace Blobfish_11
         }
         private float adjustCheckmateEval(float evaluation, sbyte movesToMate)
         {
+            /* 
+             * En forcerad matt betecknas genom: abs(2000-eval) = antal halvdrag till matt.
+             * Om evalueringen är positiv innebär det forcerad matt för vit, om negativ så 
+             * forcerad matt för svart.
+             * Detta för att hålla konventionen att ju högre tal, desto bättre för vit.
+             * Alla evalueringar med egenskapen abs(eval) > 1000 betraktas som forcerade mattar.
+            */
             if (evaluation >= 2000)
                 return evaluation - movesToMate;
             else if (evaluation <= -2000)
@@ -544,7 +560,7 @@ namespace Blobfish_11
             }
             return piece;
         }
-        private int automaticDepth(Position pos)
+        private void setAutomaticDepths(Position pos)
         {
             double materialSum = 0;
             double weightForPawnOnLastRank = calculationWeights[4] * 0.75f;
@@ -577,12 +593,16 @@ namespace Blobfish_11
                 }
             }
             if (materialSum < 11)
-                return 7;
+                minimumDepth = 7;
             else if (materialSum <= calculationWeights[4])
-                return 6;
+                minimumDepth = 6;
             else if (materialSum < 25)
-                return 5;
-            else return 4;
+                minimumDepth = 5;
+            else 
+                minimumDepth = 4;
+
+            //TODO: Beräkna depthExtend till nytt värde.
+            maximumDepth = (sbyte)(minimumDepth + defaultDepthExtend);
         }
     }
 }

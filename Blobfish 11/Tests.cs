@@ -93,7 +93,7 @@ namespace Blobfish_11
                 Position pos = new Position(FEN);
                 EvalResult result = blobfish.eval(pos, movesToMate+1);
                 int plysToMate = (movesToMate * 2) -1;
-                bool success = result.evaluation == (pos.whiteToMove ? (2001 - plysToMate) : (-2001 + plysToMate));
+                bool success = result.evaluation == (pos.whiteToMove ? (2000 - plysToMate) : (-2000 + plysToMate));
                 if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
                 else
                 {
