@@ -61,10 +61,6 @@ namespace Blobfish_11
                 globalBeta.setValue(float.PositiveInfinity);
                 List<Thread> threadList = new List<Thread>();
 
-                //bool success = ThreadPool.SetMinThreads(2, 1);
-                //bool success2 = ThreadPool.SetMaxThreads(2, 1);
-                //if (!(success && success2)) throw new Exception("Fel vid modifikation av trådpoolen!");
-
                 SecureFloat bestMove = new SecureFloat(0);
                 for(int i = 0;i<moves.Count;i++)
                 //foreach (Move currentMove in moves)
@@ -82,9 +78,6 @@ namespace Blobfish_11
                     thread.Start();
                     threadList.Add(thread);
 
-
-                    //ThreadPool.QueueUserWorkItem(new WaitCallback(threadStartStarter),
-                    //    new ThreadStartArguments(currentMove.execute(pos), (sbyte)(minDepth - 1), newFloat, globalAlpha, globalBeta));
                 }
                 //result.bestMove = moves[0];
                 Thread.Sleep(sleepTime);
@@ -132,11 +125,6 @@ namespace Blobfish_11
             result.allMoves = moves;
             return result;
         }
-        public void threadStartStarter(Object t)
-        {
-            ThreadStartArguments tsa = (ThreadStartArguments)t;
-            //threadStart(tsa.pos, tsa.depth, tsa.ansPlace, tsa.globalAlpha, tsa.globalBeta);
-        }
         public void threadStart(Position pos, sbyte depth, int moveIndex, SecureFloat bestMove,
             SecureFloat ansPlace, SecureFloat globalAlpha, SecureFloat globalBeta)
         {
@@ -161,7 +149,6 @@ namespace Blobfish_11
         }
         private float alphaBeta(Position pos, sbyte depth, FloatContainer alphaContainer, FloatContainer betaContainer, bool forceBranching)
         {
-            //string moveName = ""; //Endast i debug-syfte
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
@@ -185,8 +172,6 @@ namespace Blobfish_11
                     if (betaContainer is SecureFloat && betaContainer.getValue() < beta.getValue())
                         beta.setValue(betaContainer.getValue());
 
-                    //Endast i debug-syfte
-                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -217,8 +202,6 @@ namespace Blobfish_11
                 {
                     if (alphaContainer is SecureFloat && alphaContainer.getValue() > alpha.getValue())
                         alpha.setValue(alphaContainer.getValue());
-                    //Endast i debug-syfte
-                    //moveName = currentMove.toString(pos.board);
 
                     Position newPos = currentMove.execute(pos);
                     if (extendedDepth(currentMove, pos, depth, moves.Count) || isCheck(newPos))
@@ -411,8 +394,6 @@ namespace Blobfish_11
                     }
                     float defCoeff = defence[2-i, j + 2];
                     float finDefValue = defValue * defCoeff;
-
-                    //float DefContribution = (finDefValue * (oppHeavyMaterial - endgameLimit)) / kingSafteyDivisor;
 
                     defenceAccumulator += finDefValue;
                 }
