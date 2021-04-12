@@ -16,6 +16,9 @@ namespace Blobfish_11
         //Löparparets egenvärde.
         readonly float bishopPairValue = 0.4f;
 
+        readonly float rookOnSemiOpenLineCoefficient = 1.08f;
+        readonly float rookOnOpenLineCoefficient = 1.11f;
+
         //Värdet av att vara vid draget när en variant slutar.
         readonly float toMoveValue = 0.25f;
 
@@ -32,7 +35,7 @@ namespace Blobfish_11
         readonly int sleepTime = 100;
 
         //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
-        double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBR
+        double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBRQ
 
         //För vart och ett av talen som är större än antalet drag i ställningen så
         //ökas djupet med ett. Talen bör vara i minskande ordning.
@@ -113,14 +116,14 @@ namespace Blobfish_11
         };
         private static readonly float[,] rook =
         {
-            {1f,      1.03f,    1.07f,    1.1f,     1.1f,     1.07f,    1.03f,    1f,    },
-            {1.03f,   1f,       0.96f,    1.02f,    1.02f,    0.96f,    1f,       1.03f, },
-            {1.07f,   0.96f,    0.93f,    0.91f,    0.91f,    0.93f,    0.96f,    1.07f, },
-            {1.1f,    1.02f,    0.91f,    0.89f,    0.89f,    0.91f,    1.02f,    1.1f,  },
-            {1.1f,    1.02f,    0.91f,    0.89f,    0.89f,    0.91f,    1.02f,    1.1f,  },
-            {1.07f,   0.96f,    0.93f,    0.91f,    0.91f,    0.93f,    0.96f,    1.07f, },
-            {1.03f,   1f,       0.96f,    1.02f,    1.02f,    0.96f,    1f,       1.03f, },
-            {1f,      1.03f,    1.07f,    1.1f,     1.1f,     1.07f,    1.03f,    1f,    }
+            {1.01f, 1.02f, 1.04f, 1.06f, 1.06f, 1.04f, 1.02f, 1.01f },
+            {1.02f, 0.99f, 0.98f, 1f,    1f,    0.98f, 0.99f, 1.02f },
+            {1.04f, 0.98f, 0.96f, 0.95f, 0.95f, 0.96f, 0.98f, 1.04f },
+            {1.06f, 1f,    0.95f, 0.94f, 0.94f, 0.95f, 1f,    1.06f },
+            {1.06f, 1f,    0.95f, 0.94f, 0.94f, 0.95f, 1f,    1.06f },
+            {1.04f, 0.98f, 0.96f, 0.95f, 0.95f, 0.96f, 0.98f, 1.04f },
+            {1.02f, 0.99f, 0.98f, 1f,    1f,    0.98f, 0.99f, 1.02f },
+            {1.01f, 1.02f, 1.04f, 1.06f, 1.06f, 1.04f, 1.02f, 1.01f }
         };
         private static readonly float[,] queen =
         {
