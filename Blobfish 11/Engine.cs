@@ -23,10 +23,10 @@ namespace Blobfish_11
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
-            int gameResult = decisiveResult(pos, moves);
-            if (gameResult != -2)
+            GameResult gameResult = decisiveResult(pos, moves);
+            if (gameResult != GameResult.Undecided)
             {
-                result.evaluation = gameResult;
+                result.evaluation = numericEval(gameResult);
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
@@ -158,7 +158,7 @@ namespace Blobfish_11
             }
             List<Move> moves = allValidMoves(pos, true);
             if (moves.Count == 0)
-                return decisiveResult(pos, moves);
+                return numericEval(decisiveResult(pos, moves));
 
             OrdinaryFloat alpha = new OrdinaryFloat(alphaContainer.getValue());
             OrdinaryFloat beta = new OrdinaryFloat(betaContainer.getValue());
@@ -371,6 +371,12 @@ namespace Blobfish_11
             // TODO: Variera värdet av att vara vid draget?
             return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }
+        private float numericEval(GameResult gr)
+        {
+            if (gr == GameResult.WhiteWin) return 2000;
+            else if (gr == GameResult.BlackWin) return -2000;
+            else return 0;
+        }
         private float kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
             float defenceAccumulator = 0;
@@ -457,7 +463,7 @@ namespace Blobfish_11
             }
             return pawnValues[1] - pawnValues[0];
         }
-        public int decisiveResult(Position pos, List<Move> moves)
+        public GameResult decisiveResult(Position pos, List<Move> moves)
         {
             //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
@@ -466,18 +472,18 @@ namespace Blobfish_11
                 bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
-                    if (pos.whiteToMove) return -2000;
-                    else return 2000;
+                    if (pos.whiteToMove) return GameResult.BlackWin;
+                    else return GameResult.WhiteWin;
                 }
-                else return 0; //Patt
+                else return GameResult.DrawByStaleMate; //Patt
             }
 
             if (pos.halfMoveClock >= 100)
             {
-                return 0; //Femtiodragsregeln.
+                return GameResult.DrawBy50MoveRule; //Femtiodragsregeln.
             }
 
-            return -2;
+            return GameResult.Undecided;
         }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {

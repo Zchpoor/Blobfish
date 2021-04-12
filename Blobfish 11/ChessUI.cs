@@ -126,14 +126,14 @@ namespace Blobfish_11
 
 
             //TODO: Faktorisera ut med liknande kod nedan.
-            int res = blobFish.decisiveResult(pos, currentMoves);
-            if (res != -2)
+            GameResult res = blobFish.decisiveResult(pos, currentMoves);
+            if (res != GameResult.Undecided)
             {
                 resultPopUp(res);
             }
             else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
-                resultPopUp(-1);
+                resultPopUp(GameResult.DrawByInsufficientMaterial);
             }
             else if (engineIsToMove())
             {
@@ -183,14 +183,14 @@ namespace Blobfish_11
         }
         private void printEval(EvalResult result)
         {
-            int decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
-            if (decisiveResult != -2)
+            GameResult decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
+            if (decisiveResult != GameResult.Undecided)
             {
                 resultPopUp(decisiveResult);
             }
             else if (!blobFish.mateableMaterial(game.currentPosition.board))
             {
-                resultPopUp(-1);
+                resultPopUp(GameResult.DrawByInsufficientMaterial);
             }
             else if (result.bestMove != null)
             {
@@ -237,26 +237,36 @@ namespace Blobfish_11
                 
             }
         }
-        private void resultPopUp(int result)
+        private void resultPopUp(GameResult result)
         {
             if (retrospectMode)
                 return;
-            if (result > 1000)
+            if (result == GameResult.WhiteWin)
             {
                 MessageBox.Show("Vit vann på schack matt!");
                 game.result = "1-0";
             }
-            else if (result < -1000)
+            else if (result == GameResult.BlackWin)
             {
                 MessageBox.Show("Svart vann på schack matt!");
                 game.result = "0-1";
             }
-            else if (result == 0)
+            else if (result == GameResult.DrawBy50MoveRule)
             {
-                MessageBox.Show("Partiet slutade remi!");
+                MessageBox.Show("Partiet slutade remi, på grund av 50-dragsregeln!");
                 game.result = "1/2-1/2";
             }
-            else if (result == -1)
+            else if (result == GameResult.DrawByStaleMate)
+            {
+                MessageBox.Show("Partiet slutade remi, på grund av patt!");
+                game.result = "1/2-1/2";
+            }
+            else if (result == GameResult.DrawByRepetition)
+            {
+                MessageBox.Show("Partiet slutade remi, på grund av dragupprepning!");
+                game.result = "1/2-1/2";
+            }
+            else if (result == GameResult.DrawByInsufficientMaterial)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
                 game.result = "1/2-1/2";
@@ -275,7 +285,6 @@ namespace Blobfish_11
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //TODO: Kolla så ställningen inte förändrats.
             //TODO: Bli av med denna worker?
             //Flytta motorn hit?
             blobFish.cancelFlag.setValue(0);
