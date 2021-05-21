@@ -24,8 +24,9 @@ namespace Blobfish_11
         public ChessUI() 
         {
             InitializeComponent();
+            this.Height = boardPanel.Height + 30;
             this.MinimumSize = this.Size;
-            this.MaximumSize = this.Size;
+            //this.MaximumSize = this.Size;
             int squareSize = 60;
             boardPanel.AutoSize = true;
             moveLabel.Text = "";

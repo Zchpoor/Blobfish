@@ -284,8 +284,13 @@ namespace Blobfish_11
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PGNHandler handler = new PGNHandler();
-            handler.save(game);
+            //PGNHandler handler = new PGNHandler();
+            PGNHandler.save(game);
+        }
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            game = PGNHandler.load();
+            display(game.firstPosition);
         }
         private void startaOmToolStripMenuItem_Click(object sender, EventArgs e)
         {
