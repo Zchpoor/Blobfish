@@ -362,5 +362,10 @@ namespace Blobfish_11
                 return new Engine();
             }
         }
+        private void flipBoard()
+        {
+            flipped = !flipped;
+            display(game.currentPosition);
+        }
     }
 }

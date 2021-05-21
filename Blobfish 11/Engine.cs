@@ -12,6 +12,7 @@ namespace Blobfish_11
     {
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public SecureFloat moveNowFlag = new SecureFloat(0f);
+
         public EvalResult eval(Position pos, int minDepth)
         {
 
@@ -465,7 +466,6 @@ namespace Blobfish_11
         }
         public GameResult decisiveResult(Position pos, List<Move> moves)
         {
-            //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
                 Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
@@ -475,15 +475,17 @@ namespace Blobfish_11
                     if (pos.whiteToMove) return GameResult.BlackWin;
                     else return GameResult.WhiteWin;
                 }
-                else return GameResult.DrawByStaleMate; //Patt
+                else return GameResult.DrawByStaleMate;
             }
-
-            if (pos.halfMoveClock >= 100)
+            else if (pos.halfMoveClock >= 100)
             {
-                return GameResult.DrawBy50MoveRule; //Femtiodragsregeln.
+                return GameResult.DrawBy50MoveRule;
             }
-
-            return GameResult.Undecided;
+            else if (!mateableMaterial(pos.board))
+            {
+                return GameResult.DrawByInsufficientMaterial;
+            }
+            else return GameResult.Undecided;
         }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
@@ -527,7 +529,7 @@ namespace Blobfish_11
                     item.Abort();
             }
         }
-        public bool mateableMaterial(char[,] board)
+        private bool mateableMaterial(char[,] board)
         {
             //TODO: Fixa för mattbart material för de respektive spelarna.
             bool anyKnight = false;

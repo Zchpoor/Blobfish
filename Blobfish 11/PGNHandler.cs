@@ -14,6 +14,13 @@ namespace Blobfish_11
         {
             try
             {
+                string gameResultText;
+                if (game.result == GameResult.WhiteWin) gameResultText = "1-0";
+                if (game.result == GameResult.BlackWin) gameResultText = "0-1";
+                if (game.result == GameResult.Undecided) gameResultText = "*";
+                else gameResultText = "1/2-1/2";
+                
+                //TODO: Use stringBuilder.
                 string text = "";
                 text += "[Event \"Blobfish game\"]\n";
                 text += "[Site \"?\"]\n";
@@ -21,7 +28,9 @@ namespace Blobfish_11
                 text += "[Round \"-\"]\n";
                 text += "[White \""+ game.players[0]+"\"]\n";
                 text += "[Black \"" + game.players[1] + "\"]\n";
-                text += "[Result \"" + game.result + "\"]\n";
+                text += "[Result \"";
+                text += gameResultText;
+                text += "\"]\n";
                 if(game.firstPosition.getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
                 {
                     //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
@@ -41,7 +50,7 @@ namespace Blobfish_11
                     {
                         //TODO: Färre än 80 tecken per rad.
                         text += "\n" + game.scoresheet();
-                        text += game.result;
+                        text += gameResultText;
                         byte[] byteArray = Encoding.ASCII.GetBytes(text);
                         fileStream.Write(byteArray, 0, text.Length);
                     }

@@ -101,7 +101,7 @@ namespace Blobfish_11
             evalStatusLabel.Text = "";
             computerMoveStatusLabel.Text = "";
             timeSpentStatusLabel.Text = "";
-            game.result = "*";
+            game.result = GameResult.Undecided;
             computerBlackToolStripMenuItem.Checked = true;
             game = new Game();
             display(game.currentPosition);
@@ -124,16 +124,10 @@ namespace Blobfish_11
                 }
             }
 
-
-            //TODO: Faktorisera ut med liknande kod nedan.
             GameResult res = blobFish.decisiveResult(pos, currentMoves);
             if (res != GameResult.Undecided)
             {
                 resultPopUp(res);
-            }
-            else if (!blobFish.mateableMaterial(game.currentPosition.board))
-            {
-                resultPopUp(GameResult.DrawByInsufficientMaterial);
             }
             else if (engineIsToMove())
             {
@@ -176,21 +170,12 @@ namespace Blobfish_11
             }
             return text;
         }
-        private void flipBoard()
-        {
-            flipped = !flipped;
-            display(game.currentPosition);
-        }
         private void printEval(EvalResult result)
         {
             GameResult decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
             if (decisiveResult != GameResult.Undecided)
             {
                 resultPopUp(decisiveResult);
-            }
-            else if (!blobFish.mateableMaterial(game.currentPosition.board))
-            {
-                resultPopUp(GameResult.DrawByInsufficientMaterial);
             }
             else if (result.bestMove != null)
             {
@@ -244,33 +229,28 @@ namespace Blobfish_11
             if (result == GameResult.WhiteWin)
             {
                 MessageBox.Show("Vit vann på schack matt!");
-                game.result = "1-0";
             }
             else if (result == GameResult.BlackWin)
             {
                 MessageBox.Show("Svart vann på schack matt!");
-                game.result = "0-1";
             }
             else if (result == GameResult.DrawBy50MoveRule)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av 50-dragsregeln!");
-                game.result = "1/2-1/2";
             }
             else if (result == GameResult.DrawByStaleMate)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av patt!");
-                game.result = "1/2-1/2";
             }
             else if (result == GameResult.DrawByRepetition)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av dragupprepning!");
-                game.result = "1/2-1/2";
             }
             else if (result == GameResult.DrawByInsufficientMaterial)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
-                game.result = "1/2-1/2";
             }
+            game.result = result;
             retrospectMode = true;
         }
         private bool engineIsToMove()

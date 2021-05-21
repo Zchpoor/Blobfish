@@ -49,7 +49,7 @@ namespace Blobfish_11
             }
 
         }
-        public string result { get; set; } = "*";
+        public GameResult result { get; set; } = GameResult.Undecided;
         public Position currentPosition { get { return gameTree.position; } }
         public Position firstPosition { get { return firstGameTreeNode.position; } }
         public void addMove(Move move)
