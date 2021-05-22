@@ -1,0 +1,10 @@
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Release\Blobfish 11.exe.config
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Release\Blobfish 11.exe
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Release\Blobfish 11.pdb
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish 11.csprojAssemblyReference.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish_11.ChessUI.resources
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish_11.Properties.Resources.resources
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish 11.csproj.GenerateResource.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish 11.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish 11.exe
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Release\Blobfish 11.pdb

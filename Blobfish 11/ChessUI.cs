@@ -94,7 +94,8 @@ namespace Blobfish_11
                 }
             }
             reset();
-            this.Height = boardPanel.Height + menuStrip1.Height + statusStrip1.Height + fenBox.Height + 50;
+            this.Height = boardPanel.Height + menuStrip1.Height + statusStrip1.Height + 
+                extraInfoTextBox.Height + fenBox.Height + 50;
             this.MinimumSize = this.Size;
             this.MaximumSize = this.Size;
         }
@@ -111,6 +112,7 @@ namespace Blobfish_11
         private void display(Position pos)
         {
             updateScoresheetBox();
+            updateExtraInfoTextBox();
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             currentMoves = blobFish.allValidMoves(pos, false);
@@ -149,6 +151,28 @@ namespace Blobfish_11
                 scoresheetBox.Rtf = game.RTFScoresheet(); //Uppdaterar protokollet.
             }
         }
+        private void updateExtraInfoTextBox()
+        {
+            string[] players = new string[2];
+            for (int i = 0; i < 2; i++)
+            {
+                players[i] = game.players[i];
+                if (game.eloRatings[i] > 0)
+                {
+                    players[i] += " (" + game.eloRatings[i].ToString() + ")";
+                }
+            }
+            string newText = players[0] + " - " + players[1] + Environment.NewLine;
+            if (game.gameEvent != "")
+                newText += game.gameEvent + Environment.NewLine;
+            if (game.round != "")
+                newText += game.round + Environment.NewLine;
+            if (game.date != "")
+                newText += game.date + Environment.NewLine;
+            extraInfoTextBox.Clear();
+            extraInfoTextBox.Text = newText;
+        }
+
         private void playBestEngineMove()
         {
             if (!ponderingWorker.IsBusy)

@@ -76,8 +76,22 @@ namespace Blobfish_11
             {
                 string filename = ofd.FileName;
                 string[] filelines = File.ReadAllLines(filename);
-                string completeString = String.Join(" ", filelines);
-                List<string> moveNames = getMoveNames(completeString);
+
+                List<string> moves = new List<string>();
+                List<string> metaData = new List<string>();
+
+                foreach (string line in filelines)
+                {
+                    if (line.Length == 0)
+                        continue;
+                    else if (line[0] == '[')
+                        metaData.Add(line);
+                    else
+                        moves.Add(line);
+                }
+
+
+                List<string> moveNames = getMoveNames(moves);
 
                 foreach (string moveName in moveNames)
                 {
@@ -85,27 +99,85 @@ namespace Blobfish_11
                     game.addMove(move);
                 }
 
+                setMetaData(metaData, game);
+
                 return game;
             }
 
             return null;
         }
-        private static List<string> getMoveNames (string completeString)
+        private static List<string> getMoveNames (List<string> inMoves)
         {
-            List<string> moves = new List<string>();
-            string[] tokens = completeString.Split(' ');
+            string allMoves = String.Join(" ", inMoves);
+            List<string> outMoves = new List<string>();
 
+            string[] tokens = allMoves.Split(' ');
+
+            string[] possibleResults = { "1-0", "0-1", "1/2-1/2", "*"};
             foreach (string token in tokens)
             {
                 if(token.Contains('.'))
                 {
+                    int indexOfDot = token.IndexOf(".");
+                    string moveName = token.Substring(indexOfDot+1, token.Length - indexOfDot-1);
+                    if (moveName != "")
+                        outMoves.Add(moveName);
+
                     continue;
                 }
-
-                moves.Add(token);
+                if(possibleResults.Contains(token))
+                {
+                    continue;
+                }
+                outMoves.Add(token);
                 Console.WriteLine(token);
             }
-            return moves;
+            return outMoves;
+        }
+        private static void setMetaData(List<string> gameStrings, Game game)
+        {
+            foreach (string line in gameStrings)
+            {
+                if (line[0] != '[' || line[line.Length-1] != ']')
+                    break;
+
+                string metaField = line.Substring(1, line.IndexOf(' '));
+                metaField = metaField.ToLower().Trim();
+
+                //Assuming the value goes on until the second last character.
+                int firstQuote = line.IndexOf('\"')+1;
+                string metaValue = line.Substring(firstQuote, (line.Length-2)-firstQuote);
+                try
+                {
+                    switch (metaField)
+                    {
+                        case "event": game.gameEvent = metaValue; break;
+                        case "result": game.result = getGameResult(metaValue); break;
+                        case "white": game.players[0] = metaValue; break;
+                        case "black": game.players[1] = metaValue; break;
+                        case "site": game.site = metaValue; break;
+                        case "date": game.date = metaValue; break;
+                        case "round": game.round = metaValue; break;
+                        case "eco": game.eco = metaValue; break;
+                        case "whiteelo": game.eloRatings[0] = int.Parse(metaValue); break;
+                        case "blackelo": game.eloRatings[1] = int.Parse(metaValue); break;
+                        default: break;
+                    }
+                }catch (Exception e)
+                {
+                    MessageBox.Show("Error when parsing metadata: " + e.Message, "Exception!");
+                }
+            }
+        }
+        private static GameResult getGameResult(string result)
+        {
+            if (result == "1-0")
+                return GameResult.WhiteWin;
+            if (result == "0-1")
+                return GameResult.BlackWin;
+            if (result == "1/2-1/2")
+                return GameResult.DrawByRepetition;
+            return GameResult.Undecided;
         }
 
         private static Move getMove(string moveName, Position currentPosition) {
@@ -115,17 +187,19 @@ namespace Blobfish_11
             foreach (Move move in allMoves)
             {
                 if (move.toString(currentPosition) == moveName)
+                {
+                    Console.WriteLine(moveName);
                     return move;
+                }
             }
             throw new Exception("No move with the name: " + moveName);
         }
 
-
-        private char getSymbol(int NAGNumber)
+        private static char getSymbol(int NAGNumber)
         {
             int symbolNumber(int number)
             {
-                switch (NAGNumber)
+                switch (number)
                 {
                     case 1: return 0x0021;
                     case 2: return 0x003F;

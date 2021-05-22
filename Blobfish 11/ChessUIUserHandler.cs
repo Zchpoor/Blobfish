@@ -290,7 +290,8 @@ namespace Blobfish_11
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             game = PGNHandler.load();
-            display(game.firstPosition);
+            game.goToFirstPosition();
+            display(game.currentPosition);
         }
         private void startaOmToolStripMenuItem_Click(object sender, EventArgs e)
         {

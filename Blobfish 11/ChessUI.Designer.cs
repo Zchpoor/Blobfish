@@ -79,6 +79,7 @@
             this.evalStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.timeSpentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.scoresheetBox = new System.Windows.Forms.RichTextBox();
+            this.extraInfoTextBox = new System.Windows.Forms.RichTextBox();
             this.ponderingPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -239,7 +240,7 @@
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
             this.menuStrip1.ShowItemToolTips = true;
-            this.menuStrip1.Size = new System.Drawing.Size(1102, 36);
+            this.menuStrip1.Size = new System.Drawing.Size(1102, 33);
             this.menuStrip1.TabIndex = 14;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -253,7 +254,7 @@
             this.toolStripSeparator4,
             this.closeToolStripMenuItem});
             this.partiToolStripMenuItem.Name = "partiToolStripMenuItem";
-            this.partiToolStripMenuItem.Size = new System.Drawing.Size(97, 32);
+            this.partiToolStripMenuItem.Size = new System.Drawing.Size(97, 29);
             this.partiToolStripMenuItem.Text = "Program";
             // 
             // saveToolStripMenuItem
@@ -309,7 +310,7 @@
             this.partiToolStripMenuItem1.Name = "partiToolStripMenuItem1";
             this.partiToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
-            this.partiToolStripMenuItem1.Size = new System.Drawing.Size(62, 32);
+            this.partiToolStripMenuItem1.Size = new System.Drawing.Size(62, 29);
             this.partiToolStripMenuItem1.Text = "Parti";
             // 
             // filpBoardToolStripMenuItem
@@ -353,7 +354,7 @@
             this.depthToolStripMenuItem,
             this.styleToolStripMenuItem});
             this.motorToolStripMenuItem.Name = "motorToolStripMenuItem";
-            this.motorToolStripMenuItem.Size = new System.Drawing.Size(78, 32);
+            this.motorToolStripMenuItem.Size = new System.Drawing.Size(78, 29);
             this.motorToolStripMenuItem.Text = "Motor";
             // 
             // engineColorMenuItem
@@ -516,7 +517,7 @@
             this.computerMoveStatusLabel,
             this.evalStatusLabel,
             this.timeSpentStatusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 845);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 932);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 16, 0);
             this.statusStrip1.Size = new System.Drawing.Size(1102, 40);
@@ -573,11 +574,21 @@
             this.scoresheetBox.TabIndex = 16;
             this.scoresheetBox.Text = "";
             // 
+            // extraInfoTextBox
+            // 
+            this.extraInfoTextBox.Enabled = false;
+            this.extraInfoTextBox.Location = new System.Drawing.Point(18, 816);
+            this.extraInfoTextBox.Name = "extraInfoTextBox";
+            this.extraInfoTextBox.Size = new System.Drawing.Size(718, 113);
+            this.extraInfoTextBox.TabIndex = 17;
+            this.extraInfoTextBox.Text = "";
+            // 
             // ChessUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1102, 885);
+            this.ClientSize = new System.Drawing.Size(1102, 972);
+            this.Controls.Add(this.extraInfoTextBox);
             this.Controls.Add(this.scoresheetBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.ponderingPanel);
@@ -659,6 +670,7 @@
         private System.Windows.Forms.ToolStripStatusLabel timeSpentStatusLabel;
         private System.Windows.Forms.RichTextBox scoresheetBox;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.RichTextBox extraInfoTextBox;
     }
 }
 
