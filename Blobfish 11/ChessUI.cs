@@ -25,10 +25,8 @@ namespace Blobfish_11
         {
             InitializeComponent();
             this.Height = boardPanel.Height + 30;
-            this.MinimumSize = this.Size;
-            //this.MaximumSize = this.Size;
             int squareSize = 60;
-            boardPanel.AutoSize = true;
+            //boardPanel.AutoSize = true;
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
@@ -96,6 +94,9 @@ namespace Blobfish_11
                 }
             }
             reset();
+            this.Height = boardPanel.Height + menuStrip1.Height + statusStrip1.Height + fenBox.Height + 50;
+            this.MinimumSize = this.Size;
+            this.MaximumSize = this.Size;
         }
         private void reset()
         {
