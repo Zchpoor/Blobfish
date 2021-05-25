@@ -195,11 +195,11 @@ namespace Blobfish_11
             throw new Exception("No move with the name: " + moveName);
         }
 
-        private static char getSymbol(int NAGNumber)
+        private static string getSymbol(int NAGNumber)
         {
-            int symbolNumber(int number)
+            int symbolNumber()
             {
-                switch (number)
+                switch (NAGNumber)
                 {
                     case 1: return 0x0021;
                     case 2: return 0x003F;
@@ -217,10 +217,41 @@ namespace Blobfish_11
                     case 16: return 0x00B1;
                     case 17: return 0x2213;
 
+                    case 22:
+                    case 23: return 0x2A00;
+
+                    case 32:
+                    case 33: return 0x27F3;
+
+                    case 36:
+                    case 37: return 0x2191;
+
+                    case 40:
+                    case 41: return 0x2192;
+
+                    case 44:
+                    case 45: return 0x2A73;
+
+                    case 132:
+                    case 133: return 0x21C6;
+
+                    case 138:
+                    case 139: return 0x2A01;
+                    //------Non-standard------
+                    case 140: return 0x2206;
+                    case 141: return 0x2207;
+                    case 142: return 0x2313;
+
+                    case 146: return 'N';
+
+                    case 238: return 0x25CB;
+
                     default: return 36;
                 }
             }
-            return (char)symbolNumber(NAGNumber);
+            if (NAGNumber == 18)
+                return ((char)0x002B).ToString() + ((char)0x002D).ToString();
+            return ((char)symbolNumber()).ToString();
         }
     }
 }
