@@ -24,10 +24,9 @@ namespace Blobfish_11
         public ChessUI() 
         {
             InitializeComponent();
-            this.MinimumSize = this.Size;
-            this.MaximumSize = this.Size;
+            this.Height = boardPanel.Height + 30;
             int squareSize = 60;
-            boardPanel.AutoSize = true;
+            //boardPanel.AutoSize = true;
             moveLabel.Text = "";
             ponderingLabel.Text = "Datorn tänker.";
             ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
@@ -95,13 +94,17 @@ namespace Blobfish_11
                 }
             }
             reset();
+            this.Height = boardPanel.Height + menuStrip1.Height + statusStrip1.Height + 
+                extraInfoTextBox.Height + fenBox.Height + 50;
+            this.MinimumSize = this.Size;
+            this.MaximumSize = this.Size;
         }
         private void reset()
         {
             evalStatusLabel.Text = "";
             computerMoveStatusLabel.Text = "";
             timeSpentStatusLabel.Text = "";
-            game.result = "*";
+            game.result = GameResult.Undecided;
             computerBlackToolStripMenuItem.Checked = true;
             game = new Game();
             display(game.currentPosition);
@@ -109,6 +112,7 @@ namespace Blobfish_11
         private void display(Position pos)
         {
             updateScoresheetBox();
+            updateExtraInfoTextBox();
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
             currentMoves = blobFish.allValidMoves(pos, false);
@@ -124,16 +128,10 @@ namespace Blobfish_11
                 }
             }
 
-
-            //TODO: Faktorisera ut med liknande kod nedan.
-            int res = blobFish.decisiveResult(pos, currentMoves);
-            if (res != -2)
+            GameResult res = blobFish.decisiveResult(pos, currentMoves);
+            if (res != GameResult.Undecided)
             {
                 resultPopUp(res);
-            }
-            else if (!blobFish.mateableMaterial(game.currentPosition.board))
-            {
-                resultPopUp(-1);
             }
             else if (engineIsToMove())
             {
@@ -153,6 +151,28 @@ namespace Blobfish_11
                 scoresheetBox.Rtf = game.RTFScoresheet(); //Uppdaterar protokollet.
             }
         }
+        private void updateExtraInfoTextBox()
+        {
+            string[] players = new string[2];
+            for (int i = 0; i < 2; i++)
+            {
+                players[i] = game.players[i];
+                if (game.eloRatings[i] > 0)
+                {
+                    players[i] += " (" + game.eloRatings[i].ToString() + ")";
+                }
+            }
+            string newText = players[0] + " - " + players[1] + Environment.NewLine;
+            if (game.gameEvent != "")
+                newText += game.gameEvent + Environment.NewLine;
+            if (game.round != "")
+                newText += game.round + Environment.NewLine;
+            if (game.date != "")
+                newText += game.date + Environment.NewLine;
+            extraInfoTextBox.Clear();
+            extraInfoTextBox.Text = newText;
+        }
+
         private void playBestEngineMove()
         {
             if (!ponderingWorker.IsBusy)
@@ -176,21 +196,12 @@ namespace Blobfish_11
             }
             return text;
         }
-        private void flipBoard()
-        {
-            flipped = !flipped;
-            display(game.currentPosition);
-        }
         private void printEval(EvalResult result)
         {
-            int decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
-            if (decisiveResult != -2)
+            GameResult decisiveResult = blobFish.decisiveResult(game.currentPosition, currentMoves);
+            if (decisiveResult != GameResult.Undecided)
             {
                 resultPopUp(decisiveResult);
-            }
-            else if (!blobFish.mateableMaterial(game.currentPosition.board))
-            {
-                resultPopUp(-1);
             }
             else if (result.bestMove != null)
             {
@@ -237,30 +248,35 @@ namespace Blobfish_11
                 
             }
         }
-        private void resultPopUp(int result)
+        private void resultPopUp(GameResult result)
         {
             if (retrospectMode)
                 return;
-            if (result > 1000)
+            if (result == GameResult.WhiteWin)
             {
                 MessageBox.Show("Vit vann på schack matt!");
-                game.result = "1-0";
             }
-            else if (result < -1000)
+            else if (result == GameResult.BlackWin)
             {
                 MessageBox.Show("Svart vann på schack matt!");
-                game.result = "0-1";
             }
-            else if (result == 0)
+            else if (result == GameResult.DrawBy50MoveRule)
             {
-                MessageBox.Show("Partiet slutade remi!");
-                game.result = "1/2-1/2";
+                MessageBox.Show("Partiet slutade remi, på grund av 50-dragsregeln!");
             }
-            else if (result == -1)
+            else if (result == GameResult.DrawByStaleMate)
+            {
+                MessageBox.Show("Partiet slutade remi, på grund av patt!");
+            }
+            else if (result == GameResult.DrawByRepetition)
+            {
+                MessageBox.Show("Partiet slutade remi, på grund av dragupprepning!");
+            }
+            else if (result == GameResult.DrawByInsufficientMaterial)
             {
                 MessageBox.Show("Partiet slutade remi, på grund av ej mattbart material!");
-                game.result = "1/2-1/2";
             }
+            game.result = result;
             retrospectMode = true;
         }
         private bool engineIsToMove()
@@ -275,7 +291,6 @@ namespace Blobfish_11
 
         private void ponderingWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //TODO: Kolla så ställningen inte förändrats.
             //TODO: Bli av med denna worker?
             //Flytta motorn hit?
             blobFish.cancelFlag.setValue(0);
@@ -414,40 +429,3 @@ namespace Blobfish_11
         }
     }
 }
-
-/*
- * TODO:
- * Bekvämligheter:
- *  +/#
- *  Fler tester.
- *  Välja pjäs att promotera till.
- *  Se material.
- *  Se bästa variant
- *  Koordinater
- *  Få "dra nu" att fungera bättre.
- *  Läsa in PGN.
- * 
- * Justera matriserna:
- *  Gör torn assymmetriska?
- *  Föredra Sc3 före Sd2
- *  Minska behov av terräng.
- * 
- * Effektiviseringar:
- *  Effektivisera algoritmer för dragberäkning.
- *  Tråd-pool?
- *  Beräkna nästa lager av drag tidigare.
- *  Gemensamt bräde i tråd?
- *  Klass med värden åt tråd.
- *  Bli av med delegates?
- *  
- * Förbättringar:
- *  Ta öppna linjer med torn.
- *  Dragupprepningar
- *  Gör kraftiga hot forcerande.
- *  Få schackar/forcerade drag att kräva beräkning två drag framåt.
- *  Avbryt inuti trådarna.
- *  Minska behov av terräng i slutspel.
- *  Bra/dåliga löpare.
- *  
- *  Buggar:
- */

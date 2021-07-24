@@ -49,7 +49,13 @@ namespace Blobfish_11
             }
 
         }
-        public string result { get; set; } = "*";
+        public GameResult result { get; set; } = GameResult.Undecided;
+        public string gameEvent { get; set; } = "";
+        public string site { get; set; } = "";
+        public string date { get; set; } = ""; //Change type?
+        public string round { get; set; } = "";
+        public string eco { get; set; } = ""; //Change type?
+        public int[] eloRatings { get; set; } = { -1, -1 };
         public Position currentPosition { get { return gameTree.position; } }
         public Position firstPosition { get { return firstGameTreeNode.position; } }
         public void addMove(Move move)

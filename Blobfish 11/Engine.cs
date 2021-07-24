@@ -12,6 +12,7 @@ namespace Blobfish_11
     {
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public SecureFloat moveNowFlag = new SecureFloat(0f);
+
         public EvalResult eval(Position pos, int minDepth)
         {
 
@@ -23,10 +24,10 @@ namespace Blobfish_11
             List<Move> moves = allValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
-            int gameResult = decisiveResult(pos, moves);
-            if (gameResult != -2)
+            GameResult gameResult = decisiveResult(pos, moves);
+            if (gameResult != GameResult.Undecided)
             {
-                result.evaluation = gameResult;
+                result.evaluation = numericEval(gameResult);
                 result.allMoves = new List<Move>();
                 result.allEvals = null;
                 return result; //Ställningen är avgjord.
@@ -158,7 +159,7 @@ namespace Blobfish_11
             }
             List<Move> moves = allValidMoves(pos, true);
             if (moves.Count == 0)
-                return decisiveResult(pos, moves);
+                return numericEval(decisiveResult(pos, moves));
 
             OrdinaryFloat alpha = new OrdinaryFloat(alphaContainer.getValue());
             OrdinaryFloat beta = new OrdinaryFloat(betaContainer.getValue());
@@ -368,8 +369,13 @@ namespace Blobfish_11
             }
             float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
             float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
-            // TODO: Variera värdet av att vara vid draget?
             return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
+        }
+        private float numericEval(GameResult gr)
+        {
+            if (gr == GameResult.WhiteWin) return 2000;
+            else if (gr == GameResult.BlackWin) return -2000;
+            else return 0;
         }
         private float kingSaftey(Position pos, bool forWhite, int oppHeavyMaterial)
         {
@@ -439,45 +445,58 @@ namespace Blobfish_11
             float[] pawnValues = new float[2];
             for (sbyte c = 0; c < 2; c++)
             {
-                sbyte neighbours = 0;
-                sbyte lines = 0;
-                if (pawns[c, 0] > 0) lines++; //specialfall för a-linjen.
-                if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
-                for (sbyte i = 1; i < 7; i++) //från b till g sista. 
+                sbyte neighbours = 0; //Summan av antalet "grannar" som linjer där det står bönder har.
+                sbyte lines = 0; //Antal rader på vilka det finns bönder.
+
+                if (pawns[c, 0] > 0) //Specialfall för a-linjen.
                 {
-                    if (pawns[c, i] > 0) lines++;
-                    if (pawns[c, i - 1] > 0) neighbours += pawns[c, 0];
-                    if (pawns[c, i + 1] > 0) neighbours += pawns[c, 0];
+                    lines++; 
+                    if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
                 }
-                if (pawns[c, 7] > 0) lines++; //specialfall för h-linjen.
-                if (pawns[c, 6] > 0) neighbours += pawns[c, 0];
-                pawnValues[c] = ((numberOfPawns[c] * (neighbours + lines + 41)) + 9.37f) / 64;
-                //e(p,s)=(p(s+41)+9,37)/64. TODO: Förbättra formel
+
+                for (sbyte i = 1; i < 7; i++) //från b-linjen till g-linjen. 
+                {
+                    if (pawns[c, i] > 0)
+                    {
+                        lines++;
+                        if (pawns[c, i - 1] > 0) neighbours += pawns[c, i];
+                        if (pawns[c, i + 1] > 0) neighbours += pawns[c, i];
+                    }
+                }
+
+                if (pawns[c, 7] > 0) //Specialfall för h-linjen.
+                {
+                    lines++;
+                    if (pawns[c, 6] > 0) neighbours += pawns[c, 7];
+                }
+                
+                pawnValues[c] = precomputedPawnValues[numberOfPawns[c], neighbours + lines];
                 pawnValues[c] *= posFactor[c];
             }
             return pawnValues[1] - pawnValues[0];
         }
-        public int decisiveResult(Position pos, List<Move> moves)
+        public GameResult decisiveResult(Position pos, List<Move> moves)
         {
-            //TODO: Gör om funktion. Märkliga argument.
             if (moves.Count == 0)
             {
                 Square relevantKingSquare = pos.whiteToMove ? pos.kingPositions[1] : pos.kingPositions[0];
                 bool isCheck = isControlledBy(pos, relevantKingSquare, !pos.whiteToMove);
                 if (isCheck)
                 {
-                    if (pos.whiteToMove) return -2000;
-                    else return 2000;
+                    if (pos.whiteToMove) return GameResult.BlackWin;
+                    else return GameResult.WhiteWin;
                 }
-                else return 0; //Patt
+                else return GameResult.DrawByStaleMate;
             }
-
-            if (pos.halfMoveClock >= 100)
+            else if (pos.halfMoveClock >= 100)
             {
-                return 0; //Femtiodragsregeln.
+                return GameResult.DrawBy50MoveRule;
             }
-
-            return -2;
+            else if (!mateableMaterial(pos.board))
+            {
+                return GameResult.DrawByInsufficientMaterial;
+            }
+            else return GameResult.Undecided;
         }
         private bool extendedDepth(Move move, Position pos, int currentDepth, int numberOfAvailableMoves)
         {
@@ -521,7 +540,7 @@ namespace Blobfish_11
                     item.Abort();
             }
         }
-        public bool mateableMaterial(char[,] board)
+        private bool mateableMaterial(char[,] board)
         {
             //TODO: Fixa för mattbart material för de respektive spelarna.
             bool anyKnight = false;

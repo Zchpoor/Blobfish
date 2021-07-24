@@ -284,8 +284,14 @@ namespace Blobfish_11
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PGNHandler handler = new PGNHandler();
-            handler.save(game);
+            //PGNHandler handler = new PGNHandler();
+            PGNHandler.save(game);
+        }
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            game = PGNHandler.load();
+            game.goToFirstPosition();
+            display(game.currentPosition);
         }
         private void startaOmToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -361,6 +367,11 @@ namespace Blobfish_11
                 MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
                 return new Engine();
             }
+        }
+        private void flipBoard()
+        {
+            flipped = !flipped;
+            display(game.currentPosition);
         }
     }
 }

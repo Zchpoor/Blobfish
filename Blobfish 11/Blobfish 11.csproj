@@ -62,6 +62,7 @@
     <Compile Include="EngineData.cs" />
     <Compile Include="EngineMoveCalculation.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameResult.cs" />
     <Compile Include="GameTree.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="PGNHandler.cs" />
@@ -109,6 +110,7 @@
     <Content Include="Images\Wp.png" />
     <Content Include="Images\WQ.png" />
     <Content Include="Images\WR.png" />
+    <Content Include="TODO.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

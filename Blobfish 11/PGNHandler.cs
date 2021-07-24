@@ -8,12 +8,20 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public class PGNHandler
+    public static class PGNHandler
     {
-        public void save(Game game)
+        private static Engine engine = new Engine();
+        public static void save(Game game)
         {
             try
             {
+                string gameResultText;
+                if (game.result == GameResult.WhiteWin) gameResultText = "1-0";
+                if (game.result == GameResult.BlackWin) gameResultText = "0-1";
+                if (game.result == GameResult.Undecided) gameResultText = "*";
+                else gameResultText = "1/2-1/2";
+                
+                //TODO: Use stringBuilder.
                 string text = "";
                 text += "[Event \"Blobfish game\"]\n";
                 text += "[Site \"?\"]\n";
@@ -21,7 +29,9 @@ namespace Blobfish_11
                 text += "[Round \"-\"]\n";
                 text += "[White \""+ game.players[0]+"\"]\n";
                 text += "[Black \"" + game.players[1] + "\"]\n";
-                text += "[Result \"" + game.result + "\"]\n";
+                text += "[Result \"";
+                text += gameResultText;
+                text += "\"]\n";
                 if(game.firstPosition.getFEN() != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
                 {
                     //Om partiet inte startade i utgångsställningen så läggs ett fält till för FEN.
@@ -41,7 +51,7 @@ namespace Blobfish_11
                     {
                         //TODO: Färre än 80 tecken per rad.
                         text += "\n" + game.scoresheet();
-                        text += game.result;
+                        text += gameResultText;
                         byte[] byteArray = Encoding.ASCII.GetBytes(text);
                         fileStream.Write(byteArray, 0, text.Length);
                     }
@@ -55,6 +65,193 @@ namespace Blobfish_11
             {
                 MessageBox.Show("Ett okänt inträffade.\nFelmeddelande:\n" + e.Message);
             }
+        }
+        public static Game load()
+        {
+            Game game = new Game();
+
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "pgn files (*.pgn)|*.pgn";
+            if(ofd.ShowDialog() == DialogResult.OK)
+            {
+                string filename = ofd.FileName;
+                string[] filelines = File.ReadAllLines(filename);
+
+                List<string> moves = new List<string>();
+                List<string> metaData = new List<string>();
+
+                foreach (string line in filelines)
+                {
+                    if (line.Length == 0)
+                        continue;
+                    else if (line[0] == '[')
+                        metaData.Add(line);
+                    else
+                        moves.Add(line);
+                }
+
+
+                List<string> moveNames = getMoveNames(moves);
+
+                foreach (string moveName in moveNames)
+                {
+                    Move move = getMove(moveName, game.currentPosition);
+                    game.addMove(move);
+                }
+
+                setMetaData(metaData, game);
+
+                return game;
+            }
+
+            return null;
+        }
+        private static List<string> getMoveNames (List<string> inMoves)
+        {
+            string allMoves = String.Join(" ", inMoves);
+            List<string> outMoves = new List<string>();
+
+            string[] tokens = allMoves.Split(' ');
+
+            string[] possibleResults = { "1-0", "0-1", "1/2-1/2", "*"};
+            foreach (string token in tokens)
+            {
+                if(token.Contains('.'))
+                {
+                    int indexOfDot = token.IndexOf(".");
+                    string moveName = token.Substring(indexOfDot+1, token.Length - indexOfDot-1);
+                    if (moveName != "")
+                        outMoves.Add(moveName);
+
+                    continue;
+                }
+                if(possibleResults.Contains(token))
+                {
+                    continue;
+                }
+                outMoves.Add(token);
+                Console.WriteLine(token);
+            }
+            return outMoves;
+        }
+        private static void setMetaData(List<string> gameStrings, Game game)
+        {
+            foreach (string line in gameStrings)
+            {
+                if (line[0] != '[' || line[line.Length-1] != ']')
+                    break;
+
+                string metaField = line.Substring(1, line.IndexOf(' '));
+                metaField = metaField.ToLower().Trim();
+
+                //Assuming the value goes on until the second last character.
+                int firstQuote = line.IndexOf('\"')+1;
+                string metaValue = line.Substring(firstQuote, (line.Length-2)-firstQuote);
+                try
+                {
+                    switch (metaField)
+                    {
+                        case "event": game.gameEvent = metaValue; break;
+                        case "result": game.result = getGameResult(metaValue); break;
+                        case "white": game.players[0] = metaValue; break;
+                        case "black": game.players[1] = metaValue; break;
+                        case "site": game.site = metaValue; break;
+                        case "date": game.date = metaValue; break;
+                        case "round": game.round = metaValue; break;
+                        case "eco": game.eco = metaValue; break;
+                        case "whiteelo": game.eloRatings[0] = int.Parse(metaValue); break;
+                        case "blackelo": game.eloRatings[1] = int.Parse(metaValue); break;
+                        default: break;
+                    }
+                }catch (Exception e)
+                {
+                    MessageBox.Show("Error when parsing metadata: " + e.Message, "Exception!");
+                }
+            }
+        }
+        private static GameResult getGameResult(string result)
+        {
+            if (result == "1-0")
+                return GameResult.WhiteWin;
+            if (result == "0-1")
+                return GameResult.BlackWin;
+            if (result == "1/2-1/2")
+                return GameResult.DrawByRepetition;
+            return GameResult.Undecided;
+        }
+
+        private static Move getMove(string moveName, Position currentPosition) {
+            moveName = moveName.Replace("+", "");
+            moveName = moveName.Replace("#", "");
+            List<Move> allMoves = engine.allValidMoves(currentPosition, false);
+            foreach (Move move in allMoves)
+            {
+                if (move.toString(currentPosition) == moveName)
+                {
+                    Console.WriteLine(moveName);
+                    return move;
+                }
+            }
+            throw new Exception("No move with the name: " + moveName);
+        }
+
+        private static string getSymbol(int NAGNumber)
+        {
+            int symbolNumber()
+            {
+                switch (NAGNumber)
+                {
+                    case 1: return 0x0021;
+                    case 2: return 0x003F;
+                    case 3: return 0x203C;
+                    case 4: return 0x2047;
+                    case 5: return 0x2049;
+                    case 6: return 0x2048;
+                    case 7: return 0x25A1;
+
+                    case 10: return 0x003D;
+
+                    case 13: return 0x221E;
+                    case 14: return 0x2A72;
+                    case 15: return 0x2A71;
+                    case 16: return 0x00B1;
+                    case 17: return 0x2213;
+
+                    case 22:
+                    case 23: return 0x2A00;
+
+                    case 32:
+                    case 33: return 0x27F3;
+
+                    case 36:
+                    case 37: return 0x2191;
+
+                    case 40:
+                    case 41: return 0x2192;
+
+                    case 44:
+                    case 45: return 0x2A73;
+
+                    case 132:
+                    case 133: return 0x21C6;
+
+                    case 138:
+                    case 139: return 0x2A01;
+                    //------Non-standard------
+                    case 140: return 0x2206;
+                    case 141: return 0x2207;
+                    case 142: return 0x2313;
+
+                    case 146: return 'N';
+
+                    case 238: return 0x25CB;
+
+                    default: return 36;
+                }
+            }
+            if (NAGNumber == 18)
+                return ((char)0x002B).ToString() + ((char)0x002D).ToString();
+            return ((char)symbolNumber()).ToString();
         }
     }
 }

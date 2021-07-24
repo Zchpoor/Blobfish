@@ -8,3 +8,13 @@ C:\Users\Emanuel\source\repos\Blobfish 11\Blobfish 11\obj\Debug\Blobfish 11.cspr
 C:\Users\Emanuel\source\repos\Blobfish 11\Blobfish 11\obj\Debug\Blobfish 11.csproj.CoreCompileInputs.cache
 C:\Users\Emanuel\source\repos\Blobfish 11\Blobfish 11\obj\Debug\Blobfish 11.exe
 C:\Users\Emanuel\source\repos\Blobfish 11\Blobfish 11\obj\Debug\Blobfish 11.pdb
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Debug\Blobfish 11.exe.config
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Debug\Blobfish 11.exe
+C:\Users\Admin\Blobfish\Blobfish 11\bin\Debug\Blobfish 11.pdb
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish 11.csprojAssemblyReference.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish_11.ChessUI.resources
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish_11.Properties.Resources.resources
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish 11.csproj.GenerateResource.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish 11.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish 11.exe
+C:\Users\Admin\Blobfish\Blobfish 11\obj\Debug\Blobfish 11.pdb
