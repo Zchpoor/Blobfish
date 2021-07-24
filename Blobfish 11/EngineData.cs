@@ -10,7 +10,7 @@ namespace Blobfish_11
     public partial class Engine
     {
         //Pjäsernas grundvärde.
-        readonly float[] pieceValues = {1, 3, 3, 5, 9 };
+        readonly float[] pieceValues = { 1, 3, 3, 5, 9 };
         readonly float kingValue = 4f;
 
         //Löparparets egenvärde.
@@ -21,6 +21,10 @@ namespace Blobfish_11
 
         //Värdet av att vara vid draget när en variant slutar.
         readonly float toMoveValue = 0.25f;
+
+        //Förberäknade värden på bönderna utifrån formeln för bondeevaluering.
+        //Gör denna till readonly när detta gjorts till egen klass.
+        float[,] precomputedPawnValues;
 
         //Pjäsernas försvarsvärde.
         readonly float[] pieceDefenceValues = { 1, 1.5f, 1.2f, 0.4f, 0.1f };
@@ -35,7 +39,7 @@ namespace Blobfish_11
         readonly int sleepTime = 100;
 
         //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
-        double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBRQ
+        readonly double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBRQ
 
         //För vart och ett av talen som är större än antalet drag i ställningen så
         //ökas djupet med ett. Talen bör vara i minskande ordning.
@@ -45,10 +49,14 @@ namespace Blobfish_11
         //Maximalt djup en variant kan beräknas efter minDepth uppnåtts.
         readonly int maximumDepth = 8;
 
-        public Engine() {}
+        public Engine()
+        {
+            fillPrecomputedPawnValues();
+        }
         public Engine(int[] moveIncreaseLimits)
         {
             this.moveIncreaseLimits = moveIncreaseLimits;
+            fillPrecomputedPawnValues();
         }
         public Engine(float[] pieceValues, float bishopPairValue, float[] defenceValues,
             int endgameLimit, float kingSafteyCoefficient, float safteySoftCap, 
@@ -67,7 +75,28 @@ namespace Blobfish_11
             this.endgameLimit = endgameLimit;
             this.moveIncreaseLimits = moveIncreaseLimits;
             this.toMoveValue = toMoveValue;
+            fillPrecomputedPawnValues();
         }
+
+        private void fillPrecomputedPawnValues()
+        {
+            int maxNumberOfPawns = 8;
+            //Summan av antal grannar och antalet linjer som bönderna står på bör inte kunna överskridas i ett vanligt parti.
+            int maxNeighbourLineSum = 22;
+
+            this.precomputedPawnValues = new float[maxNumberOfPawns+1, maxNeighbourLineSum+1];
+
+            for (int numberOfPawns = 0; numberOfPawns <= maxNumberOfPawns; numberOfPawns++)
+            {
+                for (int neighbourLineSum = 0; neighbourLineSum <= maxNeighbourLineSum; neighbourLineSum++)
+                {
+                    float pawnValue = ((numberOfPawns * (neighbourLineSum + 41)) + 9.37f) / 64;
+                    //e(p,s)=(p(s+41)+9,37)/64. TODO: Förbättra formel
+                    this.precomputedPawnValues[numberOfPawns, neighbourLineSum] = pawnValue;
+                }
+            }
+        }
+
         
         private static readonly float[,,] pawn =
         {

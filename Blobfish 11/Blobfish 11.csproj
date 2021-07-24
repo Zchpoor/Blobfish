@@ -110,6 +110,7 @@
     <Content Include="Images\Wp.png" />
     <Content Include="Images\WQ.png" />
     <Content Include="Images\WR.png" />
+    <Content Include="TODO.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

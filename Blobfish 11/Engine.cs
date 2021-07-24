@@ -369,7 +369,6 @@ namespace Blobfish_11
             }
             float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
             float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
-            // TODO: Variera värdet av att vara vid draget?
             return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }
         private float numericEval(GameResult gr)
@@ -446,20 +445,32 @@ namespace Blobfish_11
             float[] pawnValues = new float[2];
             for (sbyte c = 0; c < 2; c++)
             {
-                sbyte neighbours = 0;
-                sbyte lines = 0;
-                if (pawns[c, 0] > 0) lines++; //specialfall för a-linjen.
-                if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
-                for (sbyte i = 1; i < 7; i++) //från b till g sista. 
+                sbyte neighbours = 0; //Summan av antalet "grannar" som linjer där det står bönder har.
+                sbyte lines = 0; //Antal rader på vilka det finns bönder.
+
+                if (pawns[c, 0] > 0) //Specialfall för a-linjen.
                 {
-                    if (pawns[c, i] > 0) lines++;
-                    if (pawns[c, i - 1] > 0) neighbours += pawns[c, 0];
-                    if (pawns[c, i + 1] > 0) neighbours += pawns[c, 0];
+                    lines++; 
+                    if (pawns[c, 1] > 0) neighbours += pawns[c, 0];
                 }
-                if (pawns[c, 7] > 0) lines++; //specialfall för h-linjen.
-                if (pawns[c, 6] > 0) neighbours += pawns[c, 0];
-                pawnValues[c] = ((numberOfPawns[c] * (neighbours + lines + 41)) + 9.37f) / 64;
-                //e(p,s)=(p(s+41)+9,37)/64. TODO: Förbättra formel
+
+                for (sbyte i = 1; i < 7; i++) //från b-linjen till g-linjen. 
+                {
+                    if (pawns[c, i] > 0)
+                    {
+                        lines++;
+                        if (pawns[c, i - 1] > 0) neighbours += pawns[c, i];
+                        if (pawns[c, i + 1] > 0) neighbours += pawns[c, i];
+                    }
+                }
+
+                if (pawns[c, 7] > 0) //Specialfall för h-linjen.
+                {
+                    lines++;
+                    if (pawns[c, 6] > 0) neighbours += pawns[c, 7];
+                }
+                
+                pawnValues[c] = precomputedPawnValues[numberOfPawns[c], neighbours + lines];
                 pawnValues[c] *= posFactor[c];
             }
             return pawnValues[1] - pawnValues[0];
