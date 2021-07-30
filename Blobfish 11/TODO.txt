@@ -26,9 +26,9 @@ Effektiviseringar:
 	Klass med värden åt tråd.
 	Bli av med delegates?
 	Går det att cacha/förberäkna på fler ställen?
+	Går det att utnyttja att den nya ställingen beräknas samtidigt som dragen?
    
 Förbättringar:
-	Ta öppna linjer med torn.
 	Dragupprepningar
 	Gör kraftiga hot forcerande.
 	Få schackar/forcerade drag att kräva beräkning två drag framåt.
