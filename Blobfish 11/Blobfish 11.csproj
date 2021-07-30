@@ -66,6 +66,7 @@
     <Compile Include="GameTree.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="PGNHandler.cs" />
+    <Compile Include="PieceMovementHandler.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
