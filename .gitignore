@@ -10,3 +10,7 @@
 *.o
 *.so
 *.cache
+*.diagsession
+*.pdb
+*.suo
+*.txt
