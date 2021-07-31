@@ -18,12 +18,12 @@ namespace Blobfish_11
         public virtual Position execute(Position oldPos)
         {
             Position newPos = oldPos.boardCopy();
-            char pieceOnCurrentSquare = oldPos.board[from.rank, from.line];
-            newPos.board[to.rank, to.line] = pieceOnCurrentSquare;
-            newPos.board[from.rank, from.line] = '\0';
+            Piece pieceOnCurrentSquare = oldPos.board[from.rank, from.line];
+            newPos[to] = pieceOnCurrentSquare;
+            newPos[from] = Piece.None;
             plyForward(newPos);
-            if (pieceOnCurrentSquare == 'p' || pieceOnCurrentSquare == 'P' ||
-                oldPos.board[to.rank, to.line] != '\0')
+            if (pieceOnCurrentSquare == Piece.Pawn || pieceOnCurrentSquare == Piece.Pawn.AsWhite() ||
+                oldPos[to] != Piece.None)
             {
                 //Om ett bondedrag eller slag spelats, så skall räknaren för femtiodragsregelen sättas till 0.
                 newPos.halfMoveClock = 0;
@@ -32,7 +32,7 @@ namespace Blobfish_11
             {
                 newPos.halfMoveClock = (sbyte)(oldPos.halfMoveClock + 1);
             }
-            if (pieceOnCurrentSquare == 'k')
+            if (pieceOnCurrentSquare == Piece.King)
             {
                 //Ta bort svarts rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights = new bool[] { oldPos.castlingRights[0],
@@ -41,7 +41,7 @@ namespace Blobfish_11
                 //Sparar om kungens placering.
                 newPos.kingPositions = new Square[] { new Square(this.to.rank, this.to.line), newPos.kingPositions[1] };
             }
-            else if (pieceOnCurrentSquare == 'K')
+            else if (pieceOnCurrentSquare == Piece.King.AsWhite())
             {
                 //Ta bort vits rockadmöjligheter om kungen förflyttas.
                 newPos.castlingRights = new bool[] { false, false,
@@ -51,7 +51,7 @@ namespace Blobfish_11
                 newPos.kingPositions = new Square[] { newPos.kingPositions[0], new Square(this.to.rank, this.to.line) };
 
             }
-            else if (pieceOnCurrentSquare == 'r')
+            else if (pieceOnCurrentSquare == Piece.Rook)
             {
                 //Ta bort en av rockadmöjligheterna om ett av svarts torn förflyttas.
 
@@ -66,7 +66,7 @@ namespace Blobfish_11
                     false, oldPos.castlingRights[3]};
                 }
             }
-            else if (pieceOnCurrentSquare == 'R')
+            else if (pieceOnCurrentSquare == Piece.Rook.AsWhite())
             {
                 //Ta bort en av rockadmöjligheterna om ett av vits torn förflyttas.
 
@@ -83,8 +83,8 @@ namespace Blobfish_11
             }
 
             //Beräkna en passant-fält
-            if (pieceOnCurrentSquare == 'P'
-                || pieceOnCurrentSquare == 'p') //Om den förflyttade pjäsen är en bonde
+            if (pieceOnCurrentSquare == Piece.Pawn.AsWhite()
+                || pieceOnCurrentSquare == Piece.Pawn) //Om den förflyttade pjäsen är en bonde
             {
                 if (Math.Abs(from.rank - to.rank) == 2) //Om förflyttningen är två steg.
                 {
@@ -107,23 +107,20 @@ namespace Blobfish_11
             }
             pos.whiteToMove = !pos.whiteToMove;
         }
-        public virtual bool isCapture(char[,] board)
+        public virtual bool isCapture(Piece[,] board)
         {
-            return board[to.rank, to.line] != '\0';
+            return board[to.rank, to.line] != Piece.None;
         }
         public virtual string toString(Position pos)
         {
             //TODO: Checks etc.
-            char[,] board = pos.board;
             string ret = "";
-            char thisPiece = board[from.rank, from.line];
-            if (thisPiece != 'p' && thisPiece != 'P')
+            var board = pos.board;
+            Piece thisPiece = pos[from];
+            if (thisPiece != Piece.Pawn && thisPiece != Piece.Pawn.AsWhite())
             {
-                if (thisPiece >= 'a')
-                {
-                    thisPiece = (char)(thisPiece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
-                }
-                ret += thisPiece;
+                thisPiece = thisPiece.AsWhite();
+                ret += thisPiece.Name();
             }
             else if(isCapture(board))
             {
@@ -142,8 +139,8 @@ namespace Blobfish_11
         }
         private string extraDescription(Position pos)
         {
-            char[,] board = pos.board;
-            char thisPiece = board[from.rank, from.line];
+            Piece[,] board = pos.board;
+            Piece thisPiece = board[from.rank, from.line];
             bool onLine = false, onRank = false, otherPiece = false;
             void determineExtras(Square square)
             {
@@ -159,14 +156,14 @@ namespace Blobfish_11
                 }
             }
             Engine.functionByPiece dE = new Engine.functionByPiece(determineExtras);
-            char thisPieceToLower = thisPiece <= 'Z' ? (char)(thisPiece + ('a' - 'A')) : thisPiece;
+            Piece thisPieceAsBlack = thisPiece.AsBlack();
 
-            switch (thisPieceToLower)
+            switch (thisPieceAsBlack)
             {
-                case 'r': Engine.foreachRookSquare(pos, to, dE); break;
-                case 'b': Engine.foreachBishopSquare(pos, to, dE); break;
-                case 'n': Engine.foreachKnightSquare(pos, to, dE); break;
-                case 'q': Engine.foreachRookSquare(pos, to, dE); Engine.foreachBishopSquare(pos, to, dE); break;
+                case Piece.Rook: Engine.foreachRookSquare(pos, to, dE); break;
+                case Piece.Bishop: Engine.foreachBishopSquare(pos, to, dE); break;
+                case Piece.Knight: Engine.foreachKnightSquare(pos, to, dE); break;
+                case Piece.Queen: Engine.foreachRookSquare(pos, to, dE); Engine.foreachBishopSquare(pos, to, dE); break;
             }
             String ret = "";
             if (onRank && onLine)
@@ -203,9 +200,9 @@ namespace Blobfish_11
             Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = oldPos.board[from.rank, from.line];
-            newPos.board[from.rank, from.line] = '\0';
+            newPos.board[from.rank, from.line] = Piece.None;
             newPos.board[rookTo.rank, rookTo.line] = oldPos.board[rookFrom.rank, rookFrom.line];
-            newPos.board[rookFrom.rank, rookFrom.line] = '\0';
+            newPos.board[rookFrom.rank, rookFrom.line] = Piece.None;
             if (oldPos.whiteToMove) //Ta bort alla rockadmöjligheter för spelaren som rockerar.
             {
                 newPos.castlingRights = new bool[] { false, false,
@@ -248,23 +245,23 @@ namespace Blobfish_11
             Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = oldPos.board[from.rank, from.line];
-            newPos.board[from.rank, from.line] = '\0';
-            newPos.board[pawnToRemove.rank, pawnToRemove.line] = '\0';
+            newPos.board[from.rank, from.line] = Piece.None;
+            newPos.board[pawnToRemove.rank, pawnToRemove.line] = Piece.None;
             plyForward(newPos);
             newPos.enPassantSquare.rank = -1;
             newPos.enPassantSquare.line = -1;
             newPos.halfMoveClock = 0;
             return newPos;
         }
-        public override bool isCapture(char[,] board)
+        public override bool isCapture(Piece[,] board)
         {
             return true;
         }
     }
     public class Promotion : Move
     {
-        public char promoteTo;
-        public Promotion(Square fromSquare, Square toSquare, char promoteTo) :
+        public Piece promoteTo;
+        public Promotion(Square fromSquare, Square toSquare, Piece promoteTo) :
             base(fromSquare, toSquare)
         {
             this.promoteTo = promoteTo;
@@ -274,7 +271,7 @@ namespace Blobfish_11
             Position newPos = oldPos.boardCopy();
 
             newPos.board[to.rank, to.line] = promoteTo;
-            newPos.board[from.rank, from.line] = '\0';
+            newPos.board[from.rank, from.line] = Piece.None;
             plyForward(newPos);
             newPos.enPassantSquare.rank = -1;
             newPos.enPassantSquare.line = -1;

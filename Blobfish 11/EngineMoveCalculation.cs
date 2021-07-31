@@ -51,20 +51,19 @@ namespace Blobfish_11
         }
         private void pieceCalculation(Position pos, Square pieceSquare, List<Move> allMoves)
         {
-            char pieceChar = pos.board[pieceSquare.rank, pieceSquare.line];
-            bool pieceIsWhite = isWhite(pieceChar);
+            Piece pieceChar = pos[pieceSquare];
+            bool pieceIsWhite = pieceChar.IsWhite();
             if (pieceIsWhite != pos.whiteToMove)
                 return;
-            if (pieceChar == '\0') return;
+            if (pieceChar == Piece.None) return;
 
-            if (pieceChar > 'a')
-                pieceChar = (char)(pieceChar - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            pieceChar = pieceChar.AsBlack();
 
-            char pieceOnCurrentSquare;
+            Piece pieceOnCurrentSquare;
             void addMoveIfValid(Square currentSquare)
             {
-                pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                if (pieceOnCurrentSquare == '\0' || isWhite(pieceOnCurrentSquare) != pieceIsWhite)
+                pieceOnCurrentSquare = pos[currentSquare];
+                if (pieceOnCurrentSquare == Piece.None || pieceOnCurrentSquare.IsWhite() != pieceIsWhite)
                 {
                     allMoves.Add(new Move(pieceSquare, currentSquare));
                 }
@@ -72,14 +71,15 @@ namespace Blobfish_11
             functionByPiece amiv = new functionByPiece(addMoveIfValid);
             switch (pieceChar)
             {
-                case '\0': return;
-                case 'P': pawnMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
-                case 'N': foreachKnightSquare(pos, pieceSquare, amiv); break;
-                case 'B': foreachBishopSquare(pos, pieceSquare, amiv); break;
-                case 'R': foreachRookSquare(pos, pieceSquare, amiv); break;
-                case 'Q': foreachBishopSquare(pos, pieceSquare, amiv);
+                case Piece.None: return;
+                case Piece.Pawn: pawnMoves(pos, pieceSquare, pieceIsWhite, allMoves); break;
+                case Piece.Knight: foreachKnightSquare(pos, pieceSquare, amiv); break;
+                case Piece.Bishop: foreachBishopSquare(pos, pieceSquare, amiv); break;
+                case Piece.Rook: foreachRookSquare(pos, pieceSquare, amiv); break;
+                case Piece.Queen:
+                    foreachBishopSquare(pos, pieceSquare, amiv);
                     foreachRookSquare(pos, pieceSquare, amiv); break;
-                case 'K': kingMoves(pos, pieceSquare, pieceIsWhite, allMoves, amiv); break;
+                case Piece.King: kingMoves(pos, pieceSquare, pieceIsWhite, allMoves, amiv); break;
                 default: return;
             }
         }
@@ -87,8 +87,22 @@ namespace Blobfish_11
         {
             void addPromotions(Square fromSquare, Square toSquare)
             {
-                string allPromotions = pieceIsWhite ? "QRBN" : "qrbn";
-                foreach (char tkn in allPromotions)
+                Piece[] allPromotions = pieceIsWhite ?
+                    new[]
+                    {
+                        Piece.Queen.AsWhite(),
+                        Piece.Rook.AsWhite(),
+                        Piece.Bishop.AsWhite(),
+                        Piece.Knight.AsWhite(),
+                    } :
+                    new[]
+                    {
+                        Piece.Queen,
+                        Piece.Rook,
+                        Piece.Bishop,
+                        Piece.Knight,
+                    };
+                foreach (Piece tkn in allPromotions)
                 {
                     possibleMoves.Add(new Promotion(fromSquare, toSquare, tkn));
                 }
@@ -98,8 +112,8 @@ namespace Blobfish_11
             Square currentSquare = new Square(pieceSquare.rank + moveDirection, pieceSquare.line);
             if (validSquare(currentSquare))
             {
-                char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                if (pieceOnCurrentSquare == '\0')
+                Piece pieceOnCurrentSquare = pos[currentSquare];
+                if (pieceOnCurrentSquare == Piece.None)
                 {
 
                     sbyte promotionRank = pieceIsWhite ? (sbyte)0 : (sbyte)7;
@@ -116,7 +130,7 @@ namespace Blobfish_11
                         {
                             currentSquare.rank = (sbyte)(pieceSquare.rank + (moveDirection * 2));
                             pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                            if (pieceOnCurrentSquare == '\0')
+                            if (pieceOnCurrentSquare == Piece.None)
                             {
                                 //Två steg.
                                 possibleMoves.Add(new Move(pieceSquare, currentSquare));
@@ -132,8 +146,8 @@ namespace Blobfish_11
                 if (validSquare(currentSquare))
                 {
                     sbyte promotionRank = pieceIsWhite ? (sbyte)0 : (sbyte)7;
-                    char pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
-                    if (isWhite(pieceOnCurrentSquare) != pieceIsWhite && pieceOnCurrentSquare != '\0') //Om den är av motsatt färg.
+                    Piece pieceOnCurrentSquare = pos[currentSquare];
+                    if (pieceOnCurrentSquare.IsWhite() != pieceIsWhite && pieceOnCurrentSquare != Piece.None) //Om den är av motsatt färg.
                     {
                         if (currentSquare.rank == promotionRank) //Promotering.
                         {
@@ -161,15 +175,17 @@ namespace Blobfish_11
             if (pieceSquare.rank == castlingRank && pieceSquare.line == 4 && !isControlledBy(pos, pieceSquare, !pieceIsWhite))
             {
                 //Kungen står på ett fält där rockad skulle kunna vara möjligt.
-                char correctRook = pieceIsWhite ? 'R' : 'r';
+                Piece correctRook = Piece.Rook;
+                if (pieceIsWhite) correctRook = correctRook.AsWhite();
+
                 sbyte castlingRightOffset = pieceIsWhite ? (sbyte) 0: (sbyte) 2;
                 if (pos.board[castlingRank, 0] == correctRook && pos.castlingRights[castlingRightOffset + 1])
                 {
                     //Lång rockad
                     Square rookTo = new Square(castlingRank, (sbyte) 3);
                     Square kingTo = new Square(castlingRank, (sbyte) 2);
-                    if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
-                        pos.board[kingTo.rank, kingTo.line - 1] == '\0' && !isControlledBy(pos, rookTo, !pieceIsWhite) &&
+                    if (pos[rookTo] == Piece.None && pos[kingTo] == Piece.None &&
+                        pos.board[kingTo.rank, kingTo.line - 1] == Piece.None && !isControlledBy(pos, rookTo, !pieceIsWhite) &&
                         !isControlledBy(pos, kingTo, !pieceIsWhite && !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
                         Square rookFrom = new Square(castlingRank, (sbyte) 0);
@@ -181,7 +197,7 @@ namespace Blobfish_11
                     //Kort rockad
                     Square rookTo = new Square(castlingRank, (sbyte) 5);
                     Square kingTo = new Square(castlingRank, (sbyte) 6);
-                    if (pos.board[rookTo.rank, rookTo.line] == '\0' && pos.board[kingTo.rank, kingTo.line] == '\0' &&
+                    if (pos[rookTo] == Piece.None && pos[kingTo] == Piece.None &&
                         !isControlledBy(pos, rookTo, !pieceIsWhite) && !isControlledBy(pos, kingTo, !pieceIsWhite &&
                         !isControlledBy(pos, pieceSquare, !pieceIsWhite)))
                     {
@@ -233,13 +249,12 @@ namespace Blobfish_11
             //Generell funktion som itererar över en linje/diagonal så länge det är giltiga fält.
             pieceSquare.rank += rankOffset;
             pieceSquare.line += lineOffset;
-            char[,] board = pos.board;
 
             while (validSquare(pieceSquare))
             {
                 callback(pieceSquare);
-                char pieceOnCurrentSquare = board[pieceSquare.rank, pieceSquare.line];
-                if (pieceOnCurrentSquare != '\0') //Ett fält där en pjäs står.
+                Piece pieceOnCurrentSquare = pos[pieceSquare];
+                if (pieceOnCurrentSquare != Piece.None) //Ett fält där en pjäs står.
                 {
                     break;
                 }
@@ -292,8 +307,10 @@ namespace Blobfish_11
         {
             //Tab (\t) används om inget annat tecken skall sökas efter.
             bool isControlled = false;
-            char pieceOnCurrentSquare;
-            char[] piecesToLookFor = byWhite ?  new char[] { 'B', 'Q' }: new char[] { 'b', 'q' };
+            Piece pieceOnCurrentSquare;
+            Piece[] piecesToLookFor = byWhite ? 
+                new Piece[] { Piece.Bishop.AsWhite(), Piece.Queen.AsWhite() } : 
+                new Piece[] { Piece.Bishop, Piece.Queen };
             void CheckIfPieceToLookFor(Square currentSquare)
             {
                 pieceOnCurrentSquare = pos.board[currentSquare.rank, currentSquare.line];
@@ -304,22 +321,22 @@ namespace Blobfish_11
             foreachBishopSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
-            piecesToLookFor[0] = byWhite ? 'R' : 'r';
+            piecesToLookFor[0] = byWhite ? Piece.Rook.AsWhite() : Piece.Rook;
             foreachRookSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
-            piecesToLookFor[0] = byWhite ? 'K' : 'k';
-            piecesToLookFor[1] = byWhite ? '\t' : '\t'; //Kommer aldrig återfinnas.
+            piecesToLookFor[0] = byWhite ? Piece.King.AsWhite() : Piece.King;
+            piecesToLookFor[1] = Piece.NonsensePiece; //Kommer aldrig återfinnas.
             foreachKingSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
-            piecesToLookFor[0] = byWhite ? 'N' : 'n';
+            piecesToLookFor[0] = byWhite ? Piece.Knight.AsWhite() : Piece.Knight;
             foreachKnightSquare(pos, relevantSquare, ciptlf);
             if (isControlled) return true;
 
             //Bönder
             sbyte riktning = byWhite ? (sbyte)1 : (sbyte)-1;
-            char pawnToLookFor = byWhite ? 'P' : 'p';
+            Piece pawnToLookFor = byWhite ? Piece.Pawn.AsWhite() : Piece.Pawn;
             Square currentPawnSquare;
             currentPawnSquare.rank = (sbyte)(relevantSquare.rank + riktning);
             for (sbyte i = -1; i <= 1; i+=2)
@@ -327,7 +344,7 @@ namespace Blobfish_11
                 currentPawnSquare.line = (sbyte)(relevantSquare.line + i);
                 if (validSquare(currentPawnSquare))
                 {
-                    if(pos.board[currentPawnSquare.rank, currentPawnSquare.line] == pawnToLookFor)
+                    if(pos[currentPawnSquare] == pawnToLookFor)
                     {
                         return true;
                     }
@@ -366,12 +383,12 @@ namespace Blobfish_11
         }
         private int priorityOf(Move move, Position pos)
         {
-            char toChar = pos.board[move.to.rank, move.to.line];
-            char fromChar = pos.board[move.from.rank, move.from.line];
-            if (toChar != '\0') //Slag
+            Piece toPiece = pos[move.to];
+            Piece fromPiece = pos[move.from];
+            if (toPiece != Piece.None) //Slag
             {
-                int valueOfCapturedPiece = roughValueOf(toChar);
-                int valueDiff = valueOfCapturedPiece - roughValueOf(fromChar);
+                int valueOfCapturedPiece = roughValueOf(toPiece);
+                int valueDiff = valueOfCapturedPiece - roughValueOf(fromPiece);
                 
                 if (valueDiff <= 0)
                     return 0;
@@ -390,14 +407,14 @@ namespace Blobfish_11
                 {
                     return 1;
                 }
-                else if (move is Promotion && (move as Promotion).promoteTo == 'Q')
+                else if (move is Promotion && (move as Promotion).promoteTo.AsBlack() == Piece.Queen)
                 {
                     return 4;
                 }
                 else
                 {
                     int secondLastRow = pos.whiteToMove ? 1 : 6;
-                    if ((fromChar == 'p' || fromChar == 'P') && move.to.rank == secondLastRow)
+                    if ((fromPiece == Piece.Pawn || fromPiece == Piece.Pawn.AsWhite()) && move.to.rank == secondLastRow)
                     {
                         return 1;
                     }
@@ -409,18 +426,17 @@ namespace Blobfish_11
                 }
             }
         }
-        private int roughValueOf(char piece)
+        private int roughValueOf(Piece piece)
         {
-            if (piece == '\0') return 0;
-            if (piece > 'a')
-                piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            if (piece == Piece.None) return 0;
+            piece = piece.AsBlack();
             switch (piece)
             {
-                case 'P': return 1;
-                case 'N': return 3;
-                case 'B': return 3;
-                case 'R': return 5;
-                case 'Q': return 9;
+                case Piece.Pawn: return 1;
+                case Piece.Knight: return 3;
+                case Piece.Bishop: return 3;
+                case Piece.Rook: return 5;
+                case Piece.Queen: return 9;
                 default: return 0;
             }
         }

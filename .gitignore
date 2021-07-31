@@ -14,3 +14,5 @@
 *.pdb
 *.suo
 *.txt
+*.cache~Stashed changes
+*.config

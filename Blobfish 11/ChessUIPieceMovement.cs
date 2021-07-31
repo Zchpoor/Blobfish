@@ -22,17 +22,17 @@ namespace Blobfish_11
         //Byt ut till annan pekare?
         private Cursor dragCursor = Cursors.Hand;
 
-        private bool moveablePiece(char piece)
+        private bool moveablePiece(Piece piece)
         {
-            if (piece == '\0')
+            if (piece == Piece.None)
             {
                 return false;
             }
-            else if (game.currentPosition.whiteToMove && piece < 'a')
+            else if (game.currentPosition.whiteToMove && piece.IsWhite())
             {
                 return true;
             }
-            else if (!game.currentPosition.whiteToMove && piece >= 'a')
+            else if (!game.currentPosition.whiteToMove && !piece.IsWhite())
             {
                 return true;
             }
@@ -52,12 +52,12 @@ namespace Blobfish_11
 
             PictureBox from = sender as PictureBox;
             dragFromSquare = picBoxSquare(from);
-            char piece = game.currentPosition.board[dragFromSquare.rank, dragFromSquare.line];
+            Piece piece = game.currentPosition[dragFromSquare];
             if (!moveablePiece(piece))
                 return;
 
             fromImage = from.Image;
-            from.Image = piecesPictures['\0'];
+            from.Image = piecesPictures[Piece.None];
             from.DoDragDrop(fromImage, DragDropEffects.Copy);
         }
         private void squareDragEnter(object sender, DragEventArgs e)

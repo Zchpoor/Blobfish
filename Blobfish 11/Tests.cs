@@ -30,7 +30,7 @@ namespace Blobfish_11
             bool makeTest(string FEN, int moves)
             {
                 Position pos = new Position(FEN);
-                List<Move> allMoves = blobfish.allValidMoves(pos, false);
+                List<Move> allMoves = PieceMovementHandler.AllValidMoves(pos, false);
                 bool success = allMoves.Count == moves;
                 if (success) detailedResult += "  Test " + testCounter.ToString() + ": Lyckades" + Environment.NewLine;
                 else

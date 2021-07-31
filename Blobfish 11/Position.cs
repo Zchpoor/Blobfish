@@ -15,12 +15,12 @@ namespace Blobfish_11
         public short moveCounter;
         public Square enPassantSquare; //{-1, -1} om en passant ej kan spelas.
         public bool[] castlingRights; //KQkq
-        public char[,] board; //[0] är rader (siffror), [1] är kolumner (bokstäver)
+        public Piece[,] board; //[x,] är rader (siffror), [,x] är kolumner (bokstäver)
         public Square[] kingPositions; //Bra att kunna komma åt snabbt. 0=svart, 1=vit
 
         public Position(string FEN)
         {
-            this.board = new char[8, 8];
+            this.board = new Piece[8, 8];
             this.kingPositions = new Square[2];
             this.castlingRights = new bool[4];
             sbyte line = 0, rank = 0;
@@ -30,51 +30,51 @@ namespace Blobfish_11
                 switch (tkn)
                 {
                     case 'p':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Pawn;
                         line++;
                         break;
                     case 'P':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Pawn | Piece.White;
                         line++;
                         break;
 
                     case 'n':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Knight;
                         line++; break;
                     case 'N':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Knight| Piece.White;
                         line++; break;
 
                     case 'b':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Bishop;
                         line++; break;
                     case 'B':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Bishop | Piece.White;
                         line++; break;
 
                     case 'r':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Rook;
                         line++; break;
                     case 'R':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Rook | Piece.White;
                         line++; break;
 
                     case 'k':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.King;
                         kingPositions[0].rank = rank;
                         kingPositions[0].line = line;
                         line++; break;
                     case 'K':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.King | Piece.White;
                         kingPositions[1].rank = rank;
                         kingPositions[1].line = line;
                         line++; break;
 
                     case 'q':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Queen;
                         line++; break;
                     case 'Q':
-                        board[rank, line] = tkn;
+                        board[rank, line] = Piece.Queen | Piece.White;
                         line++; break;
 
                     case '/': line = 0; rank++; break;
@@ -151,7 +151,7 @@ namespace Blobfish_11
             //Till exempel: "2".
 
         }
-        public Position(char[,] board, bool whiteToMove, bool[] castlingRights, Square enPassantSquare,
+        public Position(Piece[,] board, bool whiteToMove, bool[] castlingRights, Square enPassantSquare,
             sbyte halfMoveClock, short moveCounter, Square[] kingPositions)
         {
             this.board = board;
@@ -162,9 +162,20 @@ namespace Blobfish_11
             this.enPassantSquare = enPassantSquare;
             this.kingPositions = kingPositions;
         }
+        public Piece this[Square square]
+        {
+            get
+            {
+                return this.board[square.rank, square.line];
+            }
+            set
+            {
+                this.board[square.rank, square.line] = value;
+            }
+        } 
         public Position boardCopy()
         {
-            char[,] newBoard = new char[8, 8];
+            Piece[,] newBoard = new Piece[8, 8];
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -183,8 +194,8 @@ namespace Blobfish_11
                 int emptySquaresCounter = 0;
                 for (int j = 0; j < 8; j++)
                 {
-                    char currentPiece = board[i, j];
-                    if ( currentPiece == '\0')
+                    Piece currentPiece = board[i, j];
+                    if ( currentPiece == Piece.None)
                         emptySquaresCounter++;
                     else
                     {

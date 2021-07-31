@@ -240,7 +240,7 @@ namespace Blobfish_11
             float[] pawnPosFactor = { 1f, 1f };
             sbyte[,] pawns = new sbyte[2, 8]; //0=svart, 1=vit.
             //TODO: ordna med färgkomplex.
-            char[,] board = pos.board;
+            Piece[,] board = pos.board;
 
             for (sbyte rank = 0; rank < 8; rank++)
             {
@@ -248,13 +248,13 @@ namespace Blobfish_11
                 {
                     switch (board[rank, line])
                     {
-                        case 'p':
+                        case Piece.Pawn:
                             numberOfPawns[0]++;
                             pawns[0, line]++;
                             pawnPosFactor[0] += pawn[0, rank, line];
                             break;
 
-                        case 'P':
+                        case (Piece.Pawn | Piece.White):
                             numberOfPawns[1]++;
                             pawns[1, line]++;
                             pawnPosFactor[1] += pawn[1, rank, line];
@@ -275,16 +275,15 @@ namespace Blobfish_11
                 {
                     switch (board[rank, line])
                     {
-                        case 'n':
+                        case Piece.Knight:
                             pieceValue -= pieceValues[1] * knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
-                        case 'N':
+                        case (Piece.Knight | Piece.White):
                             pieceValue += pieceValues[1] * knight[rank, line];
                             heavyMaterial[1] += 3;
                             break;
-
-                        case 'b':
+                        case Piece.Bishop:
                             pieceValue -= pieceValues[2] * bishop[rank, line];
                             heavyMaterial[0] += 3;
                             if ((rank + line) % 2 == 0)
@@ -292,7 +291,7 @@ namespace Blobfish_11
                             else
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
-                        case 'B':
+                        case (Piece.Bishop | Piece.White):
                             pieceValue += pieceValues[2] * bishop[rank, line];
                             heavyMaterial[1] += 3;
                             if ((rank + line) % 2 == 0)
@@ -301,7 +300,7 @@ namespace Blobfish_11
                                 bishopColors[1] = true; //Vit löpare på svart fält
                             break;
 
-                        case 'r':
+                        case Piece.Rook:
                             float val = pieceValues[3] * rook[rank, line];
                             if(pawns[0, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
                             {
@@ -317,7 +316,7 @@ namespace Blobfish_11
                             pieceValue -= val;
                             heavyMaterial[0] += 5;
                             break;
-                        case 'R':
+                        case (Piece.Rook | Piece.White):
                             val = pieceValues[3] * rook[rank, line];
                             if (pawns[1, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
                             {
@@ -334,11 +333,11 @@ namespace Blobfish_11
                             heavyMaterial[1] += 5;
                             break;
                         
-                        case 'q':
+                        case Piece.Queen:
                             pieceValue -= pieceValues[4] * queen[rank, line];
                             heavyMaterial[0] += 9;
                             break;
-                        case 'Q':
+                        case (Piece.Queen | Piece.White):
                             pieceValue += pieceValues[4] * queen[rank, line];
                             heavyMaterial[1] += 9;
                             break;
@@ -392,7 +391,7 @@ namespace Blobfish_11
                     if (!validSquare(currentSquare)){
                         continue;
                     }
-                    char currentPiece = pos.board[currentSquare.rank, currentSquare.line];
+                    Piece currentPiece = pos[currentSquare];
                     float defValue = defenceValueOf(currentPiece);
                     if(defValue == 0f)
                     {
@@ -423,21 +422,20 @@ namespace Blobfish_11
             }
             return kingCoefficient * safteyValue;
         }
-        private float defenceValueOf(char piece)
+        private float defenceValueOf(Piece piece)
         {
-            if (piece == '\0') return 0;
-            if (piece > 'a') 
-                piece = (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+            if (piece == Piece.None) return 0;
+            piece = piece.AsBlack();
             switch (piece)
             {
-                case 'P': return pieceDefenceValues[0];
-                case 'N': return pieceDefenceValues[1];
-                case 'B': return pieceDefenceValues[2];
-                case 'R': return pieceDefenceValues[3];
-                case 'Q': return pieceDefenceValues[4];
-                case 'K': return 0;
+                case Piece.Pawn: return pieceDefenceValues[0];
+                case Piece.Knight: return pieceDefenceValues[1];
+                case Piece.Bishop: return pieceDefenceValues[2];
+                case Piece.Rook: return pieceDefenceValues[3];
+                case Piece.Queen: return pieceDefenceValues[4];
+                case Piece.King: return 0;
                 default: 
-                    throw new Exception("Okänt tecken!");
+                    throw new Exception("Okänd pjäs!");
             }
         }
         private float evalPawns(int[] numberOfPawns, float[] posFactor, sbyte[,] pawns)
@@ -540,7 +538,7 @@ namespace Blobfish_11
                     item.Abort();
             }
         }
-        private bool mateableMaterial(char[,] board)
+        private bool mateableMaterial(Piece[,] board)
         {
             //TODO: Fixa för mattbart material för de respektive spelarna.
             bool anyKnight = false;
@@ -551,13 +549,13 @@ namespace Blobfish_11
                 for (int j = 0; j < 8; j++)
                 {
 
-                switch (myToUpper(board[i,j]))
+                switch (board[i,j].AsBlack())
                 {
-                    case 'P': return true;
-                    case 'Q': return true;
-                    case 'R': return true;
-                    case 'N': if (anyKnight) return true; else anyKnight = true; break;
-                    case 'B': 
+                    case Piece.Pawn: return true;
+                    case Piece.Queen: return true;
+                    case Piece.Rook: return true;
+                    case Piece.Knight: if (anyKnight) return true; else anyKnight = true; break;
+                    case Piece.Bishop: 
                             if ((i + j) % 2 == 0) anyLightSquaredBishop = true;
                             else anyDarkSquaredBishop = true;
                             if (anyDarkSquaredBishop && anyLightSquaredBishop) return true;
@@ -569,14 +567,14 @@ namespace Blobfish_11
             if (anyKnight && (anyDarkSquaredBishop || anyLightSquaredBishop)) return true;
                 return false;
         }
-        private char myToUpper(char piece)
-        {
-            if (piece > 'a')
-            {
-                return (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
-            }
-            return piece;
-        }
+        //private char myToUpper(Piece piece)
+        //{
+        //    if (!piece.IsWhite)
+        //    {
+        //        return (char)(piece - ('a' - 'A')); //Gör om tecknet till stor bokstav.
+        //    }
+        //    return piece;
+        //}
         private int automaticDepth(Position pos)
         {
             double materialSum = 0;
@@ -586,10 +584,10 @@ namespace Blobfish_11
             {
                 for (int line = 0; line < 8; line++)
                 {
-                    char piece = pos.board[rank, line];
-                    if (piece == 'P' || piece == 'p')
+                    Piece piece = pos.board[rank, line];
+                    if (piece.Is(Piece.Pawn))
                     {
-                        if ((piece == 'P' && rank == 1) || (piece == 'p' && rank == 6))
+                        if ((piece == Piece.Pawn.AsWhite() && rank == 1) || (piece == Piece.Pawn && rank == 6))
                         {
                             //Bönder som är ett steg ifrån att promotera.
                             materialSum += weightForPawnOnLastRank;
@@ -599,13 +597,13 @@ namespace Blobfish_11
                             materialSum += calculationWeights[0];
                         }
                     }
-                    else if (piece == 'N' || piece == 'n')
+                    else if (piece.Is(Piece.Knight))
                         materialSum += calculationWeights[1];
-                    else if (piece == 'B' || piece == 'b')
+                    else if (piece.Is(Piece.Bishop))
                         materialSum += calculationWeights[2];
-                    else if (piece == 'R' || piece == 'r')
+                    else if (piece.Is(Piece.Rook))
                         materialSum += calculationWeights[3];
-                    if (piece == 'Q' || piece == 'q')
+                    if (piece.Is(Piece.Queen))
                         materialSum += calculationWeights[4];
                 }
             }

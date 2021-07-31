@@ -19,7 +19,7 @@ namespace Blobfish_11
         int minDepth = 4;
         int numberOfDots = 1;
         TimeSpan ponderingTime = new TimeSpan(0);
-        Dictionary<char, Image> piecesPictures = new Dictionary<char, Image>(13);
+        Dictionary<Piece, Image> piecesPictures = new Dictionary<Piece, Image>(13);
 
         public ChessUI() 
         {
@@ -36,8 +36,13 @@ namespace Blobfish_11
             {
                 string[] picNames = 
                     {"null.png", "Bp.png","WP.png","Bn.png","WN.png","Bb.png","WB.png","Br.png","WR.png","Bq.png","WQ.png","Bk.png","WK.png"};
-                char[] pieceNames =
-                    {'\0', 'p', 'P', 'n', 'N', 'b', 'B', 'r', 'R', 'q', 'Q', 'k', 'K' };
+                Piece[] pieceNames =
+                    { Piece.None, Piece.Pawn, Piece.Pawn.AsWhite()
+                    , Piece.Knight, Piece.Knight.AsWhite()
+                    , Piece.Bishop, Piece.Bishop.AsWhite()
+                    , Piece.Rook, Piece.Rook.AsWhite()
+                    , Piece.Queen, Piece.Queen.AsWhite()
+                    , Piece.King, Piece.King.AsWhite()};
                 for (int i = 0; i < picNames.Length; i++)
                 {
                     piecesPictures.Add(pieceNames[i], Image.FromFile(picNames[i]));
@@ -79,7 +84,7 @@ namespace Blobfish_11
                     picBox.SizeMode = PictureBoxSizeMode.Zoom;
                     picBox.Margin = new Padding(0);
                     picBox.Padding = new Padding(0);
-                    picBox.Image = piecesPictures['\0'];
+                    picBox.Image = piecesPictures[Piece.None];
 
                     picBox.AllowDrop = true;
                     picBox.MouseDown += new MouseEventHandler(squareMouseDown);
@@ -121,7 +126,7 @@ namespace Blobfish_11
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    char piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
+                    Piece piece = flipped ? pos.board[7-i, 7-j] : pos.board[i, j];
                     Falt[i, j].Image = piecesPictures[piece];
                     Cursor cursor = moveablePiece(piece) ? dragCursor : Cursors.Default;
                     Falt[i, j].Cursor = cursor;
@@ -413,7 +418,7 @@ namespace Blobfish_11
                     }
                     else
                     {
-                        char pieceOnSquare = game.currentPosition.board[rank, line];
+                        Piece pieceOnSquare = game.currentPosition.board[rank, line];
                         Cursor cursor = moveablePiece(pieceOnSquare) ? dragCursor : Cursors.Default;
                         if (flipped)
                         {

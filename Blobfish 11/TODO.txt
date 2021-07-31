@@ -39,4 +39,4 @@ Förbättringar:
 	Variera värdet av att vara vid draget.
    
 Buggar:
- 
+	Dubbelkolla PGN-utskrift.
