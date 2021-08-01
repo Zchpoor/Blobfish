@@ -60,6 +60,9 @@
     </Compile>
     <Compile Include="Engine.cs" />
     <Compile Include="EngineData.cs" />
+    <Compile Include="EngineDataAggressive.cs" />
+    <Compile Include="EngineDataCareful.cs" />
+    <Compile Include="EngineDataExperimental.cs" />
     <Compile Include="EngineMoveCalculation.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameResult.cs" />

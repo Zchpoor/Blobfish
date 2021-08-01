@@ -123,16 +123,16 @@ namespace Blobfish_11
                     flipBoard();
                     break;
                 case "eval":
-                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
+                    printEval(blobFish.eval(game.currentPosition, minDepth));
                     break;
                 case "evaluate":
-                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
+                    printEval(blobFish.eval(game.currentPosition, minDepth));
                     break;
                 case "bedöm":
-                    printEval(choosePlayingStyle().eval(game.currentPosition, minDepth));
+                    printEval(blobFish.eval(game.currentPosition, minDepth));
                     break;
                 case "num":
-                    float res = choosePlayingStyle().numericEval(game.currentPosition);
+                    float res = blobFish.numericEval(game.currentPosition);
                     scoresheetBox.Text = "Omedelbar ställningsbedömning:" + Environment.NewLine + Math.Round(res, 2).ToString();
                     break;
                 case "spec":
@@ -331,41 +331,35 @@ namespace Blobfish_11
                 scoresheetBox.Text = Tests.runTests();
             }
         }
-        private Engine choosePlayingStyle()
+        private EngineData choosePlayingStyle()
         {
-            //Byt namn på funktionen?
-            int[] MIL = { };
-
             try
             {
                 if (style0ToolStripMenuItem.Checked) //Normal
                 {
-                    return new Engine(MIL);
+                    return new EngineData();
                 }
                 else if (style1ToolStripMenuItem.Checked) //Försiktig
                 {
-                    return new Engine(new float[] { 1f, 3f, 3f, 5f, 9f }, 0.8f,
-                        new float[] { 1.2f, 2.2f, 1.4f, 0.4f, 0.1f }, 6, 1.15f, 5f, MIL, 0.15f);
+                    return new EngineDataCareful();
                 }
                 else if (style2ToolStripMenuItem.Checked) //Aggressiv
                 {
-                    return new Engine(new float[] { 1.2f, 4f, 4f, 6.5f, 12f }, 0.4f,
-                        new float[] { 1, 2, 1.4f, 0.4f, 0.1f }, 8, 0.5f, 2.5f, MIL, 0.4f);
+                    return new EngineDataAggressive();
                 }
                 else if (style3ToolStripMenuItem.Checked) //Experimentell
                 {
-                    return new Engine(new float[] { 1f, 3f, 3f, 4.5f, 9f }, 0.4f,
-                        new float[] { 1, 1f, 0.8f, 0.1f, 0.05f }, 8, 1f, 1f, MIL, 0.25f);
+                    return new EngineDataAggressive();
                 }
                 else
                 {
-                    return new Engine();
+                    return new EngineData();
                 }
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message + Environment.NewLine + "Använder standardmotorn.");
-                return new Engine();
+                return new EngineData();
             }
         }
         private void flipBoard()

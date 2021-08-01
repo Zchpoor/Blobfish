@@ -13,6 +13,17 @@ namespace Blobfish_11
         public SecureFloat cancelFlag = new SecureFloat(0f);
         public SecureFloat moveNowFlag = new SecureFloat(0f);
 
+        public EngineData Data { get; set; }
+
+        public Engine()
+        {
+            this.Data = new EngineData();
+        }
+        public Engine(EngineData data)
+        {
+            this.Data = data;
+        }
+
         public EvalResult eval(Position pos, int minDepth)
         {
 
@@ -21,7 +32,7 @@ namespace Blobfish_11
             {
                 minDepth = automaticDepth(pos);
             }
-            List<Move> moves = allValidMoves(pos, true);
+            List<Move> moves = PieceMovementHandler.AllValidMoves(pos, true);
             EvalResult result = new EvalResult();
 
             GameResult gameResult = decisiveResult(pos, moves);
@@ -49,7 +60,7 @@ namespace Blobfish_11
 
                 // Ökar minimum-djupet om antalet tillgängliga drag är färre än de som anges
                 // i moveIncreaseLimits, vilka återfinns i EngineData.
-                foreach (int item in moveIncreaseLimits)
+                foreach (int item in this.Data.MoveIncreaseLimits)
                 {
                     if (moves.Count <= item) minDepth++;
                     else break;
@@ -81,7 +92,7 @@ namespace Blobfish_11
 
                 }
                 //result.bestMove = moves[0];
-                Thread.Sleep(sleepTime);
+                Thread.Sleep(this.Data.SleepTime);
                 for (int i = 0; i < allEvals.Count; i++)
                 {
                     SecureFloat threadResult = allEvals[i];
@@ -107,7 +118,7 @@ namespace Blobfish_11
                             result.bestMove = moves[(int)bestMove.getValue()];
                             return result;
                         }
-                        Thread.Sleep(sleepTime);
+                        Thread.Sleep(this.Data.SleepTime);
                         i--;
                     }
                     else
@@ -153,11 +164,11 @@ namespace Blobfish_11
             if (depth <= 0 && !forceBranching)
                 return numericEval(pos);
 
-            if (depth <= -maximumDepth) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
+            if (depth <= -this.Data.MaximumDepth) //Maximalt antal forcerande drag som får ta plats i slutet av en variant.
             {
                 return numericEval(pos);
             }
-            List<Move> moves = allValidMoves(pos, true);
+            List<Move> moves = PieceMovementHandler.AllValidMoves(pos, true);
             if (moves.Count == 0)
                 return numericEval(decisiveResult(pos, moves));
 
@@ -226,6 +237,24 @@ namespace Blobfish_11
                 return value;
             }
         }
+        private float EvaluateFinalMove(Position pos, float currentEvaluation, Move move)
+        {
+            if (move.isCapture(pos.board)
+                || move is Castle
+                || move is Promotion
+                || move.from.Equals(pos.kingPositions[0]) //TODO: Effetivisera för fler typer av drag?
+                || move.from.Equals(pos.kingPositions[1])
+            )
+            {
+                return numericEval(pos); //Det långsamma sättet, men som alltid fungerar.
+            }
+            else
+            {
+                Piece movedPiece = pos[move.from];
+                //Beräkna skillnaden som draget gör på ställningen.
+                return numericEval(pos);
+            }
+        }
         public float numericEval(Position pos)
         {
             /* 
@@ -251,13 +280,13 @@ namespace Blobfish_11
                         case Piece.Pawn:
                             numberOfPawns[0]++;
                             pawns[0, line]++;
-                            pawnPosFactor[0] += pawn[0, rank, line];
+                            pawnPosFactor[0] += this.Data.Pawn[0, rank, line];
                             break;
 
                         case (Piece.Pawn | Piece.White):
                             numberOfPawns[1]++;
                             pawns[1, line]++;
-                            pawnPosFactor[1] += pawn[1, rank, line];
+                            pawnPosFactor[1] += this.Data.Pawn[1, rank, line];
                             break;
                     }
                 }
@@ -276,15 +305,15 @@ namespace Blobfish_11
                     switch (board[rank, line])
                     {
                         case Piece.Knight:
-                            pieceValue -= pieceValues[1] * knight[rank, line];
+                            pieceValue -= this.Data.PieceValues[1] * this.Data.Knight[rank, line];
                             heavyMaterial[0] += 3;
                             break;
                         case (Piece.Knight | Piece.White):
-                            pieceValue += pieceValues[1] * knight[rank, line];
+                            pieceValue += this.Data.PieceValues[1] * this.Data.Knight[rank, line];
                             heavyMaterial[1] += 3;
                             break;
                         case Piece.Bishop:
-                            pieceValue -= pieceValues[2] * bishop[rank, line];
+                            pieceValue -= this.Data.PieceValues[2] * this.Data.Bishop[rank, line];
                             heavyMaterial[0] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[2] = true; //Svart löpare på vitt fält
@@ -292,7 +321,7 @@ namespace Blobfish_11
                                 bishopColors[3] = true; //Svart löpare på svart fält
                             break;
                         case (Piece.Bishop | Piece.White):
-                            pieceValue += pieceValues[2] * bishop[rank, line];
+                            pieceValue += this.Data.PieceValues[2] * this.Data.Bishop[rank, line];
                             heavyMaterial[1] += 3;
                             if ((rank + line) % 2 == 0)
                                 bishopColors[0] = true; //Vit löpare på vitt fält
@@ -301,32 +330,32 @@ namespace Blobfish_11
                             break;
 
                         case Piece.Rook:
-                            float val = pieceValues[3] * rook[rank, line];
+                            float val = this.Data.PieceValues[3] * this.Data.Rook[rank, line];
                             if(pawns[0, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
                             {
                                 if(pawns[1, line] == 0)
                                 {
-                                    val *= rookOnOpenLineCoefficient;
+                                    val *= this.Data.RookOnOpenLineCoefficient;
                                 }
                                 else
                                 {
-                                    val *= rookOnSemiOpenLineCoefficient;
+                                    val *= this.Data.RookOnSemiOpenLineCoefficient;
                                 }
                             }
                             pieceValue -= val;
                             heavyMaterial[0] += 5;
                             break;
                         case (Piece.Rook | Piece.White):
-                            val = pieceValues[3] * rook[rank, line];
+                            val = this.Data.PieceValues[3] * this.Data.Rook[rank, line];
                             if (pawns[1, line] == 0) //Om tornet står på en öppen eller halvöppen linje.
                             {
                                 if (pawns[0, line] == 0)
                                 {
-                                    val *= rookOnOpenLineCoefficient;
+                                    val *= this.Data.RookOnOpenLineCoefficient;
                                 }
                                 else
                                 {
-                                    val *= rookOnSemiOpenLineCoefficient;
+                                    val *= this.Data.RookOnSemiOpenLineCoefficient;
                                 }
                             }
                             pieceValue += val;
@@ -334,11 +363,11 @@ namespace Blobfish_11
                             break;
                         
                         case Piece.Queen:
-                            pieceValue -= pieceValues[4] * queen[rank, line];
+                            pieceValue -= this.Data.PieceValues[4] * this.Data.Queen[rank, line];
                             heavyMaterial[0] += 9;
                             break;
                         case (Piece.Queen | Piece.White):
-                            pieceValue += pieceValues[4] * queen[rank, line];
+                            pieceValue += this.Data.PieceValues[4] * this.Data.Queen[rank, line];
                             heavyMaterial[1] += 9;
                             break;
                         default:
@@ -352,11 +381,11 @@ namespace Blobfish_11
 
             if (bishopColors[0] && bishopColors[1])
             {
-                pieceValue += bishopPairValue;
+                pieceValue += this.Data.BishopPairValue;
             }
             if (bishopColors[2] && bishopColors[3])
             {
-                pieceValue -= bishopPairValue;
+                pieceValue -= this.Data.BishopPairValue;
             }
 
             for (sbyte i = 0; i < 2; i++)
@@ -366,8 +395,8 @@ namespace Blobfish_11
                 else
                     pawnPosFactor[i] /= numberOfPawns[i];
             }
-            float pawnValue = pieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
-            float toMoveAdvantage = toMoveValue * (pos.whiteToMove ? 1 : -1);
+            float pawnValue = this.Data.PieceValues[0] * evalPawns(numberOfPawns, pawnPosFactor, pawns);
+            float toMoveAdvantage = this.Data.ToMoveValue * (pos.whiteToMove ? 1 : -1);
             return pieceValue + pawnValue + kingSafteyDifference + toMoveAdvantage;
         }
         private float numericEval(GameResult gr)
@@ -397,28 +426,28 @@ namespace Blobfish_11
                     {
                         continue;
                     }
-                    float defCoeff = defence[2-i, j + 2];
+                    float defCoeff = this.Data.Defence[2-i, j + 2];
                     float finDefValue = defValue * defCoeff;
 
                     defenceAccumulator += finDefValue;
                 }
             }
-            if(defenceAccumulator > safteySoftCap)
+            if(defenceAccumulator > this.Data.SafteySoftCap)
             {
                 //Halverar nyttan av kungsförsvar efter en viss gräns.
-                defenceAccumulator -= (defenceAccumulator - safteySoftCap) / 2;
+                defenceAccumulator -= (defenceAccumulator - this.Data.SafteySoftCap) / 2;
             }
-            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - endgameLimit)* kingSafteyCoefficient) /200f;
+            float safteyValue = (defenceAccumulator * (oppHeavyMaterial - this.Data.EndgameLimit) * this.Data.KingSafteyCoefficient) /200f;
 
             float kingCoefficient;
-            if (oppHeavyMaterial > endgameLimit)
+            if (oppHeavyMaterial > this.Data.EndgameLimit)
             {
-                kingCoefficient =   king[0, kingSquare.rank, kingSquare.line];
+                kingCoefficient = this.Data.King[0, kingSquare.rank, kingSquare.line];
             }
             else
             {
-                kingCoefficient =  king[1, kingSquare.rank, kingSquare.line];
-                return kingCoefficient * kingValue;
+                kingCoefficient = this.Data.King[1, kingSquare.rank, kingSquare.line];
+                return kingCoefficient * this.Data.KingValue;
             }
             return kingCoefficient * safteyValue;
         }
@@ -428,11 +457,11 @@ namespace Blobfish_11
             piece = piece.AsBlack();
             switch (piece)
             {
-                case Piece.Pawn: return pieceDefenceValues[0];
-                case Piece.Knight: return pieceDefenceValues[1];
-                case Piece.Bishop: return pieceDefenceValues[2];
-                case Piece.Rook: return pieceDefenceValues[3];
-                case Piece.Queen: return pieceDefenceValues[4];
+                case Piece.Pawn: return this.Data.PieceDefenceValues[0];
+                case Piece.Knight: return this.Data.PieceDefenceValues[1];
+                case Piece.Bishop: return this.Data.PieceDefenceValues[2];
+                case Piece.Rook: return this.Data.PieceDefenceValues[3];
+                case Piece.Queen: return this.Data.PieceDefenceValues[4];
                 case Piece.King: return 0;
                 default: 
                     throw new Exception("Okänd pjäs!");
@@ -468,7 +497,7 @@ namespace Blobfish_11
                     if (pawns[c, 6] > 0) neighbours += pawns[c, 7];
                 }
                 
-                pawnValues[c] = precomputedPawnValues[numberOfPawns[c], neighbours + lines];
+                pawnValues[c] = this.Data.PrecomputedPawnValues[numberOfPawns[c], neighbours + lines];
                 pawnValues[c] *= posFactor[c];
             }
             return pawnValues[1] - pawnValues[0];
@@ -578,7 +607,7 @@ namespace Blobfish_11
         private int automaticDepth(Position pos)
         {
             double materialSum = 0;
-            double weightForPawnOnLastRank = calculationWeights[4] * 0.75f;
+            double weightForPawnOnLastRank = this.Data.CalculationWeights[4] * 0.75f;
 
             for (int rank = 0; rank < 8; rank++)
             {
@@ -594,22 +623,22 @@ namespace Blobfish_11
                         }
                         else
                         {
-                            materialSum += calculationWeights[0];
+                            materialSum += this.Data.CalculationWeights[0];
                         }
                     }
                     else if (piece.Is(Piece.Knight))
-                        materialSum += calculationWeights[1];
+                        materialSum += this.Data.CalculationWeights[1];
                     else if (piece.Is(Piece.Bishop))
-                        materialSum += calculationWeights[2];
+                        materialSum += this.Data.CalculationWeights[2];
                     else if (piece.Is(Piece.Rook))
-                        materialSum += calculationWeights[3];
+                        materialSum += this.Data.CalculationWeights[3];
                     if (piece.Is(Piece.Queen))
-                        materialSum += calculationWeights[4];
+                        materialSum += this.Data.CalculationWeights[4];
                 }
             }
             if (materialSum < 11)
                 return 7;
-            else if (materialSum <= calculationWeights[4])
+            else if (materialSum <= this.Data.CalculationWeights[4])
                 return 6;
             else if (materialSum < 25)
                 return 5;

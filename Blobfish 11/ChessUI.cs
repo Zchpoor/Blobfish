@@ -120,7 +120,7 @@ namespace Blobfish_11
             updateExtraInfoTextBox();
             toMoveLabel.Text = pos.whiteToMove ? "Vit vid draget." : "Svart vid draget.";
 
-            currentMoves = blobFish.allValidMoves(pos, false);
+            currentMoves = PieceMovementHandler.AllValidMoves(pos, false);
 
             for (int i = 0; i < 8; i++)
             {
@@ -182,7 +182,7 @@ namespace Blobfish_11
         {
             if (!ponderingWorker.IsBusy)
             {
-                blobFish = choosePlayingStyle();
+                blobFish.Data = choosePlayingStyle();
                 ponderingTime = new TimeSpan(0);
                 ponderingTimeLabel.Text = ponderingTime.ToString(@"mm\:ss");
                 computerMoveStatusLabel.Text = "";

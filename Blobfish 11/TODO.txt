@@ -27,7 +27,6 @@ Effektiviseringar:
 	Bli av med delegates?
 	Går det att cacha/förberäkna på fler ställen?
 	Går det att utnyttja att den nya ställingen beräknas samtidigt som dragen?
-	Bli av med RookSquares() och BishopSquares()?
    
 Förbättringar:
 	Dragupprepningar
@@ -39,4 +38,3 @@ Förbättringar:
 	Variera värdet av att vara vid draget.
    
 Buggar:
-	Dubbelkolla PGN-utskrift.

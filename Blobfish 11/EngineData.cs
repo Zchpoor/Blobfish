@@ -7,74 +7,50 @@ using System.Windows.Forms;
 
 namespace Blobfish_11
 {
-    public partial class Engine
+    public class EngineData
     {
         //Pjäsernas grundvärde.
-        readonly float[] pieceValues = { 1, 3, 3, 5, 9 };
-        readonly float kingValue = 4f;
+        private readonly float[] pieceValues = { 1, 3, 3, 5, 9 };
+        private readonly float kingValue = 4f;
 
         //Löparparets egenvärde.
-        readonly float bishopPairValue = 0.4f;
+        private readonly float bishopPairValue = 0.4f;
 
-        readonly float rookOnSemiOpenLineCoefficient = 1.08f;
-        readonly float rookOnOpenLineCoefficient = 1.11f;
+        private const float rookOnSemiOpenLineCoefficient = 1.08f;
+        private const float rookOnOpenLineCoefficient = 1.11f;
 
         //Värdet av att vara vid draget när en variant slutar.
-        readonly float toMoveValue = 0.25f;
+        private readonly float toMoveValue = 0.25f;
 
         //Förberäknade värden på bönderna utifrån formeln för bondeevaluering.
         //Gör denna till readonly när detta gjorts till egen klass.
-        float[,] precomputedPawnValues;
+        public virtual float[,] PrecomputedPawnValues { get; private set; }
 
         //Pjäsernas försvarsvärde.
-        readonly float[] pieceDefenceValues = { 1, 1.5f, 1.2f, 0.4f, 0.1f };
+        private readonly float[] pieceDefenceValues = { 1, 1.5f, 1.2f, 0.4f, 0.1f };
 
         //Gränsen efter vilken försvarsnyttan halveras.
-        readonly float safteySoftCap = 4f;
-        readonly float kingSafteyCoefficient = 1;
+        private const float safteySoftCap = 4f;
+        private const float kingSafteyCoefficient = 1;
 
         //Partiet anses ha gått in i slutspel omm värdet av motståndarens 
         //tunga pjäser uppgår till mindre än eller lika med endgameLimit.
-        readonly int endgameLimit = 8;
-        readonly int sleepTime = 100;
+        private const int endgameLimit = 8;
+        private const int sleepTime = 100;
 
         //Uppskattning av hur mycket pjäserna bidrar till beräkningstid.
-        readonly double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBRQ
+        private readonly double[] calculationWeights = { 1, 4, 6, 7, 20 }; //PNBRQ
 
         //För vart och ett av talen som är större än antalet drag i ställningen så
         //ökas djupet med ett. Talen bör vara i minskande ordning.
         //Till exempel: {20, 8, 2}
-        readonly int[] moveIncreaseLimits = {};
+        private readonly int[] moveIncreaseLimits = { };
 
         //Maximalt djup en variant kan beräknas efter minDepth uppnåtts.
-        readonly int maximumDepth = 8;
+        private readonly int maximumDepth = 8;
 
-        public Engine()
+        public EngineData()
         {
-            fillPrecomputedPawnValues();
-        }
-        public Engine(int[] moveIncreaseLimits)
-        {
-            this.moveIncreaseLimits = moveIncreaseLimits;
-            fillPrecomputedPawnValues();
-        }
-        public Engine(float[] pieceValues, float bishopPairValue, float[] defenceValues,
-            int endgameLimit, float kingSafteyCoefficient, float safteySoftCap, 
-            int[] moveIncreaseLimits, float toMoveValue)
-        {
-            if (pieceValues.Length != 5)
-                throw new Exception("Fel längd på pjäsvärdesvektorn!");
-            this.pieceValues = pieceValues;
-            //this.kingValue = kingValue;
-            this.bishopPairValue = bishopPairValue;
-            if (defenceValues.Length != 5)
-                throw new Exception("Fel längd på försvarsvärdesvektorn!");
-            this.pieceDefenceValues = defenceValues;
-            this.safteySoftCap = safteySoftCap;
-            this.kingSafteyCoefficient = kingSafteyCoefficient;
-            this.endgameLimit = endgameLimit;
-            this.moveIncreaseLimits = moveIncreaseLimits;
-            this.toMoveValue = toMoveValue;
             fillPrecomputedPawnValues();
         }
 
@@ -84,7 +60,7 @@ namespace Blobfish_11
             //Summan av antal grannar och antalet linjer som bönderna står på bör inte kunna överskridas i ett vanligt parti.
             int maxNeighbourLineSum = 22;
 
-            this.precomputedPawnValues = new float[maxNumberOfPawns+1, maxNeighbourLineSum+1];
+            this.PrecomputedPawnValues = new float[maxNumberOfPawns+1, maxNeighbourLineSum+1];
 
             for (int numberOfPawns = 0; numberOfPawns <= maxNumberOfPawns; numberOfPawns++)
             {
@@ -92,13 +68,12 @@ namespace Blobfish_11
                 {
                     float pawnValue = ((numberOfPawns * (neighbourLineSum + 41)) + 9.37f) / 64;
                     //e(p,s)=(p(s+41)+9,37)/64. TODO: Förbättra formel
-                    this.precomputedPawnValues[numberOfPawns, neighbourLineSum] = pawnValue;
+                    this.PrecomputedPawnValues[numberOfPawns, neighbourLineSum] = pawnValue;
                 }
             }
         }
 
-        
-        private static readonly float[,,] pawn =
+        private readonly float[,,] pawn =
         {
             { //Svarta bönder
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }, //8
@@ -121,7 +96,7 @@ namespace Blobfish_11
                 { 0f,    0f,    0f,    0f,   0f,   0f,    0f,    0f    }  //1
             }
         };
-        private static readonly float[,] knight =
+        private readonly float[,] knight =
         {
             {0.89f,    0.95f,    0.97f,    0.98f,    0.98f,    0.97f,    0.95f,    0.89f },
             {0.95f,    0.98f,    1f,       1.02f,    1.02f,    1f,       0.98f,    0.95f },
@@ -131,8 +106,8 @@ namespace Blobfish_11
             {0.97f,    1f,       1.05f,    1.07f,    1.07f,    1.05f,    1f,       0.97f },
             {0.95f,    0.98f,    1f,       1.02f,    1.02f,    1f,       0.98f,    0.95f },
             {0.89f,    0.95f,    0.97f,    0.98f,    0.98f,    0.97f,     0.95f,    0.89f }
-        };                               
-        private static readonly float[,] bishop =
+        };
+        private readonly float[,] bishop =
         {
             {1f,    0.97f, 0.94f, 0.92f, 0.92f, 0.94f, 0.97f, 1f    },
             {0.97f, 1.02f, 0.98f, 0.96f, 0.96f, 0.98f, 1.02f, 0.97f },
@@ -143,7 +118,7 @@ namespace Blobfish_11
             {0.97f, 1.02f, 0.98f, 0.96f, 0.96f, 0.98f, 1.02f, 0.97f },
             {1f,    0.97f, 0.94f, 0.92f, 0.92f, 0.94f, 0.97f, 1f    }
         };
-        private static readonly float[,] rook =
+        private readonly float[,] rook =
         {
             {1.01f, 1.02f, 1.04f, 1.06f, 1.06f, 1.04f, 1.02f, 1.01f },
             {1.02f, 0.99f, 0.98f, 1f,    1f,    0.98f, 0.99f, 1.02f },
@@ -154,7 +129,7 @@ namespace Blobfish_11
             {1.02f, 0.99f, 0.98f, 1f,    1f,    0.98f, 0.99f, 1.02f },
             {1.01f, 1.02f, 1.04f, 1.06f, 1.06f, 1.04f, 1.02f, 1.01f }
         };
-        private static readonly float[,] queen =
+        private readonly float[,] queen =
         {
             {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f},
             {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
@@ -165,7 +140,7 @@ namespace Blobfish_11
             {0.993f, 0.997f, 1.000f, 1.003f, 1.003f, 1.000f, 0.997f, 0.993f},
             {0.990f, 0.993f, 0.997f, 1.000f, 1.000f, 0.997f, 0.993f, 0.990f}
         };
-        private static readonly float[,,] king =
+        private readonly float[,,] king =
         {
            { //Ej slutspel
                 {2f,   1.9f,  1.4f,  1f,    1f,    1.4f,  1.9f,  2f   },
@@ -178,9 +153,6 @@ namespace Blobfish_11
                 {2f,   1.9f,  1.4f,  1f,    1f,    1.4f,  1.9f,  2f   }
             },
 
-
-
-
             { //Slutspel
                 {0.91f,   0.93f,    0.95f,    0.96f,    0.96f,    0.95f,    0.93f,    0.91f, },
                 {0.93f,   0.98f,    1f,       1.03f,    1.03f,    1f,       0.98f,    0.93f, },
@@ -192,12 +164,35 @@ namespace Blobfish_11
                 {0.91f,   0.93f,    0.95f,    0.96f,    0.96f,    0.95f,    0.93f,    0.91f, }
             }
         };
-
-        private static readonly float[,] defence =
+        private readonly float[,] defence =
         {
             {0.25f,  0.6f, 0.8f,   0.6f, 0.25f,},
             {0.2f,   1.3f, 1.4f, 1.3f, 0.2f, },
             {0.1f,   1f,   0f,   1f,   0.1f, }
         };
+
+        public virtual float[] PieceValues => pieceValues;
+        public virtual float KingValue => kingValue;
+        public virtual float BishopPairValue => bishopPairValue;
+        public virtual float RookOnSemiOpenLineCoefficient => rookOnSemiOpenLineCoefficient;
+        public virtual float RookOnOpenLineCoefficient => rookOnOpenLineCoefficient;
+        public virtual float ToMoveValue => toMoveValue;
+        public virtual float[] PieceDefenceValues => pieceDefenceValues;
+        public virtual float SafteySoftCap => safteySoftCap;
+        public virtual float KingSafteyCoefficient => kingSafteyCoefficient;
+        public virtual int EndgameLimit => endgameLimit;
+        public virtual int SleepTime => sleepTime;
+        public virtual double[] CalculationWeights => calculationWeights;
+        public virtual int[] MoveIncreaseLimits => moveIncreaseLimits;
+        public virtual int MaximumDepth => maximumDepth;
+
+        public virtual float[,,] Pawn => pawn;
+        public virtual float[,] Knight => knight;
+        public virtual float[,] Bishop => bishop;
+        public virtual float[,] Rook => rook;
+        public virtual float[,] Queen => queen;
+        public virtual float[,,] King => king;
+        public virtual float[,] Defence => defence;
+
     }
 }

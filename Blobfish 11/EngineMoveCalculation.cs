@@ -207,6 +207,8 @@ namespace Blobfish_11
                 }
             }
         }
+
+        //Public för att kunna användas i Move. Bör hitta smidigare lösning för detta.
         public static void foreachKnightSquare(Position pos, Square pieceSquare, functionByPiece callback)
         {
             Square currentSquare = new Square();
